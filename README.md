@@ -1,30 +1,20 @@
-# Ethical Hacking Roadmap Dashboard
+# E-HACER | Cybersecurity Specialization Dashboard
 
-A modern, responsive dashboard to track your learning journey in ethical hacking, manage wargame progress, and organize essential cybersecurity resources.
+A modern, premium, responsive dashboard to track your learning specialization pathways, manage project completion status, and organize essential cybersecurity resources.
 
 ## Features
 
-- **Progress Tracking**: Monitor your completion status for different learning stages.
-- **CTF Simulator**: An integrated terminal sandbox to practice command-line skills and solve CTF-style challenges.
-- **Focus Tools**: Pomodoro timer and exam countdown to optimize your study sessions.
-- **Resource Management**: Curated list of tools and YouTube channels for ethical hacking.
+- **Cybersecurity Specialization Swapper**: Dynamically filter and focus stages, tools, and projects based on target domains (e.g. Web Pentesting, Infrastructure Audit, Malware Analysis, SOC Defense).
+- **Progress Tracking**: Monitor stage-wise competency checklist status.
+- **Study Planner & Notepad**: Schedule study timelines and write persistent notes.
+- **Focus Tools**: Pomodoro focus timer and exam countdown widgets.
+- **Resource Libraries**: Extensive databases for search filters covering tools, GitHub scripts, cheat sheets, and channels.
 
 ## Technologies
 
-- **Frontend**: HTML5, Vanilla CSS (utilizing Flexbox & Grid for responsive layout), Vanilla JavaScript.
-- **Persistence**: Browser `localStorage` is used to save progress, study notes, and CTF challenge states locally.
+- **Frontend**: HTML5, Vanilla CSS, Vanilla JavaScript.
+- **Persistence**: Browser `localStorage` is used to save progress and study planner states locally.
 
 ## Setup
 
-No complex setup is required. This project is built using vanilla web technologies.
-
-1.  Clone this repository.
-2.  Open `ethical_hacker_roadmap.html` directly in your web browser.
-
-## Contributing
-
-Contributions are welcome! Please feel free to open issues for bugs or feature requests, or submit pull requests for enhancements.
-
-## License
-
-This project is open-source and available under the MIT License.
+1. Open `index.html` directly in your web browser.
