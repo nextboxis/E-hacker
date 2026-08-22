@@ -33,14 +33,14 @@ export default function OverviewTab() {
                     </div>
 
                     <div className="mt-20 flex-gap-10">
-                        <button className="site-btn" onClick={() => { setActiveTab('projects'); playChime(); }}>🚀 Explore 100 Labs</button>
-                        <button className="site-btn tool-btn secondary-btn" onClick={() => { setActiveTab('python'); playChime(); }}>🐍 Python Cyber Lab</button>
-                        <button className="site-btn tool-btn" onClick={() => { setActiveTab('toolkit'); playChime(); }}>🛠️ Cyber Toolkit</button>
+                        <button className="site-btn" onClick={() => { setActiveTab('projects'); playChime(); }}> Explore 100 Labs</button>
+                        <button className="site-btn tool-btn secondary-btn" onClick={() => { setActiveTab('python'); playChime(); }}> Python Cyber Lab</button>
+                        <button className="site-btn tool-btn" onClick={() => { setActiveTab('toolkit'); playChime(); }}>️ Cyber Toolkit</button>
                     </div>
                 </div>
 
                 <div className="glass-card">
-                    <h3 className="tool-section-title">⚡ Quick Access Modules</h3>
+                    <h3 className="tool-section-title"> Quick Access Modules</h3>
                     <div className="ir-steps-list mt-15">
                         <li><strong>Project Hub:</strong> 100 real-world vulnerability exploitation & defense labs.</li>
                         <li><strong>AI Security Hub:</strong> Synthesize Sigma rules, YARA signatures, and deobfuscate payloads.</li>

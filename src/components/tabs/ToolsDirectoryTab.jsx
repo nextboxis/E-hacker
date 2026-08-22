@@ -56,22 +56,22 @@ export default function ToolsDirectoryTab() {
                     </div>
                     <div className="ai-nav-chips">
                         <button className={'ai-nav-btn ' + (subTab === 'tools' ? 'active' : '')} onClick={() => { setSubTab('tools'); playChime(); }}>
-                            🛠️ Security Tools ({TOOLS_DATABASE.length})
+                            ️ Security Tools ({TOOLS_DATABASE.length})
                         </button>
                         <button className={'ai-nav-btn ' + (subTab === 'platforms' ? 'active' : '')} onClick={() => { setSubTab('platforms'); playChime(); }}>
-                            🎯 Practice Wargames ({PRACTICE_PLATFORMS.length})
+                             Practice Wargames ({PRACTICE_PLATFORMS.length})
                         </button>
                         <button className={'ai-nav-btn ' + (subTab === 'standards' ? 'active' : '')} onClick={() => { setSubTab('standards'); playChime(); }}>
-                            📜 Standards & Payloads ({STANDARDS_AND_CHEATSHEETS.length})
+                             Standards & Payloads ({STANDARDS_AND_CHEATSHEETS.length})
                         </button>
                         <button className={'ai-nav-btn ' + (subTab === 'pdfs' ? 'active' : '')} onClick={() => { setSubTab('pdfs'); playChime(); }}>
-                            📑 PDF Manuals ({PDF_CHEAT_SHEETS.length})
+                             PDF Manuals ({PDF_CHEAT_SHEETS.length})
                         </button>
                         <button className={'ai-nav-btn ' + (subTab === 'osint' ? 'active' : '')} onClick={() => { setSubTab('osint'); playChime(); }}>
-                            🛰️ OSINT Suite ({OSINT_TOOLS.length})
+                            ️ OSINT Suite ({OSINT_TOOLS.length})
                         </button>
                         <button className={'ai-nav-btn ' + (subTab === 'channels' ? 'active' : '')} onClick={() => { setSubTab('channels'); playChime(); }}>
-                            📺 YouTube Mentors ({CHANNELS_DATABASE.length})
+                             YouTube Mentors ({CHANNELS_DATABASE.length})
                         </button>
                     </div>
                 </div>
@@ -128,9 +128,9 @@ export default function ToolsDirectoryTab() {
 
                             <div className="project-card-footer flex-wrap gap-8">
                                 <div className="flex-gap-10 align-center flex-wrap">
-                                    <a href={t.link} target="_blank" rel="noopener noreferrer" className="table-action-link" title="Visit Official Website">🌐 Portal</a>
+                                    <a href={t.link} target="_blank" rel="noopener noreferrer" className="table-action-link" title="Visit Official Website"> Portal</a>
                                     {t.github && (
-                                        <a href={t.github} target="_blank" rel="noopener noreferrer" className="table-action-link" style={{ color: '#a855f7' }} title="View GitHub Repository">🐙 GitHub</a>
+                                        <a href={t.github} target="_blank" rel="noopener noreferrer" className="table-action-link" style={{ color: '#a855f7' }} title="View GitHub Repository"> GitHub</a>
                                     )}
                                     {t.youtube && (
                                         <a href={t.youtube} target="_blank" rel="noopener noreferrer" className="table-action-link" style={{ color: '#f43f5e' }} title="Watch Video Tutorials on YouTube">▶ YouTube</a>
@@ -144,7 +144,7 @@ export default function ToolsDirectoryTab() {
                                         className="channel-badge"
                                         style={{ background: 'rgba(6, 182, 212, 0.15)', color: '#06b6d4', borderColor: 'rgba(6, 182, 212, 0.3)' }}
                                     >
-                                        📄 Cheat Sheet
+                                         Cheat Sheet
                                     </a>
                                 )}
                             </div>
@@ -169,7 +169,7 @@ export default function ToolsDirectoryTab() {
                             </div>
                             <div className="project-card-footer">
                                 <a href={p.link} target="_blank" rel="noopener noreferrer" className="site-btn" style={{ fontSize: '0.82rem', padding: '6px 14px' }}>
-                                    🚀 Launch Lab Portal ↗
+                                     Launch Lab Portal ↗
                                 </a>
                             </div>
                         </div>
@@ -207,13 +207,13 @@ export default function ToolsDirectoryTab() {
                     <div className="glass-card mb-20" style={{ background: 'rgba(6, 182, 212, 0.04)', borderColor: 'rgba(6, 182, 212, 0.2)' }}>
                         <div className="flex-space-between-center flex-wrap gap-10">
                             <div>
-                                <h3 style={{ color: '#06b6d4' }}>📑 18 Curated Cybersecurity PDF Cheat Sheets</h3>
+                                <h3 style={{ color: '#06b6d4' }}> 18 Curated Cybersecurity PDF Cheat Sheets</h3>
                                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
                                     Offline field manuals with verified command line flags, protocol dissections, and memory forensics cheat sheets.
                                 </p>
                             </div>
                             <span className="channel-badge" style={{ background: 'rgba(0, 255, 102, 0.15)', color: '#00ff66', borderColor: '#00ff66' }}>
-                                ✓ 18/18 PDFs Ready
+                                 18/18 PDFs Ready
                             </span>
                         </div>
                     </div>
@@ -223,7 +223,7 @@ export default function ToolsDirectoryTab() {
                             <div key={idx} className="project-card" style={{ background: 'rgba(13, 20, 36, 0.75)' }}>
                                 <div>
                                     <div className="project-card-header">
-                                        <span className="project-card-num" style={{ color: '#f43f5e' }}>📄 PDF</span>
+                                        <span className="project-card-num" style={{ color: '#f43f5e' }}> PDF</span>
                                         <span className="channel-badge" style={{ fontSize: '0.72rem' }}>{p.size}</span>
                                     </div>
                                     <h3 className="project-card-title">{p.name}</h3>
@@ -239,7 +239,7 @@ export default function ToolsDirectoryTab() {
                                         className="site-btn tool-btn"
                                         style={{ fontSize: '0.82rem', padding: '6px 12px' }}
                                     >
-                                        👁️ View PDF
+                                        ️ View PDF
                                     </a>
                                     <a
                                         href={'/pdfs/' + p.file}
@@ -247,7 +247,7 @@ export default function ToolsDirectoryTab() {
                                         className="site-btn"
                                         style={{ fontSize: '0.82rem', padding: '6px 14px' }}
                                     >
-                                        💾 Download
+                                         Download
                                     </a>
                                 </div>
                             </div>
@@ -272,9 +272,9 @@ export default function ToolsDirectoryTab() {
 
                             <div className="project-card-footer">
                                 <div className="flex-gap-10 align-center flex-wrap">
-                                    <a href={o.link} target="_blank" rel="noopener noreferrer" className="table-action-link">🌐 Portal</a>
+                                    <a href={o.link} target="_blank" rel="noopener noreferrer" className="table-action-link"> Portal</a>
                                     {o.github && (
-                                        <a href={o.github} target="_blank" rel="noopener noreferrer" className="table-action-link" style={{ color: '#a855f7' }}>🐙 GitHub</a>
+                                        <a href={o.github} target="_blank" rel="noopener noreferrer" className="table-action-link" style={{ color: '#a855f7' }}> GitHub</a>
                                     )}
                                     {o.youtube && (
                                         <a href={o.youtube} target="_blank" rel="noopener noreferrer" className="table-action-link" style={{ color: '#f43f5e' }}>▶ YouTube</a>
@@ -318,7 +318,7 @@ export default function ToolsDirectoryTab() {
                                         className="table-action-link"
                                         style={{ color: '#a855f7' }}
                                     >
-                                        🐙 GitHub
+                                         GitHub
                                     </a>
                                 )}
                             </div>

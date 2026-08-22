@@ -208,16 +208,16 @@ export default function DatabaseTab() {
 
                     <div className="ai-nav-chips">
                         <button className={'ai-nav-btn ' + (subTab === 'targets' ? 'active' : '')} onClick={() => { setSubTab('targets'); playChime(); }}>
-                            🎯 Target Assets ({targets.length})
+                             Target Assets ({targets.length})
                         </button>
                         <button className={'ai-nav-btn ' + (subTab === 'findings' ? 'active' : '')} onClick={() => { setSubTab('findings'); playChime(); }}>
-                            ⚡ Vulnerabilities ({findings.length})
+                             Vulnerabilities ({findings.length})
                         </button>
                         <button className={'ai-nav-btn ' + (subTab === 'notes' ? 'active' : '')} onClick={() => { setSubTab('notes'); playChime(); }}>
-                            📝 Field Notes
+                             Field Notes
                         </button>
                         <button className={'ai-nav-btn ' + (subTab === 'backup' ? 'active' : '')} onClick={() => { setSubTab('backup'); playChime(); }}>
-                            💾 Backup & Sync
+                             Backup & Sync
                         </button>
                     </div>
                 </div>
@@ -233,12 +233,12 @@ export default function DatabaseTab() {
                     />
                     <div className="flex-gap-10">
                         {subTab === 'targets' && (
-                            <button className="site-btn" onClick={handleAddTarget}>➕ Add Target Asset</button>
+                            <button className="site-btn" onClick={handleAddTarget}> Add Target Asset</button>
                         )}
                         {subTab === 'findings' && (
-                            <button className="site-btn" onClick={handleAddFinding}>➕ Log Vulnerability</button>
+                            <button className="site-btn" onClick={handleAddFinding}> Log Vulnerability</button>
                         )}
-                        <button className="site-btn tool-btn secondary-btn" onClick={handleExportDB}>💾 Quick JSON Backup</button>
+                        <button className="site-btn tool-btn secondary-btn" onClick={handleExportDB}> Quick JSON Backup</button>
                     </div>
                 </div>
             </div>
@@ -317,9 +317,9 @@ export default function DatabaseTab() {
             {subTab === 'notes' && (
                 <div className="glass-card">
                     <div className="flex-space-between-center mb-10">
-                        <h3 className="tool-section-title">📝 Engagement Scratchpad & Field Notes</h3>
+                        <h3 className="tool-section-title"> Engagement Scratchpad & Field Notes</h3>
                         <span className="channel-badge" style={{ background: 'rgba(0, 255, 102, 0.15)', color: '#00ff66' }}>
-                            ✓ Auto-Saved to Local Storage
+                             Auto-Saved to Local Storage
                         </span>
                     </div>
                     <textarea
@@ -336,7 +336,7 @@ export default function DatabaseTab() {
             {subTab === 'backup' && (
                 <div className="overview-grid">
                     <div className="glass-card">
-                        <h3 className="tool-section-title">💾 Export Complete Database Backup</h3>
+                        <h3 className="tool-section-title"> Export Complete Database Backup</h3>
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '12px 0 20px 0' }}>
                             Download a verified JSON backup containing all target scopes, vulnerability findings, and field notes.
                         </p>
@@ -344,7 +344,7 @@ export default function DatabaseTab() {
                     </div>
 
                     <div className="glass-card">
-                        <h3 className="tool-section-title">📂 Restore Database Backup</h3>
+                        <h3 className="tool-section-title"> Restore Database Backup</h3>
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '12px 0 20px 0' }}>
                             Import an existing .json database file to restore your target records and notes.
                         </p>

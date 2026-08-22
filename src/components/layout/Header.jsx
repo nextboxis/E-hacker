@@ -63,12 +63,12 @@ export default function Header() {
                         onChange={(e) => setActiveDomain(e.target.value)}
                         title="Specialization Focus Track"
                     >
-                        <option value="full">🌐 Full Spectrum</option>
-                        <option value="web">🕷️ Web Pentest</option>
-                        <option value="network">🔌 Infrastructure</option>
-                        <option value="soc">🛡️ SOC Defense</option>
-                        <option value="malware">🔬 Malware / RE</option>
-                        <option value="osint">🔍 OSINT Recon</option>
+                        <option value="full"> Full Spectrum</option>
+                        <option value="web">️ Web Pentest</option>
+                        <option value="network"> Infrastructure</option>
+                        <option value="soc">️ SOC Defense</option>
+                        <option value="malware"> Malware / RE</option>
+                        <option value="osint"> OSINT Recon</option>
                     </select>
                 </div>
 
@@ -106,7 +106,7 @@ export default function Header() {
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         title="Operative Identity & Clearance"
                     >
-                        <div className="operative-avatar-circle">{activeProfile.avatar || '🥷'}</div>
+                        <div className="operative-avatar-circle">{activeProfile.avatar || ''}</div>
                         <div className="operative-details">
                             <span className="operative-callsign">{activeProfile.callsign}</span>
                             <span className="operative-clearance-tag">{activeProfile.clearance}</span>

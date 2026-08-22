@@ -17,7 +17,7 @@ export default function LogoutModal() {
     };
 
     const handleBurn = () => {
-        if (confirm("🔥 CAUTION: This will zeroize all local session cache and reset to default factory state. Proceed?")) {
+        if (confirm(" CAUTION: This will zeroize all local session cache and reset to default factory state. Proceed?")) {
             localStorage.clear();
             window.location.reload();
         }
@@ -36,7 +36,7 @@ export default function LogoutModal() {
 
                 <div className="logout-body">
                     <div className="text-center mb-20">
-                        <div className="logout-powerdown-icon">⚡</div>
+                        <div className="logout-powerdown-icon"></div>
                         <h2 className="logout-title">SESSION TERMINATED</h2>
                         <p className="logout-subtitle">Operative {activeProfile.callsign} // Security Clearance Suspended</p>
                     </div>
@@ -51,10 +51,10 @@ export default function LogoutModal() {
                             <div className="deauth-progress-fill"></div>
                         </div>
                         <div className="deauth-log-stream mt-10">
-                            <div className="deauth-log-line">✓ [SYS] Revoking active JWT & REST session tokens...</div>
-                            <div className="deauth-log-line">✓ [CRYPTO] Zeroizing memory buffers & ephemeral keys...</div>
-                            <div className="deauth-log-line">✓ [CACHE] Flushing temporary forensic telemetry...</div>
-                            <div className="deauth-log-line deauth-success-line">✓ [AUTH] Clearance channel decommissioned safely.</div>
+                            <div className="deauth-log-line"> [SYS] Revoking active JWT & REST session tokens...</div>
+                            <div className="deauth-log-line"> [CRYPTO] Zeroizing memory buffers & ephemeral keys...</div>
+                            <div className="deauth-log-line"> [CACHE] Flushing temporary forensic telemetry...</div>
+                            <div className="deauth-log-line deauth-success-line"> [AUTH] Clearance channel decommissioned safely.</div>
                         </div>
                     </div>
 
@@ -83,9 +83,9 @@ export default function LogoutModal() {
 
                     {/* Action Buttons */}
                     <div className="logout-actions-grid">
-                        <button className="site-btn" onClick={handleReauth}>🔑 Re-Authenticate Callsign</button>
-                        <button className="site-btn tool-btn secondary-btn" onClick={handleSwitch}>👥 Switch Profile</button>
-                        <button className="site-btn tool-btn text-danger" onClick={handleBurn}>🔥 Emergency Clean Burn</button>
+                        <button className="site-btn" onClick={handleReauth}> Re-Authenticate Callsign</button>
+                        <button className="site-btn tool-btn secondary-btn" onClick={handleSwitch}> Switch Profile</button>
+                        <button className="site-btn tool-btn text-danger" onClick={handleBurn}> Emergency Clean Burn</button>
                     </div>
                 </div>
             </div>

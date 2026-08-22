@@ -57,16 +57,16 @@ export default function ToolkitTab() {
                         <p>Zero-dependency client-side cryptographic hashing, multi-format encoders, subnet calculators, and vulnerability analyzers.</p>
                     </div>
                     <div className="ai-nav-chips">
-                        <button className={`ai-nav-btn ${tool === 'hash' ? 'active' : ''}`} onClick={() => setTool('hash')}>🔑 Multi-Hash Generator</button>
-                        <button className={`ai-nav-btn ${tool === 'encoder' ? 'active' : ''}`} onClick={() => setTool('encoder')}>🔄 Security Encoder</button>
-                        <button className={`ai-nav-btn ${tool === 'subnet' ? 'active' : ''}`} onClick={() => setTool('subnet')}>🌐 Subnet & CIDR Calc</button>
+                        <button className={`ai-nav-btn ${tool === 'hash' ? 'active' : ''}`} onClick={() => setTool('hash')}> Multi-Hash Generator</button>
+                        <button className={`ai-nav-btn ${tool === 'encoder' ? 'active' : ''}`} onClick={() => setTool('encoder')}> Security Encoder</button>
+                        <button className={`ai-nav-btn ${tool === 'subnet' ? 'active' : ''}`} onClick={() => setTool('subnet')}> Subnet & CIDR Calc</button>
                     </div>
                 </div>
             </div>
 
             {tool === 'hash' && (
                 <div className="glass-card">
-                    <h3 className="tool-section-title">🔑 Live Multi-Hash Generator & Identifier</h3>
+                    <h3 className="tool-section-title"> Live Multi-Hash Generator & Identifier</h3>
                     <div className="tool-input-group mt-15 mb-15">
                         <label className="tool-input-label">Plaintext Input:</label>
                         <input
@@ -89,7 +89,7 @@ export default function ToolkitTab() {
 
             {tool === 'encoder' && (
                 <div className="glass-card">
-                    <h3 className="tool-section-title">🔄 Multi-Format Security Encoder / Decoder</h3>
+                    <h3 className="tool-section-title"> Multi-Format Security Encoder / Decoder</h3>
                     <div className="flex-gap-10 mt-15 mb-15">
                         {['base64', 'hex', 'url'].map(m => (
                             <button key={m} className={`filter-chip ${encMode === m ? 'active' : ''}`} onClick={() => { setEncMode(m); handleEncode(encInput, m); }}>
@@ -115,7 +115,7 @@ export default function ToolkitTab() {
 
             {tool === 'subnet' && (
                 <div className="glass-card">
-                    <h3 className="tool-section-title">🌐 IPv4 Subnet & CIDR Range Calculator</h3>
+                    <h3 className="tool-section-title"> IPv4 Subnet & CIDR Range Calculator</h3>
                     <div className="overview-grid mt-15 mb-15">
                         <div>
                             <label className="tool-input-label">IP Address:</label>

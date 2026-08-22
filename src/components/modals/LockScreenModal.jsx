@@ -27,14 +27,14 @@ export default function LockScreenModal() {
     return (
         <div className="modal-overlay lock-screen-overlay active">
             <div className="lock-screen-dialog">
-                <div className="lock-icon-glow">🔒</div>
+                <div className="lock-icon-glow"></div>
                 <h2 className="lock-title">WORKSTATION LOCKED</h2>
                 <div className="lock-time-display">{time}</div>
                 <div className="lock-date-display">{date}</div>
 
                 <div className="lock-user-card mt-20">
                     <div className="operative-avatar-circle" style={{ width: '50px', height: '50px', fontSize: '1.5rem' }}>
-                        {activeProfile.avatar || '🥷'}
+                        {activeProfile.avatar || ''}
                     </div>
                     <div>
                         <h4 style={{ color: 'var(--text-primary)', fontSize: '1.1rem' }}>{activeProfile.callsign}</h4>
@@ -61,7 +61,7 @@ export default function LockScreenModal() {
                     style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                     onClick={handleUnlock}
                 >
-                    👆 Touch Biometric Bypass
+                     Touch Biometric Bypass
                 </button>
             </div>
         </div>

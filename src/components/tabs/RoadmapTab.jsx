@@ -17,7 +17,7 @@ export default function RoadmapTab() {
     return (
         <div className="tab-panel active">
             <div className="glass-card mb-20">
-                <h2>🗺️ 6-Stage Cybersecurity Specialization Roadmap</h2>
+                <h2>️ 6-Stage Cybersecurity Specialization Roadmap</h2>
                 <p>Track your progression from computer fundamentals to advanced enterprise red teaming and exploit development. Check off skills as you master them.</p>
             </div>
 

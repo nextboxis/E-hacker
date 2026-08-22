@@ -5,7 +5,7 @@ export const PRACTICE_PLATFORMS = [
         desc: "Free, interactive web security training from the creators of Burp Suite. Covers SQLi, XSS, CSRF, SSRF, OAuth, and business logic flaws.",
         link: "https://portswigger.net/web-security",
         badge: "Free • Best for Web",
-        icon: "🕷️"
+        icon: "️"
     },
     {
         name: "Hack The Box (HTB)",
@@ -13,7 +13,7 @@ export const PRACTICE_PLATFORMS = [
         desc: "Massive online cyber training platform with hundreds of retired and active virtual machines, Pro Labs, and Academy courses.",
         link: "https://www.hackthebox.com",
         badge: "Hands-on VMs",
-        icon: "📦"
+        icon: ""
     },
     {
         name: "TryHackMe (THM)",
@@ -21,7 +21,7 @@ export const PRACTICE_PLATFORMS = [
         desc: "Gamified, browser-based hands-on rooms covering cybersecurity fundamentals, network exploitation, and SOC defense.",
         link: "https://tryhackme.com",
         badge: "Guided Learning",
-        icon: "🎮"
+        icon: ""
     },
     {
         name: "OverTheWire Wargames",
@@ -29,7 +29,7 @@ export const PRACTICE_PLATFORMS = [
         desc: "Legendary SSH-based wargames starting with Bandit (Linux CLI basics) through Leviathan, Narnia, and Behemoth.",
         link: "https://overthewire.org/wargames",
         badge: "Free SSH Wargame",
-        icon: "⚔️"
+        icon: "️"
     },
     {
         name: "CyberDefenders",
@@ -37,7 +37,7 @@ export const PRACTICE_PLATFORMS = [
         desc: "Hands-on cybersecurity defense training with realistic PCAP forensics, memory dumps, and SIEM investigation challenges.",
         link: "https://cyberdefenders.org",
         badge: "Blue Team Labs",
-        icon: "🛡️"
+        icon: "️"
     },
     {
         name: "PicoCTF",
@@ -45,7 +45,7 @@ export const PRACTICE_PLATFORMS = [
         desc: "Carnegie Mellon University's free educational cybersecurity program with challenges in cryptography, reverse engineering, and web.",
         link: "https://picoctf.org",
         badge: "Free CTF",
-        icon: "🚩"
+        icon: ""
     }
 ];
 
@@ -56,7 +56,7 @@ export const STANDARDS_AND_CHEATSHEETS = [
         desc: "Globally accessible knowledge base of adversary tactics and techniques based on real-world threat observations.",
         link: "https://attack.mitre.org",
         badge: "Industry Standard",
-        icon: "🎯"
+        icon: ""
     },
     {
         name: "PayloadsAllTheThings",
@@ -64,7 +64,7 @@ export const STANDARDS_AND_CHEATSHEETS = [
         desc: "A list of useful payloads and bypasses for Web Application Security and Pentest engagements.",
         link: "https://github.com/swisskyrepo/PayloadsAllTheThings",
         badge: "GitHub 60k+ ⭐",
-        icon: "🧰"
+        icon: ""
     },
     {
         name: "GTFOBins",
@@ -72,7 +72,7 @@ export const STANDARDS_AND_CHEATSHEETS = [
         desc: "Curated list of Unix binaries that can be used to bypass local security restrictions and elevate privileges.",
         link: "https://gtfobins.github.io",
         badge: "PrivEsc Essential",
-        icon: "🐧"
+        icon: ""
     },
     {
         name: "LOLBAS Project",
@@ -80,7 +80,7 @@ export const STANDARDS_AND_CHEATSHEETS = [
         desc: "Living Off The Land Binaries, Scripts, and Libraries for Windows defense evasion and privilege escalation.",
         link: "https://lolbas-project.github.io",
         badge: "Windows LOLBins",
-        icon: "🪟"
+        icon: ""
     },
     {
         name: "OWASP Cheat Sheet Series",
@@ -88,7 +88,7 @@ export const STANDARDS_AND_CHEATSHEETS = [
         desc: "High-value, concise secure development guidelines authored by global application security practitioners.",
         link: "https://cheatsheetseries.owasp.org",
         badge: "OWASP Official",
-        icon: "📜"
+        icon: ""
     },
     {
         name: "CyberChef (GCHQ)",
@@ -96,7 +96,7 @@ export const STANDARDS_AND_CHEATSHEETS = [
         desc: "The Cyber Swiss Army Knife - a web app for encryption, encoding, compression, and data analysis by UK GCHQ.",
         link: "https://gchq.github.io/CyberChef",
         badge: "GCHQ Tool",
-        icon: "🔪"
+        icon: ""
     },
     {
         name: "Exploit Database (Exploit-DB)",
@@ -104,7 +104,7 @@ export const STANDARDS_AND_CHEATSHEETS = [
         desc: "OffSec-maintained archive of public exploits, shellcode, and vulnerable software components.",
         link: "https://www.exploit-db.com",
         badge: "OffSec Archive",
-        icon: "💥"
+        icon: ""
     },
     {
         name: "CISA KEV Catalog",
@@ -112,7 +112,7 @@ export const STANDARDS_AND_CHEATSHEETS = [
         desc: "Cybersecurity & Infrastructure Security Agency catalog of Known Exploited Vulnerabilities actively targeted in the wild.",
         link: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
         badge: "CISA Official",
-        icon: "🏛️"
+        icon: "️"
     }
 ];
 
@@ -123,7 +123,7 @@ export const CERTIFICATIONS_ROADMAP = [
         level: "Advanced Offensive",
         desc: "The premier gold standard practical penetration testing certification requiring a 24-hour hands-on exam.",
         link: "https://www.offsec.com/courses/pen-200",
-        icon: "🏆"
+        icon: ""
     },
     {
         name: "PNPT (Practical Network Penetration Tester)",
@@ -131,7 +131,7 @@ export const CERTIFICATIONS_ROADMAP = [
         level: "Intermediate Offensive",
         desc: "Realistic 5-day penetration testing exam simulating a full internal/external assessment, OSINT, and executive debrief.",
         link: "https://certifications.tcm-sec.com/pnpt",
-        icon: "🎖️"
+        icon: "️"
     },
     {
         name: "CompTIA Security+ (SY0-701)",
@@ -139,7 +139,7 @@ export const CERTIFICATIONS_ROADMAP = [
         level: "Foundational",
         desc: "Globally recognized baseline certification covering core security principles, threat analysis, and risk management.",
         link: "https://www.comptia.org/certifications/security",
-        icon: "🔰"
+        icon: ""
     },
     {
         name: "eJPT (eLearnSecurity Junior Penetration Tester)",
@@ -147,6 +147,6 @@ export const CERTIFICATIONS_ROADMAP = [
         level: "Entry Offensive",
         desc: "100% practical hands-on exam evaluating dynamic reconnaissance, host assessment, and web exploitation.",
         link: "https://ine.com/certifications/ejpt-certification",
-        icon: "🎯"
+        icon: ""
     }
 ];

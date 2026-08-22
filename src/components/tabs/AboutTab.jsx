@@ -4,7 +4,7 @@ export default function AboutTab() {
     return (
         <div className="tab-panel active">
             <div className="glass-card text-center mb-25">
-                <div className="dossier-avatar-box" style={{ margin: '0 auto 15px auto', width: '100px', height: '100px', fontSize: '3.5rem' }}>🥷</div>
+                <div className="dossier-avatar-box" style={{ margin: '0 auto 15px auto', width: '100px', height: '100px', fontSize: '3.5rem' }}></div>
                 <h2>Developed by Giridharan K</h2>
                 <p style={{ color: 'var(--text-secondary)' }}>Cybersecurity Architect, Exploit Researcher & Full-Stack Engineer</p>
 

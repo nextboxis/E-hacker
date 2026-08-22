@@ -8,7 +8,7 @@ export default function AuthModal() {
     const [passphrase, setPassphrase] = useState('shadowprotocol2026');
     const [domain, setDomain] = useState('full');
     const [clearance, setClearance] = useState('Level 5 • TOP SECRET');
-    const [selectedAvatar, setSelectedAvatar] = useState('🥷');
+    const [selectedAvatar, setSelectedAvatar] = useState('');
     const [isScanning, setIsScanning] = useState(false);
 
     if (!isAuthModalOpen) return null;
@@ -42,7 +42,7 @@ export default function AuthModal() {
             <div className="auth-dialog" onClick={(e) => e.stopPropagation()}>
                 <div className="auth-header">
                     <div className="auth-brand">
-                        <div className="auth-logo-glitch">⚡</div>
+                        <div className="auth-logo-glitch"></div>
                         <div>
                             <h3>OPERATIVE ACCESS PORTAL</h3>
                             <span className="auth-subtitle">E-HACKER DEFENSE NETWORK // CLEARANCE VERIFIER</span>
@@ -55,10 +55,10 @@ export default function AuthModal() {
                     {/* Mode Toggle */}
                     <div className="auth-mode-chips mb-20">
                         <button className={`filter-chip ${tab === 'signin' ? 'active' : ''}`} onClick={() => setTab('signin')}>
-                            🔑 Operative Sign In
+                             Operative Sign In
                         </button>
                         <button className={`filter-chip ${tab === 'signup' ? 'active' : ''}`} onClick={() => setTab('signup')}>
-                            🪪 Provision New Identity
+                             Provision New Identity
                         </button>
                     </div>
 
@@ -85,7 +85,7 @@ export default function AuthModal() {
                             <div className="auth-action-buttons">
                                 <button type="submit" className="site-btn auth-submit-btn">Authorize Operative</button>
                                 <button type="button" className={`biometric-btn ${isScanning ? 'scanning' : ''}`} onClick={handleBiometric}>
-                                    <span className="bio-icon">👆</span>
+                                    <span className="bio-icon"></span>
                                     <span className="bio-text">Biometric Touch ID</span>
                                     <div className="bio-scanline"></div>
                                 </button>
@@ -100,12 +100,12 @@ export default function AuthModal() {
                             <div className="tool-input-group mb-15">
                                 <label className="tool-input-label">Primary Specialization Track:</label>
                                 <select className="domain-select" style={{ width: '100%' }} value={domain} onChange={(e) => setDomain(e.target.value)}>
-                                    <option value="full">🌐 Full Spectrum Hacker</option>
-                                    <option value="web">🕷️ Web Pentesting</option>
-                                    <option value="network">🔌 Network & Infrastructure</option>
-                                    <option value="soc">🛡️ SOC & Blue Team Defense</option>
-                                    <option value="malware">🔬 Malware & Reverse Eng</option>
-                                    <option value="osint">🔍 OSINT Specialist</option>
+                                    <option value="full"> Full Spectrum Hacker</option>
+                                    <option value="web">️ Web Pentesting</option>
+                                    <option value="network"> Network & Infrastructure</option>
+                                    <option value="soc">️ SOC & Blue Team Defense</option>
+                                    <option value="malware"> Malware & Reverse Eng</option>
+                                    <option value="osint"> OSINT Specialist</option>
                                 </select>
                             </div>
                             <div className="tool-input-group mb-15">
@@ -121,7 +121,7 @@ export default function AuthModal() {
                             <div className="tool-input-group mb-20">
                                 <label className="tool-input-label">Choose Operative Avatar:</label>
                                 <div className="avatar-select-grid">
-                                    {['🥷', '🕷️', '🛡️', '🔬', '⚡', '👾'].map(av => (
+                                    {['', '️', '️', '', '', ''].map(av => (
                                         <span key={av} className={`avatar-opt ${selectedAvatar === av ? 'active' : ''}`} onClick={() => setSelectedAvatar(av)}>{av}</span>
                                     ))}
                                 </div>

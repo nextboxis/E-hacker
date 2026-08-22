@@ -52,7 +52,7 @@ export default function ProfileTab() {
                 <div className="dossier-watermark">TOP SECRET // NOFORN</div>
                 <div className="dossier-hero-layout">
                     <div className="dossier-avatar-col">
-                        <div className="dossier-avatar-box">{activeProfile.avatar || '🥷'}</div>
+                        <div className="dossier-avatar-box">{activeProfile.avatar || ''}</div>
                         <div className="dossier-level-pill">LEVEL {activeProfile.level || 1}</div>
                     </div>
 
@@ -64,10 +64,10 @@ export default function ProfileTab() {
                                 <p className="dossier-motto">"{activeProfile.bio || 'Knowledge is free. Security is an illusion.'}"</p>
                             </div>
                             <div className="dossier-actions-group">
-                                <button className="site-btn tool-btn" onClick={() => setProfTab('profiles')}>👥 Switch Profile</button>
-                                <button className="site-btn tool-btn secondary-btn" onClick={() => setProfTab('edit')}>✏️ Edit Details</button>
-                                <button className="site-btn tool-btn" onClick={() => setIsLocked(true)}>🔒 Lock</button>
-                                <button className="site-btn tool-btn text-danger" onClick={() => setIsLogoutModalOpen(true)}>🚪 Deauthorize</button>
+                                <button className="site-btn tool-btn" onClick={() => setProfTab('profiles')}> Switch Profile</button>
+                                <button className="site-btn tool-btn secondary-btn" onClick={() => setProfTab('edit')}>️ Edit Details</button>
+                                <button className="site-btn tool-btn" onClick={() => setIsLocked(true)}> Lock</button>
+                                <button className="site-btn tool-btn text-danger" onClick={() => setIsLogoutModalOpen(true)}> Deauthorize</button>
                             </div>
                         </div>
 
@@ -93,16 +93,16 @@ export default function ProfileTab() {
                 </div>
 
                 <div className="ai-nav-chips mt-20">
-                    <button className={`profile-nav-btn ${profTab === 'dossier' ? 'active' : ''}`} onClick={() => setProfTab('dossier')}>🪪 Operative Dossier</button>
-                    <button className={`profile-nav-btn ${profTab === 'profiles' ? 'active' : ''}`} onClick={() => setProfTab('profiles')}>👥 Multi-Profile Manager</button>
-                    <button className={`profile-nav-btn ${profTab === 'edit' ? 'active' : ''}`} onClick={() => setProfTab('edit')}>⚙️ Edit Identity</button>
+                    <button className={`profile-nav-btn ${profTab === 'dossier' ? 'active' : ''}`} onClick={() => setProfTab('dossier')}> Operative Dossier</button>
+                    <button className={`profile-nav-btn ${profTab === 'profiles' ? 'active' : ''}`} onClick={() => setProfTab('profiles')}> Multi-Profile Manager</button>
+                    <button className={`profile-nav-btn ${profTab === 'edit' ? 'active' : ''}`} onClick={() => setProfTab('edit')}>️ Edit Identity</button>
                 </div>
             </div>
 
             {profTab === 'dossier' && (
                 <div className="overview-grid">
                     <div className="glass-card">
-                        <h3 className="tool-section-title">📊 Competency & Skill Progress</h3>
+                        <h3 className="tool-section-title"> Competency & Skill Progress</h3>
                         <div className="mt-15">
                             <div className="flex-space-between-center mb-8">
                                 <span className="subnet-stat-label">100 Labs Completion:</span>
@@ -115,14 +115,14 @@ export default function ProfileTab() {
                     </div>
 
                     <div className="glass-card">
-                        <h3 className="tool-section-title">📜 Operative Mission Record</h3>
+                        <h3 className="tool-section-title"> Operative Mission Record</h3>
                         <div className="ir-steps-list mt-10">
                             <li><strong>Status:</strong> Active & Authorized</li>
                             <li><strong>Storage Engine:</strong> Encrypted Local-First IndexedDB Engine</li>
                             <li><strong>Vercel Edge Gateway:</strong> Connected & Verified</li>
                         </div>
                         <div className="mt-20">
-                            <button className="site-btn" onClick={handleExport}>💾 Export Full Profile Dossier (JSON)</button>
+                            <button className="site-btn" onClick={handleExport}> Export Full Profile Dossier (JSON)</button>
                         </div>
                     </div>
                 </div>
@@ -131,7 +131,7 @@ export default function ProfileTab() {
             {profTab === 'profiles' && (
                 <div className="glass-card">
                     <div className="flex-space-between-center mb-15 flex-wrap gap-10">
-                        <h3 className="tool-section-title">👥 Multi-Operative Profile Manager</h3>
+                        <h3 className="tool-section-title"> Multi-Operative Profile Manager</h3>
                         <button
                             className="site-btn"
                             onClick={() => {
@@ -139,7 +139,7 @@ export default function ProfileTab() {
                                 if (name) createProfile({ callsign: name });
                             }}
                         >
-                            ➕ Provision New Profile
+                             Provision New Profile
                         </button>
                     </div>
 
@@ -180,7 +180,7 @@ export default function ProfileTab() {
 
             {profTab === 'edit' && (
                 <div className="glass-card">
-                    <h3 className="tool-section-title">⚙️ Edit Operative Identity & Credentials</h3>
+                    <h3 className="tool-section-title">️ Edit Operative Identity & Credentials</h3>
                     <form onSubmit={handleSave} className="mt-15">
                         <div className="overview-grid">
                             <div className="tool-input-group mb-15">
@@ -207,7 +207,7 @@ export default function ProfileTab() {
                         <div className="tool-input-group mb-20">
                             <label className="tool-input-label">Choose Avatar:</label>
                             <div className="avatar-select-grid">
-                                {['🥷', '🕷️', '🛡️', '🔬', '⚡', '👾', '🎯', '🐉'].map(av => (
+                                {['', '️', '️', '', '', '', '', ''].map(av => (
                                     <span key={av} className={`avatar-opt ${editAvatar === av ? 'active' : ''}`} onClick={() => setEditAvatar(av)}>{av}</span>
                                 ))}
                             </div>

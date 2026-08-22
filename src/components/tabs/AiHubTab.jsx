@@ -148,16 +148,16 @@ level: high`);
                 </div>
 
                 <div className="ai-nav-chips">
-                    <button className={`ai-nav-btn ${subTab === 'rules' ? 'active' : ''}`} onClick={() => setSubTab('rules')}>🤖 AI Rule Synthesizer</button>
-                    <button className={`ai-nav-btn ${subTab === 'cve' ? 'active' : ''}`} onClick={() => setSubTab('cve')}>⚡ Real-time CVE Feed</button>
-                    <button className={`ai-nav-btn ${subTab === 'radar' ? 'active' : ''}`} onClick={() => setSubTab('radar')}>📡 Global Threat Radar</button>
+                    <button className={`ai-nav-btn ${subTab === 'rules' ? 'active' : ''}`} onClick={() => setSubTab('rules')}> AI Rule Synthesizer</button>
+                    <button className={`ai-nav-btn ${subTab === 'cve' ? 'active' : ''}`} onClick={() => setSubTab('cve')}> Real-time CVE Feed</button>
+                    <button className={`ai-nav-btn ${subTab === 'radar' ? 'active' : ''}`} onClick={() => setSubTab('radar')}> Global Threat Radar</button>
                 </div>
             </div>
 
             {subTab === 'rules' && (
                 <div className="glass-card">
                     <div className="flex-space-between-center mb-15 flex-wrap gap-10">
-                        <h3 className="tool-section-title">🤖 AI Detection Rule & Script Synthesizer</h3>
+                        <h3 className="tool-section-title"> AI Detection Rule & Script Synthesizer</h3>
                         <div className="ai-format-chips">
                             {['sigma', 'splunk', 'yara'].map(f => (
                                 <button
@@ -181,7 +181,7 @@ level: high`);
                                 onChange={(e) => setRulePrompt(e.target.value)}
                             />
                             <button className="site-btn" style={{ minWidth: '140px' }} onClick={() => generateRule(rulePrompt, ruleFormat)}>
-                                ⚡ Synthesize
+                                 Synthesize
                             </button>
                         </div>
                     </div>
@@ -199,7 +199,7 @@ level: high`);
             {subTab === 'cve' && (
                 <div className="glass-card">
                     <div className="flex-space-between-center mb-15 flex-wrap gap-15">
-                        <h3 className="tool-section-title">⚡ Live Real-Time CVE & Threat Stream</h3>
+                        <h3 className="tool-section-title"> Live Real-Time CVE & Threat Stream</h3>
                         <input
                             type="text"
                             className="search-input"
@@ -234,7 +234,7 @@ level: high`);
             {subTab === 'radar' && (
                 <div className="glass-card">
                     <div className="flex-space-between-center mb-15">
-                        <h3 className="tool-section-title">📡 Global Cyber Attack Telemetry Radar</h3>
+                        <h3 className="tool-section-title"> Global Cyber Attack Telemetry Radar</h3>
                         <div className="radar-status-badge">
                             <span className="pulse-dot"></span>
                             <span>SCAN FREQUENCY: 12.8 GHz</span>

@@ -53,7 +53,7 @@ export default function QuizTab() {
     return (
         <div className="tab-panel active">
             <div className="glass-card">
-                <h3 className="tool-section-title">🎯 Certification Practice Exam & Concept Drills</h3>
+                <h3 className="tool-section-title"> Certification Practice Exam & Concept Drills</h3>
                 {!showResults ? (
                     <div className="mt-20">
                         <span className="channel-badge mb-10">Question {currentIdx + 1} of {QUESTIONS.length}</span>

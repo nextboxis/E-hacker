@@ -36,20 +36,20 @@ export default function ProjectModal() {
                 <div className="project-modal-body">
                     {/* Objectives */}
                     <div className="project-modal-section">
-                        <h4 className="project-section-heading">🎯 Lab Objective & Threat Vector</h4>
+                        <h4 className="project-section-heading"> Lab Objective & Threat Vector</h4>
                         <p className="project-desc-text">{p.desc}</p>
                     </div>
 
                     {/* Environment Setup */}
                     <div className="project-modal-section">
-                        <h4 className="project-section-heading">⚙️ Environment Prerequisites & Target Setup</h4>
+                        <h4 className="project-section-heading">️ Environment Prerequisites & Target Setup</h4>
                         <div className="project-env-box">{p.env}</div>
                     </div>
 
                     {/* Verified Commands */}
                     <div className="project-modal-section">
                         <div className="flex-space-between-center mb-8">
-                            <h4 className="project-section-heading">⚡ Verified Execution Syntax & Proof-of-Concept</h4>
+                            <h4 className="project-section-heading"> Verified Execution Syntax & Proof-of-Concept</h4>
                             <button className="table-action-link" onClick={handleCopy}>Copy Syntax</button>
                         </div>
                         <pre className="modal-code-box"><code>{p.commands}</code></pre>
@@ -57,7 +57,7 @@ export default function ProjectModal() {
 
                     {/* Mitigation */}
                     <div className="project-modal-section">
-                        <h4 className="project-section-heading">🛡️ Defensive Remediation & Blue Team Countermeasures</h4>
+                        <h4 className="project-section-heading">️ Defensive Remediation & Blue Team Countermeasures</h4>
                         <div className="project-mitigation-box">{p.mitigation}</div>
                     </div>
                 </div>

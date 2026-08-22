@@ -7,7 +7,7 @@ export const TOOLS_DATABASE = [
         github: "https://github.com/nmap/nmap",
         youtube: "https://www.youtube.com/results?search_query=nmap+tutorial+cybersecurity",
         pdf: "/pdfs/nmap.pdf",
-        icon: "🌐",
+        icon: "",
         commands: "nmap -sS -sV -sC -p- -T4 <target-ip>"
     },
     {
@@ -18,7 +18,7 @@ export const TOOLS_DATABASE = [
         github: "https://github.com/wireshark/wireshark",
         youtube: "https://www.youtube.com/results?search_query=wireshark+packet+analysis+tutorial",
         pdf: "/pdfs/wireshark.pdf",
-        icon: "🦈",
+        icon: "",
         commands: "tshark -r capture.pcap -Y 'http.request.method==POST' -T fields -e http.user_agent"
     },
     {
@@ -29,7 +29,7 @@ export const TOOLS_DATABASE = [
         github: "https://github.com/PortSwigger",
         youtube: "https://www.youtube.com/results?search_query=burp+suite+tutorial+web+penetration+testing",
         pdf: "/pdfs/burp_suite.pdf",
-        icon: "🕷️",
+        icon: "️",
         commands: "Proxy -> Intercept -> Action -> Send to Repeater (Ctrl+R)"
     },
     {
@@ -40,7 +40,7 @@ export const TOOLS_DATABASE = [
         github: "https://github.com/rapid7/metasploit-framework",
         youtube: "https://www.youtube.com/results?search_query=metasploit+framework+tutorial+beginner",
         pdf: "/pdfs/metasploit_framework.pdf",
-        icon: "💣",
+        icon: "",
         commands: "msfconsole -q; use exploit/multi/handler; set payload windows/x64/meterpreter/reverse_tcp"
     },
     {
@@ -51,7 +51,7 @@ export const TOOLS_DATABASE = [
         github: "https://github.com/NationalSecurityAgency/ghidra",
         youtube: "https://www.youtube.com/results?search_query=ghidra+reverse+engineering+tutorial",
         pdf: "/pdfs/ghidra_reverse_eng.pdf",
-        icon: "🔬",
+        icon: "",
         commands: "ghidraRun -> New Project -> Import Binary -> Auto Analyze"
     },
     {
@@ -62,7 +62,7 @@ export const TOOLS_DATABASE = [
         github: "https://github.com/openwall/john",
         youtube: "https://www.youtube.com/results?search_query=john+the+ripper+password+cracking+tutorial",
         pdf: "/pdfs/john_the_ripper.pdf",
-        icon: "🔑",
+        icon: "",
         commands: "john --wordlist=/usr/share/wordlists/rockyou.txt hashes.txt --format=NT"
     },
     {
@@ -73,7 +73,7 @@ export const TOOLS_DATABASE = [
         github: "https://github.com/hashcat/hashcat",
         youtube: "https://www.youtube.com/results?search_query=hashcat+tutorial+gpu+cracking",
         pdf: "/pdfs/john_the_ripper.pdf",
-        icon: "⚡",
+        icon: "",
         commands: "hashcat -m 1000 -a 0 ntlm_hashes.txt rockyou.txt -r rules/best64.rule"
     },
     {
@@ -84,7 +84,7 @@ export const TOOLS_DATABASE = [
         github: "https://github.com/sqlmapproject/sqlmap",
         youtube: "https://www.youtube.com/results?search_query=sqlmap+database+penetration+testing+tutorial",
         pdf: "/pdfs/sqlmap.pdf",
-        icon: "💉",
+        icon: "",
         commands: "sqlmap -u 'http://target/item.php?id=1' --dbs --batch --random-agent"
     },
     {
@@ -95,7 +95,7 @@ export const TOOLS_DATABASE = [
         github: "https://github.com/gentilkiwi/mimikatz",
         youtube: "https://www.youtube.com/results?search_query=mimikatz+active+directory+credential+dumping",
         pdf: "/pdfs/mimikatz.pdf",
-        icon: "👑",
+        icon: "",
         commands: "privilege::debug -> sekurlsa::logonpasswords -> lsadump::sam"
     },
     {
@@ -106,7 +106,7 @@ export const TOOLS_DATABASE = [
         github: "https://github.com/fortra/impacket",
         youtube: "https://www.youtube.com/results?search_query=impacket+active+directory+attacks+tutorial",
         pdf: "/pdfs/kali_linux.pdf",
-        icon: "🏢",
+        icon: "",
         commands: "impacket-GetUserSPNs domain.local/user:password -request -dc-ip 10.10.10.1"
     },
     {
@@ -117,7 +117,7 @@ export const TOOLS_DATABASE = [
         github: "https://github.com/SpecterOps/BloodHound",
         youtube: "https://www.youtube.com/results?search_query=bloodhound+active+directory+attack+paths",
         pdf: "/pdfs/kali_linux.pdf",
-        icon: "🐕",
+        icon: "",
         commands: "bloodhound-python -u 'user' -p 'pass' -d domain.local -ns 10.10.10.1 -c All"
     },
     {
@@ -128,7 +128,7 @@ export const TOOLS_DATABASE = [
         github: "https://github.com/volatilityfoundation/volatility3",
         youtube: "https://www.youtube.com/results?search_query=volatility+3+memory+forensics+tutorial",
         pdf: "/pdfs/volatility.pdf",
-        icon: "🧠",
+        icon: "",
         commands: "python3 vol.py -f memory.dmp windows.pslist; python3 vol.py -f memory.dmp windows.malfind"
     },
     {
@@ -139,7 +139,7 @@ export const TOOLS_DATABASE = [
         github: "https://github.com/the-tcpdump-group/tcpdump",
         youtube: "https://www.youtube.com/results?search_query=tcpdump+command+line+packet+capture+tutorial",
         pdf: "/pdfs/tcpdump.pdf",
-        icon: "📡",
+        icon: "",
         commands: "tcpdump -i eth0 -nn -s0 -w output.pcap 'port 80 or port 443'"
     },
     {
@@ -150,7 +150,7 @@ export const TOOLS_DATABASE = [
         github: "https://github.com/openssl/openssl",
         youtube: "https://www.youtube.com/results?search_query=openssl+certificates+and+encryption+tutorial",
         pdf: "/pdfs/openssl.pdf",
-        icon: "🔐",
+        icon: "",
         commands: "openssl s_client -connect target.com:443 -tls1_3"
     },
     {
@@ -161,7 +161,7 @@ export const TOOLS_DATABASE = [
         github: "https://github.com/SigmaHQ/sigma",
         youtube: "https://www.youtube.com/results?search_query=sigma+rules+detection+engineering+tutorial",
         pdf: "/pdfs/linux_ubuntu.pdf",
-        icon: "🛡️",
+        icon: "️",
         commands: "sigmac -t splunk -c tools/config/generic/sysmon.yml rules/windows/process_creation/rule.yml"
     }
 ];
@@ -194,7 +194,7 @@ export const OSINT_TOOLS = [
         link: "https://www.shodan.io",
         github: "https://github.com/achillean/shodan-python",
         youtube: "https://www.youtube.com/results?search_query=shodan+osint+reconnaissance+tutorial",
-        icon: "🛰️"
+        icon: "️"
     },
     {
         name: "Censys",
@@ -202,7 +202,7 @@ export const OSINT_TOOLS = [
         link: "https://search.censys.io",
         github: "https://github.com/censys/censys-python",
         youtube: "https://www.youtube.com/results?search_query=censys+osint+attack+surface+tutorial",
-        icon: "🔍"
+        icon: ""
     },
     {
         name: "SpiderFoot",
@@ -210,7 +210,7 @@ export const OSINT_TOOLS = [
         link: "https://github.com/smicallef/spiderfoot",
         github: "https://github.com/smicallef/spiderfoot",
         youtube: "https://www.youtube.com/results?search_query=spiderfoot+osint+automation+tutorial",
-        icon: "🕷️"
+        icon: "️"
     },
     {
         name: "theHarvester",
@@ -218,7 +218,7 @@ export const OSINT_TOOLS = [
         link: "https://github.com/laramies/theHarvester",
         github: "https://github.com/laramies/theHarvester",
         youtube: "https://www.youtube.com/results?search_query=theharvester+subdomain+enumeration+tutorial",
-        icon: "🌾"
+        icon: ""
     },
     {
         name: "Maltego",
@@ -226,7 +226,7 @@ export const OSINT_TOOLS = [
         link: "https://www.maltego.com",
         github: "https://github.com/paterva",
         youtube: "https://www.youtube.com/results?search_query=maltego+graph+link+analysis+tutorial",
-        icon: "🕸️"
+        icon: "️"
     },
     {
         name: "OSINT Framework",
@@ -234,7 +234,7 @@ export const OSINT_TOOLS = [
         link: "https://osintframework.com",
         github: "https://github.com/lockfale/OSINT-Framework",
         youtube: "https://www.youtube.com/results?search_query=osint+framework+investigation+guide",
-        icon: "🧭"
+        icon: ""
     }
 ];
 
@@ -244,7 +244,7 @@ export const CHANNELS_DATABASE = [
         desc: "CTF walkthroughs, malware analysis, practical reverse engineering, and real-world breach breakdowns.",
         link: "https://youtube.com/@_JohnHammond",
         github: "https://github.com/JohnHammond",
-        icon: "📺",
+        icon: "",
         badge: "CTF & Malware"
     },
     {
@@ -252,7 +252,7 @@ export const CHANNELS_DATABASE = [
         desc: "In-depth Hack The Box retired machine walkthroughs and offensive security methodologies.",
         link: "https://youtube.com/@ippsec",
         github: "https://github.com/IppSec",
-        icon: "📺",
+        icon: "",
         badge: "HTB & Pentest"
     },
     {
@@ -260,7 +260,7 @@ export const CHANNELS_DATABASE = [
         desc: "Engaging tutorials on networking, Linux command line, Python scripting, and cloud security.",
         link: "https://youtube.com/@NetworkChuck",
         github: "https://github.com/networkchuck",
-        icon: "📺",
+        icon: "",
         badge: "Networking & Cloud"
     },
     {
@@ -268,7 +268,7 @@ export const CHANNELS_DATABASE = [
         desc: "Networking protocols, Python automation, ethical hacking, and hardware hacking masterclasses.",
         link: "https://youtube.com/@DavidBombal",
         github: "https://github.com/davidbombal",
-        icon: "📺",
+        icon: "",
         badge: "Hardware & Python"
     },
     {
@@ -276,7 +276,7 @@ export const CHANNELS_DATABASE = [
         desc: "Practical Ethical Hacking (PNPT), OSINT, Active Directory penetration testing, and career roadmaps.",
         link: "https://youtube.com/@TCMSecurityAcademy",
         github: "https://github.com/hmaverickadams",
-        icon: "📺",
+        icon: "",
         badge: "Active Directory & PNPT"
     }
 ];
