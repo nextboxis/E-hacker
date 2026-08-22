@@ -8,7 +8,8 @@ const TAB_TITLES = {
     toolkit: { title: "Cyber Toolkit & Labs", subtitle: "Interactive client-side calculators, cryptographic encoders, and threat analyzers" },
     'ai-hub': { title: "AI Security Hub & Live Feeds", subtitle: "AI detection rule synthesis, payload deobfuscation, live CVE feeds & threat radar" },
     python: { title: "Python Cyber Lab", subtitle: "Interactive Python pentesting scripts, REPL sandbox, and exploit automation" },
-    tools: { title: "Tool Finder", subtitle: "Searchable database of essential tools with quick tutorial links" },
+    database: { title: "Target Database & Findings", subtitle: "Local-first engagement dossier, target scope tracker, CVSS findings log, and field notes" },
+    tools: { title: "Tool Finder & Resources", subtitle: "Searchable database of essential tools, GitHub repos, YouTube guides, and 18 PDF field manuals" },
     quiz: { title: "Practice Quiz & Flashcards", subtitle: "Interactive cybersecurity practice exam and certification exam prep session" },
     profile: { title: "Operative Profile & Dossier", subtitle: "Multi-user profile manager, clearance status, and cyber achievements" },
     adhd: { title: "ADHD Focus Hub", subtitle: "Neurodivergent focus aids, gamified quests, and productivity boosters" },
@@ -45,7 +46,6 @@ export default function Header() {
             </div>
 
             <div className="header-action-group">
-                {/* Spotlight / Command Palette Button */}
                 <button
                     className="header-spotlight-btn"
                     onClick={() => setIsSpotlightOpen(true)}
@@ -56,7 +56,6 @@ export default function Header() {
                     <kbd className="spotlight-kbd">Ctrl K</kbd>
                 </button>
 
-                {/* Domain Selector */}
                 <div className="header-domain-wrapper">
                     <select
                         className="domain-select"
@@ -73,7 +72,6 @@ export default function Header() {
                     </select>
                 </div>
 
-                {/* CRT Terminal Launcher */}
                 <button
                     className="header-icon-btn"
                     onClick={() => setIsTerminalModalOpen(true)}
@@ -82,7 +80,6 @@ export default function Header() {
                     <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8h16v10zm-12-3l3.5-3.5L8 8l1.41-1.41L14.33 11.5l-4.92 4.91L8 15zm7 0h4v2h-4v-2z"/></svg>
                 </button>
 
-                {/* Gamification HUD */}
                 <div className="topbar-gamification-hud" title={`Level ${level} - ${xp} XP`}>
                     <div className="topbar-level-badge">{level}</div>
                     <div className="topbar-hud-details">
@@ -95,7 +92,6 @@ export default function Header() {
                     </div>
                 </div>
 
-                {/* Topbar Logout Button */}
                 <button
                     className="header-icon-btn text-danger"
                     onClick={() => setIsLogoutModalOpen(true)}
@@ -104,7 +100,6 @@ export default function Header() {
                     <svg viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
                 </button>
 
-                {/* Operative Profile Badge & Dropdown */}
                 <div className="header-operative-wrapper">
                     <button
                         className="operative-badge-btn"
@@ -132,6 +127,13 @@ export default function Header() {
                             >
                                 <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                                 Operative Profile & Dossier
+                            </button>
+                            <button
+                                className="op-dropdown-item"
+                                onClick={() => { setIsMenuOpen(false); setActiveTab('database'); }}
+                            >
+                                <svg viewBox="0 0 24 24"><path d="M12 3C7.58 3 4 4.79 4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7c0-2.21-3.58-4-8-4zm0 2c3.87 0 6 1.5 6 2s-2.13 2-6 2-6-1.5-6-2 2.13-2 6-2z"/></svg>
+                                Target Intelligence Database
                             </button>
                             <button
                                 className="op-dropdown-item"

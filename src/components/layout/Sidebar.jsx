@@ -8,6 +8,7 @@ const NAV_ITEMS = [
     { id: 'toolkit', label: 'Cyber Toolkit', badge: 'Live', badgeClass: 'pulse-badge', icon: 'M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.3C.4 6.7.9 9.8 2.9 11.8c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.1z' },
     { id: 'ai-hub', label: 'AI Security Hub', badge: 'AI Live', badgeClass: 'ai-badge', icon: 'M12 2a2 2 0 0 1 2 2c0 .74-.4 1.38-1 1.72V7h2a3 3 0 0 1 3 3v2h1.28c.34-.6.98-1 1.72-1a2 2 0 1 1 0 4c-.74 0-1.38-.4-1.72-1H18v2a3 3 0 0 1-3 3h-2v1.28c.6.34 1 .98 1 1.72a2 2 0 1 1-4 0c0-.74.4-1.38 1-1.72V19H9a3 3 0 0 1-3-3v-2H4.72c-.34.6-.98 1-1.72 1a2 2 0 1 1 0-4c.74 0 1.38.4 1.72 1H6v-2a3 3 0 0 1 3-3h2V5.72C10.4 5.38 10 4.74 10 4a2 2 0 0 1 2-2z' },
     { id: 'python', label: 'Python Cyber Lab', badge: 'Py 3.11', badgeStyle: { background: 'rgba(59, 130, 246, 0.2)', color: '#60a5fa', border: '1px solid rgba(59, 130, 246, 0.4)' }, icon: 'M14.25 2.25c-.4 0-.8.35-.8.75v3.5c0 .4.4.75.8.75h3.5c.4 0 .75-.35.75-.75V3c0-.4-.35-.75-.75-.75h-3.5zm-4.5 0c-.4 0-.75.35-.75.75V3c0 .4.35.75.75.75h3.5c.4 0 .75-.35.75-.75V3c0-.4-.35-.75-.75-.75h-3.5zM21 9.75c0-.4-.35-.75-.75-.75H3.75c-.4 0-.75.35-.75.75v10.5c0 .4.35.75.75.75h16.5c.4 0 .75-.35.75-.75V9.75zM12 18a3 3 0 1 1 0-6 3 3 0 0 1 0 6z' },
+    { id: 'database', label: 'Target Database', badge: 'Live DB', badgeStyle: { background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.4)' }, icon: 'M12 3C7.58 3 4 4.79 4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7c0-2.21-3.58-4-8-4zm0 2c3.87 0 6 1.5 6 2s-2.13 2-6 2-6-1.5-6-2 2.13-2 6-2zm6 5.2c-.78.47-1.99.8-3.37 1.01-1.38.21-2.9.29-4.63.29s-3.25-.08-4.63-.29C3.99 11 2.78 10.67 2 10.2V12c0 .5 2.13 2 6 2s6-1.5 6-2v-1.8zm0 5c-.78.47-1.99.8-3.37 1.01-1.38.21-2.9.29-4.63.29s-3.25-.08-4.63-.29C3.99 16 2.78 15.67 2 15.2V17c0 .5 2.13 2 6 2s6-1.5 6-2v-1.8z' },
     { id: 'tools', label: 'Tool Finder', icon: 'M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z' },
     { id: 'quiz', label: 'Practice Quiz & Cards', badge: 'Exam Prep', badgeClass: 'quiz-badge', icon: 'M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z' },
     { id: 'profile', label: 'Operative Profile', badge: 'Active', icon: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z' },
@@ -50,7 +51,7 @@ export default function Sidebar() {
                 ))}
 
                 {/* Persistent Sidebar Deauthorize Button */}
-                <div className="sidebar-footer-action" style={{ padding: '15px 12px', marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="sidebar-footer-action">
                     <button
                         className="site-btn tool-btn text-danger"
                         style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}

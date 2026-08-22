@@ -15,6 +15,7 @@ import ProjectsTab from './components/tabs/ProjectsTab';
 import ToolkitTab from './components/tabs/ToolkitTab';
 import PythonLabTab from './components/tabs/PythonLabTab';
 import AiHubTab from './components/tabs/AiHubTab';
+import DatabaseTab from './components/tabs/DatabaseTab';
 import ToolsDirectoryTab from './components/tabs/ToolsDirectoryTab';
 import QuizTab from './components/tabs/QuizTab';
 import ProfileTab from './components/tabs/ProfileTab';
@@ -27,13 +28,14 @@ function MainContent() {
     return (
         <main className="main-content" id="main-content">
             <Header />
-            <div className="content-body" style={{ padding: '24px' }}>
+            <div className="content-body">
                 {activeTab === 'overview' && <OverviewTab />}
                 {activeTab === 'roadmap' && <RoadmapTab />}
                 {activeTab === 'projects' && <ProjectsTab />}
                 {activeTab === 'toolkit' && <ToolkitTab />}
                 {activeTab === 'ai-hub' && <AiHubTab />}
                 {activeTab === 'python' && <PythonLabTab />}
+                {activeTab === 'database' && <DatabaseTab />}
                 {activeTab === 'tools' && <ToolsDirectoryTab />}
                 {activeTab === 'quiz' && <QuizTab />}
                 {activeTab === 'profile' && <ProfileTab />}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { TOOLS_DATABASE, PDF_CHEAT_SHEETS, OSINT_TOOLS, CHANNELS_DATABASE } from '../../data/toolsData';
+import { PRACTICE_PLATFORMS, STANDARDS_AND_CHEATSHEETS, CERTIFICATIONS_ROADMAP } from '../../data/resourcesData';
 import { useAuth } from '../../context/AuthContext';
 
 export default function ToolsDirectoryTab() {
@@ -8,7 +9,6 @@ export default function ToolsDirectoryTab() {
     const [search, setSearch] = useState('');
     const [selectedCat, setSelectedCat] = useState('ALL');
 
-    // Filter tools
     const filteredTools = TOOLS_DATABASE.filter(t => {
         const matchQ = t.name.toLowerCase().includes(search.toLowerCase()) || 
                        t.desc.toLowerCase().includes(search.toLowerCase()) ||
@@ -17,17 +17,27 @@ export default function ToolsDirectoryTab() {
         return matchQ && matchCat;
     });
 
-    // Filter PDFs
     const filteredPdfs = PDF_CHEAT_SHEETS.filter(p => 
         p.name.toLowerCase().includes(search.toLowerCase()) ||
         p.desc.toLowerCase().includes(search.toLowerCase()) ||
         p.cat.toLowerCase().includes(search.toLowerCase())
     );
 
-    // Filter OSINT
     const filteredOsint = OSINT_TOOLS.filter(o =>
         o.name.toLowerCase().includes(search.toLowerCase()) ||
         o.desc.toLowerCase().includes(search.toLowerCase())
+    );
+
+    const filteredPlatforms = PRACTICE_PLATFORMS.filter(p =>
+        p.name.toLowerCase().includes(search.toLowerCase()) ||
+        p.desc.toLowerCase().includes(search.toLowerCase()) ||
+        p.cat.toLowerCase().includes(search.toLowerCase())
+    );
+
+    const filteredStandards = STANDARDS_AND_CHEATSHEETS.filter(s =>
+        s.name.toLowerCase().includes(search.toLowerCase()) ||
+        s.desc.toLowerCase().includes(search.toLowerCase()) ||
+        s.cat.toLowerCase().includes(search.toLowerCase())
     );
 
     const toolCategories = ['ALL', 'Recon & Network', 'Web Pentest', 'Exploitation', 'Active Directory', 'Password & Crypto', 'Digital Forensics', 'SIEM & Blue Team'];
@@ -38,23 +48,29 @@ export default function ToolsDirectoryTab() {
             <div className="glass-card mb-25" style={{ background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.06) 0%, rgba(16, 185, 129, 0.06) 100%)', borderColor: 'rgba(6, 182, 212, 0.3)' }}>
                 <div className="flex-space-between-center flex-wrap gap-15">
                     <div>
-                        <div className="projects-badge-tag">CYBER WEAPONRY & REFERENCE LIBRARY</div>
-                        <h2 style={{ margin: '4px 0 2px 0' }}>Security Tools, GitHub Repos & PDF Field Manuals</h2>
+                        <div className="projects-badge-tag">CYBER WEAPONRY & RESOURCE REPOSITORY</div>
+                        <h2 style={{ margin: '4px 0 2px 0' }}>Security Tools, GitHub Repos, Practice Portals & PDFs</h2>
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem' }}>
-                            Searchable repository of essential penetration testing tools, official GitHub sources, YouTube tutorials, and 18 downloadable PDF cheat sheets.
+                            Comprehensive verified repository of pentest tools, GitHub sources, YouTube tutorials, practice wargames, standards, and 18 downloadable PDF field manuals.
                         </p>
                     </div>
                     <div className="ai-nav-chips">
-                        <button className={`ai-nav-btn ${subTab === 'tools' ? 'active' : ''}`} onClick={() => { setSubTab('tools'); playChime(); }}>
+                        <button className={'ai-nav-btn ' + (subTab === 'tools' ? 'active' : '')} onClick={() => { setSubTab('tools'); playChime(); }}>
                             🛠️ Security Tools ({TOOLS_DATABASE.length})
                         </button>
-                        <button className={`ai-nav-btn ${subTab === 'pdfs' ? 'active' : ''}`} onClick={() => { setSubTab('pdfs'); playChime(); }}>
+                        <button className={'ai-nav-btn ' + (subTab === 'platforms' ? 'active' : '')} onClick={() => { setSubTab('platforms'); playChime(); }}>
+                            🎯 Practice Wargames ({PRACTICE_PLATFORMS.length})
+                        </button>
+                        <button className={'ai-nav-btn ' + (subTab === 'standards' ? 'active' : '')} onClick={() => { setSubTab('standards'); playChime(); }}>
+                            📜 Standards & Payloads ({STANDARDS_AND_CHEATSHEETS.length})
+                        </button>
+                        <button className={'ai-nav-btn ' + (subTab === 'pdfs' ? 'active' : '')} onClick={() => { setSubTab('pdfs'); playChime(); }}>
                             📑 PDF Manuals ({PDF_CHEAT_SHEETS.length})
                         </button>
-                        <button className={`ai-nav-btn ${subTab === 'osint' ? 'active' : ''}`} onClick={() => { setSubTab('osint'); playChime(); }}>
+                        <button className={'ai-nav-btn ' + (subTab === 'osint' ? 'active' : '')} onClick={() => { setSubTab('osint'); playChime(); }}>
                             🛰️ OSINT Suite ({OSINT_TOOLS.length})
                         </button>
-                        <button className={`ai-nav-btn ${subTab === 'channels' ? 'active' : ''}`} onClick={() => { setSubTab('channels'); playChime(); }}>
+                        <button className={'ai-nav-btn ' + (subTab === 'channels' ? 'active' : '')} onClick={() => { setSubTab('channels'); playChime(); }}>
                             📺 YouTube Mentors ({CHANNELS_DATABASE.length})
                         </button>
                     </div>
@@ -65,8 +81,8 @@ export default function ToolsDirectoryTab() {
                     <input
                         type="text"
                         className="search-input"
-                        placeholder="Search by tool name, protocol, CVE, or keyword..."
-                        style={{ maxWidth: '340px' }}
+                        placeholder="Search tools, wargames, payloads, CVEs, or cheat sheets..."
+                        style={{ maxWidth: '360px' }}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
@@ -76,7 +92,7 @@ export default function ToolsDirectoryTab() {
                             {toolCategories.slice(0, 5).map(c => (
                                 <button
                                     key={c}
-                                    className={`filter-chip ${selectedCat === c ? 'active' : ''}`}
+                                    className={'filter-chip ' + (selectedCat === c ? 'active' : '')}
                                     onClick={() => setSelectedCat(c)}
                                 >
                                     {c}
@@ -112,38 +128,12 @@ export default function ToolsDirectoryTab() {
 
                             <div className="project-card-footer flex-wrap gap-8">
                                 <div className="flex-gap-10 align-center flex-wrap">
-                                    <a
-                                        href={t.link}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="table-action-link"
-                                        title="Visit Official Website"
-                                    >
-                                        🌐 Portal
-                                    </a>
+                                    <a href={t.link} target="_blank" rel="noopener noreferrer" className="table-action-link" title="Visit Official Website">🌐 Portal</a>
                                     {t.github && (
-                                        <a
-                                            href={t.github}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="table-action-link"
-                                            style={{ color: '#a855f7' }}
-                                            title="View GitHub Repository"
-                                        >
-                                            🐙 GitHub
-                                        </a>
+                                        <a href={t.github} target="_blank" rel="noopener noreferrer" className="table-action-link" style={{ color: '#a855f7' }} title="View GitHub Repository">🐙 GitHub</a>
                                     )}
                                     {t.youtube && (
-                                        <a
-                                            href={t.youtube}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="table-action-link"
-                                            style={{ color: '#f43f5e' }}
-                                            title="Watch Video Tutorials on YouTube"
-                                        >
-                                            ▶ YouTube
-                                        </a>
+                                        <a href={t.youtube} target="_blank" rel="noopener noreferrer" className="table-action-link" style={{ color: '#f43f5e' }} title="Watch Video Tutorials on YouTube">▶ YouTube</a>
                                     )}
                                 </div>
                                 {t.pdf && (
@@ -163,7 +153,55 @@ export default function ToolsDirectoryTab() {
                 </div>
             )}
 
-            {/* TAB 2: PDF FIELD MANUALS & CHEAT SHEETS */}
+            {/* TAB 2: PRACTICE WARGAMES & LABS */}
+            {subTab === 'platforms' && (
+                <div className="projects-dynamic-grid">
+                    {filteredPlatforms.map((p, idx) => (
+                        <div key={idx} className="project-card">
+                            <div>
+                                <div className="project-card-header">
+                                    <span className="project-card-num" style={{ fontSize: '1.2rem' }}>{p.icon}</span>
+                                    <span className="project-diff-badge diff-beginner">{p.badge}</span>
+                                </div>
+                                <h3 className="project-card-title">{p.name}</h3>
+                                <span className="project-card-tag mb-8" style={{ display: 'inline-block' }}>{p.cat}</span>
+                                <p className="project-card-desc">{p.desc}</p>
+                            </div>
+                            <div className="project-card-footer">
+                                <a href={p.link} target="_blank" rel="noopener noreferrer" className="site-btn" style={{ fontSize: '0.82rem', padding: '6px 14px' }}>
+                                    🚀 Launch Lab Portal ↗
+                                </a>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* TAB 3: STANDARDS, PAYLOADS & FRAMEWORKS */}
+            {subTab === 'standards' && (
+                <div className="projects-dynamic-grid">
+                    {filteredStandards.map((s, idx) => (
+                        <div key={idx} className="project-card">
+                            <div>
+                                <div className="project-card-header">
+                                    <span className="project-card-num" style={{ fontSize: '1.2rem' }}>{s.icon}</span>
+                                    <span className="project-diff-badge diff-advanced">{s.badge}</span>
+                                </div>
+                                <h3 className="project-card-title">{s.name}</h3>
+                                <span className="project-card-tag mb-8" style={{ display: 'inline-block' }}>{s.cat}</span>
+                                <p className="project-card-desc">{s.desc}</p>
+                            </div>
+                            <div className="project-card-footer">
+                                <a href={s.link} target="_blank" rel="noopener noreferrer" className="table-action-link">
+                                    Official Reference ↗
+                                </a>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* TAB 4: PDF FIELD MANUALS */}
             {subTab === 'pdfs' && (
                 <div>
                     <div className="glass-card mb-20" style={{ background: 'rgba(6, 182, 212, 0.04)', borderColor: 'rgba(6, 182, 212, 0.2)' }}>
@@ -195,7 +233,7 @@ export default function ToolsDirectoryTab() {
 
                                 <div className="project-card-footer">
                                     <a
-                                        href={`/pdfs/${p.file}`}
+                                        href={'/pdfs/' + p.file}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="site-btn tool-btn"
@@ -204,7 +242,7 @@ export default function ToolsDirectoryTab() {
                                         👁️ View PDF
                                     </a>
                                     <a
-                                        href={`/pdfs/${p.file}`}
+                                        href={'/pdfs/' + p.file}
                                         download={p.file}
                                         className="site-btn"
                                         style={{ fontSize: '0.82rem', padding: '6px 14px' }}
@@ -218,7 +256,7 @@ export default function ToolsDirectoryTab() {
                 </div>
             )}
 
-            {/* TAB 3: OSINT SUITE */}
+            {/* TAB 5: OSINT SUITE */}
             {subTab === 'osint' && (
                 <div className="projects-dynamic-grid">
                     {filteredOsint.map((o, idx) => (
@@ -236,14 +274,10 @@ export default function ToolsDirectoryTab() {
                                 <div className="flex-gap-10 align-center flex-wrap">
                                     <a href={o.link} target="_blank" rel="noopener noreferrer" className="table-action-link">🌐 Portal</a>
                                     {o.github && (
-                                        <a href={o.github} target="_blank" rel="noopener noreferrer" className="table-action-link" style={{ color: '#a855f7' }}>
-                                            🐙 GitHub
-                                        </a>
+                                        <a href={o.github} target="_blank" rel="noopener noreferrer" className="table-action-link" style={{ color: '#a855f7' }}>🐙 GitHub</a>
                                     )}
                                     {o.youtube && (
-                                        <a href={o.youtube} target="_blank" rel="noopener noreferrer" className="table-action-link" style={{ color: '#f43f5e' }}>
-                                            ▶ YouTube
-                                        </a>
+                                        <a href={o.youtube} target="_blank" rel="noopener noreferrer" className="table-action-link" style={{ color: '#f43f5e' }}>▶ YouTube</a>
                                     )}
                                 </div>
                             </div>
@@ -252,7 +286,7 @@ export default function ToolsDirectoryTab() {
                 </div>
             )}
 
-            {/* TAB 4: YOUTUBE CHANNELS */}
+            {/* TAB 6: YOUTUBE CHANNELS */}
             {subTab === 'channels' && (
                 <div className="projects-dynamic-grid">
                     {CHANNELS_DATABASE.map((ch, idx) => (
