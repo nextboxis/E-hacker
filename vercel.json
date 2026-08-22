@@ -1,6 +1,9 @@
 {
   "version": 2,
   "name": "e-hacker",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
   "headers": [
     {
       "source": "/(.*)",
@@ -22,23 +25,6 @@
           "value": "strict-origin-when-cross-origin"
         }
       ]
-    },
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization"
-        }
-      ]
     }
   ],
   "rewrites": [
@@ -55,8 +41,16 @@
       "destination": "/api/ai-assistant"
     },
     {
+      "source": "/api/auth",
+      "destination": "/api/auth"
+    },
+    {
       "source": "/api/db",
       "destination": "/api/database"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
