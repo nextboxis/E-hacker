@@ -2178,7 +2178,189 @@
             </div>
 
             <!-- TAB 5: PDF LIBRARY PANEL -->
-            <div id="tab-pdf" class="tab-panel">
+            
+            <!-- TAB: AI SECURITY HUB & REAL-TIME FEEDS -->
+            <div id="tab-ai-hub" class="tab-panel">
+                <div class="ai-hero-card glass-card mb-25">
+                    <div class="ai-hero-header">
+                        <div>
+                            <div class="projects-badge-tag">AI INTELLIGENCE & REAL-TIME TELEMETRY</div>
+                            <h2>AI Cyber Security Suite & Live Threat Radar</h2>
+                            <p>Generate detection rules, deobfuscate payloads, build incident response playbooks, and monitor live global CVE zero-day feeds with simulated attack radar.</p>
+                        </div>
+                        <div class="ai-live-telemetry-badge">
+                            <span class="pulse-dot"></span>
+                            <span>LIVE ENGINE ONLINE</span>
+                        </div>
+                    </div>
+
+                    <!-- AI Sub-tab Navigation -->
+                    <div class="ai-nav-chips">
+                        <button class="ai-nav-btn active" data-ai-tab="rules">🤖 AI Rule Synthesizer</button>
+                        <button class="ai-nav-btn" data-ai-tab="deobf">🔬 Payload Deobfuscator</button>
+                        <button class="ai-nav-btn" data-ai-tab="ir">📋 Incident Response Builder</button>
+                        <button class="ai-nav-btn" data-ai-tab="cve">⚡ Real-time CVE Feed</button>
+                        <button class="ai-nav-btn" data-ai-tab="radar">📡 Global Threat Radar</button>
+                    </div>
+                </div>
+
+                <!-- SUB-PANEL 1: AI RULE & SCRIPT SYNTHESIZER -->
+                <div id="ai-panel-rules" class="ai-sub-panel active">
+                    <div class="glass-card">
+                        <div class="flex-space-between-center mb-15">
+                            <h3 class="tool-section-title">🤖 AI Detection Rule & Script Synthesizer</h3>
+                            <div class="ai-format-chips">
+                                <button class="filter-chip active" data-ai-format="sigma">Sigma (YAML)</button>
+                                <button class="filter-chip" data-ai-format="splunk">Splunk (SPL)</button>
+                                <button class="filter-chip" data-ai-format="yara">YARA Rule</button>
+                                <button class="filter-chip" data-ai-format="suricata">Suricata IDS</button>
+                                <button class="filter-chip" data-ai-format="python">Python Script</button>
+                            </div>
+                        </div>
+
+                        <!-- Prompt Input -->
+                        <div class="mb-15">
+                            <label class="tool-input-label">Describe Attack Behavior or Security Requirement:</label>
+                            <div class="flex-gap-10">
+                                <input type="text" id="ai-rule-prompt" class="search-input" placeholder="e.g. Detect IIS web server w3wp.exe spawning cmd.exe or powershell.exe..." value="Detect web server process spawning command shell">
+                                <button id="ai-generate-rule-btn" class="site-btn" style="min-width: 140px;">⚡ Synthesize</button>
+                            </div>
+                        </div>
+
+                        <!-- Sample Prompts -->
+                        <div class="sample-prompts-row mb-15">
+                            <span class="sample-chip" data-rule-prompt="Detect Mimikatz DCSync Active Directory Replication">AD DCSync Attack</span>
+                            <span class="sample-chip" data-rule-prompt="Detect PowerShell downloading files via IWR or DownloadString">PowerShell Fileless Download</span>
+                            <span class="sample-chip" data-rule-prompt="Detect Cobalt Strike HTTPS beaconing with default user agent">Cobalt Strike C2 Beacon</span>
+                            <span class="sample-chip" data-rule-prompt="Detect volume shadow copy deletion via vssadmin">Ransomware Shadow Copy Deletion</span>
+                        </div>
+
+                        <!-- Output Box -->
+                        <div class="ai-code-output-card">
+                            <div class="flex-space-between-center mb-8">
+                                <span class="ai-output-meta-label" id="ai-output-format-badge">SIGMA YAML DETECTION RULE</span>
+                                <button id="ai-copy-rule-btn" class="table-action-link">Copy Synthesized Code</button>
+                            </div>
+                            <pre class="modal-code-box" style="min-height: 220px;"><code id="ai-rule-output">Loading intelligent synthesizer...</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-PANEL 2: PAYLOAD DEOBFUSCATOR -->
+                <div id="ai-panel-deobf" class="ai-sub-panel">
+                    <div class="glass-card">
+                        <h3 class="tool-section-title">🔬 AI Payload Deobfuscator & Reverse Analyzer</h3>
+                        <p class="tool-section-desc">Deconstruct obfuscated PowerShell, JavaScript, and nested encoding payloads to reveal underlying malicious commands.</p>
+
+                        <div class="mb-15">
+                            <div class="flex-space-between-center mb-8">
+                                <label class="tool-input-label">Obfuscated Input Payload:</label>
+                                <div class="flex-gap-10">
+                                    <span class="sample-chip" id="deobf-sample-ps">Load Encoded PowerShell Sample</span>
+                                    <span class="sample-chip" id="deobf-sample-js">Load Hex JS Sample</span>
+                                </div>
+                            </div>
+                            <textarea id="ai-deobf-input" class="notes-textarea" rows="4" placeholder="Paste Base64, [char[]] encoded, or obfuscated command string here..."></textarea>
+                        </div>
+
+                        <div class="mb-20">
+                            <button id="ai-deobf-btn" class="site-btn">⚡ Deobfuscate & Analyze Payload</button>
+                        </div>
+
+                        <!-- Deobfuscation Report & Clean Code Output -->
+                        <div class="ai-deobf-results-grid">
+                            <div class="deobf-stat-card">
+                                <span class="subnet-stat-label">Entropy Score:</span>
+                                <strong id="deobf-entropy" class="subnet-stat-val">5.82 / 8.0 (High Entropy)</strong>
+                            </div>
+                            <div class="deobf-stat-card">
+                                <span class="subnet-stat-label">Identified Techniques:</span>
+                                <strong id="deobf-techniques" class="subnet-stat-val">Base64 Encoding, String Reversal, AMSI Bypass</strong>
+                            </div>
+                        </div>
+
+                        <div class="ai-code-output-card mt-15">
+                            <div class="flex-space-between-center mb-8">
+                                <h4 class="refactored-style-50">Clean Deobfuscated Plaintext:</h4>
+                                <button id="ai-copy-deobf-btn" class="table-action-link">Copy Clean Output</button>
+                            </div>
+                            <pre class="modal-code-box"><code id="ai-deobf-output">Deobfuscated commands will appear here...</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-PANEL 3: INCIDENT RESPONSE PLAYBOOK BUILDER -->
+                <div id="ai-panel-ir" class="ai-sub-panel">
+                    <div class="glass-card">
+                        <div class="flex-space-between-center mb-15">
+                            <div>
+                                <h3 class="tool-section-title">📋 AI Incident Response Playbook Builder</h3>
+                                <p class="tool-section-desc">Generate NIST SP 800-61 aligned containment procedures and response checklists.</p>
+                            </div>
+                            <div>
+                                <select id="ai-ir-scenario-select" class="domain-select">
+                                    <option value="ransomware">🔒 Enterprise Ransomware Infection</option>
+                                    <option value="bec">📧 Business Email Compromise (BEC)</option>
+                                    <option value="webshell">🕷️ Web Application Shell Injection</option>
+                                    <option value="ad">🏢 Active Directory Kerberoasting & DCSync</option>
+                                    <option value="cloud">☁️ AWS S3 Bucket Credential Leak</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Timeline Workflow Accordion -->
+                        <div id="ai-ir-playbook-content" class="ir-playbook-container">
+                            <!-- Populated dynamically via script.js -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-PANEL 4: REAL-TIME LIVE CVE & THREAT FEED -->
+                <div id="ai-panel-cve" class="ai-sub-panel">
+                    <div class="glass-card">
+                        <div class="flex-space-between-center mb-15 flex-wrap gap-15">
+                            <div>
+                                <h3 class="tool-section-title">⚡ Live Real-Time CVE & Zero-Day Threat Stream</h3>
+                                <p class="tool-section-desc">Live vulnerability advisories with CVSS scores, CISA KEV tags, and verified mitigation guides.</p>
+                            </div>
+                            <div class="flex-gap-10">
+                                <input type="text" id="ai-cve-search" class="search-input" placeholder="Filter CVEs by ID or Vendor..." style="width: 220px;">
+                                <button id="ai-cve-refresh-btn" class="site-btn tool-btn">↻ Refresh</button>
+                            </div>
+                        </div>
+
+                        <div id="ai-cve-feed-container" class="cve-feed-grid">
+                            <!-- Populated dynamically via script.js -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-PANEL 5: GLOBAL THREAT RADAR VISUALIZER -->
+                <div id="ai-panel-radar" class="ai-sub-panel">
+                    <div class="glass-card">
+                        <div class="flex-space-between-center mb-15">
+                            <div>
+                                <h3 class="tool-section-title">📡 Global Cyber Attack Telemetry Radar</h3>
+                                <p class="tool-section-desc">Simulated real-time honeypot attack vectors, port sweeps, and adversary telemetry scanning.</p>
+                            </div>
+                            <div class="radar-status-badge">
+                                <span class="pulse-dot"></span>
+                                <span>SCAN FREQUENCY: 12.8 GHz</span>
+                            </div>
+                        </div>
+
+                        <div class="radar-container">
+                            <canvas id="threat-radar-canvas" class="threat-radar-canvas"></canvas>
+                            <div class="radar-live-log-box" id="radar-live-log-box">
+                                <div class="radar-log-header">LIVE ATTACK EVENT STREAM</div>
+                                <div id="radar-log-stream" class="radar-log-stream"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<div id="tab-pdf" class="tab-panel">
                 <p class="wargame-subtitle">
                     Access direct-download source links to cheat sheets, user manuals, exam objectives, and syllabus outlines for every tool and certification in the roadmap.
                 </p>

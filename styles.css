@@ -4897,3 +4897,305 @@ body.theme-light-adhd .progress-bar-circle {
         box-shadow: none !important;
     }
 }
+
+
+/* ==========================================================================
+   AI SECURITY SUITE & REAL-TIME THREAT RADAR STYLES
+   ========================================================================== */
+.ai-badge {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    color: #c084fc;
+    font-weight: 700;
+}
+
+.ai-hero-card {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%);
+    border-color: rgba(139, 92, 246, 0.25);
+}
+
+.ai-hero-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.ai-live-telemetry-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 255, 102, 0.08);
+    border: 1px solid rgba(0, 255, 102, 0.3);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--color-accent);
+}
+
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    box-shadow: 0 0 8px var(--color-accent);
+    animation: pulseDot 1.5s infinite;
+}
+
+@keyframes pulseDot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.ai-nav-chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.ai-nav-btn {
+    background: rgba(4, 15, 8, 0.6);
+    border: 1px solid var(--border-card);
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.ai-nav-btn:hover, .ai-nav-btn.active {
+    background: rgba(139, 92, 246, 0.15);
+    border-color: #8b5cf6;
+    color: #c084fc;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+}
+
+.ai-sub-panel {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.ai-sub-panel.active {
+    display: block;
+}
+
+.ai-format-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.sample-prompts-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ai-code-output-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-card);
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.ai-output-meta-label {
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: #c084fc;
+    letter-spacing: 1px;
+}
+
+.ai-deobf-results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.deobf-stat-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-card);
+    border-radius: 10px;
+    padding: 12px 16px;
+}
+
+/* Incident Response Playbook */
+.ir-playbook-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ir-phase-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-card);
+    border-radius: 10px;
+    padding: 16px;
+    border-left: 4px solid var(--color-accent);
+}
+
+.ir-phase-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.ir-phase-title {
+    font-size: 1.05rem;
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.ir-steps-list {
+    padding-left: 20px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Real-Time CVE Feed */
+.cve-feed-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.cve-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-card);
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: var(--transition);
+}
+
+.cve-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.cve-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.cve-id-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-accent);
+}
+
+.cve-title {
+    font-size: 1.05rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.cve-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 14px;
+    flex-grow: 1;
+}
+
+.cve-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* Threat Radar */
+.radar-status-badge {
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--color-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.radar-container {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+    align-items: center;
+    background: #020704;
+    border: 1px solid rgba(0, 255, 102, 0.2);
+    border-radius: 14px;
+    padding: 20px;
+    min-height: 380px;
+}
+
+@media (max-width: 900px) {
+    .radar-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.threat-radar-canvas {
+    width: 100%;
+    height: 340px;
+    border-radius: 10px;
+    background: radial-gradient(circle, rgba(0, 40, 20, 0.5) 0%, rgba(0, 10, 5, 0.9) 100%);
+    border: 1px solid rgba(0, 255, 102, 0.15);
+}
+
+.radar-live-log-box {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-card);
+    border-radius: 10px;
+    padding: 14px;
+    height: 340px;
+    display: flex;
+    flex-direction: column;
+}
+
+.radar-log-header {
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.radar-log-stream {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+}
+
+.radar-log-entry {
+    padding: 6px 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border-left: 3px solid var(--color-accent);
+    border-radius: 4px;
+    line-height: 1.4;
+    animation: fadeIn 0.3s ease;
+}
