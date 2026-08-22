@@ -7991,3 +7991,185 @@ function initProfilePage() {
 document.addEventListener('DOMContentLoaded', () => {
     initProfilePage();
 });
+
+
+// ==========================================================================
+// E-HACKER 10x DEAUTHORIZATION PROTOCOL & LOGIN ENHANCEMENTS
+// ==========================================================================
+
+const sessionStartTime = Date.now();
+
+// --- 1. PASSWORD ENTROPY & CRACK-TIME CALCULATOR ---
+function calculatePasswordEntropy(password) {
+    if (!password) return { entropy: 0, crackTime: "0 seconds", strength: "Empty" };
+
+    let poolSize = 0;
+    if (/[a-z]/.test(password)) poolSize += 26;
+    if (/[A-Z]/.test(password)) poolSize += 26;
+    if (/[0-9]/.test(password)) poolSize += 10;
+    if (/[^a-zA-Z0-9]/.test(password)) poolSize += 33;
+
+    if (poolSize === 0) return { entropy: 0, crackTime: "0 seconds", strength: "Very Weak" };
+
+    const entropy = Math.round(password.length * (Math.log(poolSize) / Math.log(2)));
+    
+    let crackTime = "Instant";
+    let strength = "Very Weak";
+    let pct = Math.min(100, Math.max(10, Math.round((entropy / 80) * 100)));
+
+    if (entropy < 28) {
+        crackTime = "< 1 millisecond";
+        strength = "Very Weak (Trivial)";
+    } else if (entropy < 36) {
+        crackTime = "~2 minutes (Offline GPU)";
+        strength = "Weak";
+    } else if (entropy < 50) {
+        crackTime = "~3 weeks";
+        strength = "Moderate";
+    } else if (entropy < 65) {
+        crackTime = "~450 years";
+        strength = "Strong";
+    } else {
+        crackTime = "~3,400 Centuries (8x RTX 4090)";
+        strength = "Military-Grade Cryptographic";
+    }
+
+    return { entropy, crackTime, strength, pct };
+}
+
+// --- 2. VIRTUAL 30-SECOND TOTP GENERATOR ---
+function generateLiveTotpToken() {
+    const epoch = Math.floor(Date.now() / 30000);
+    const hash = (epoch * 9301 + 49297) % 233280;
+    const token = ('000000' + (hash * 1000 % 1000000)).slice(-6);
+    return token;
+}
+
+// --- 3. SPEECH SYNTHESIS OPERATIVE GREETING ---
+function speakOperativeGreeting(callsign, clearance) {
+    if ('speechSynthesis' in window) {
+        try {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(`Access granted, Operative ${callsign.split('@')[0]}. Clearance Level 5 verified.`);
+            utterance.rate = 1.05;
+            utterance.pitch = 0.85;
+            window.speechSynthesis.speak(utterance);
+        } catch (e) {}
+    }
+}
+
+// --- 4. 10x LOGOUT DEAUTHORIZATION SEQUENCE ---
+function triggerLogoutSequence() {
+    const logoutModal = document.getElementById('logout-modal');
+    if (!logoutModal) return;
+
+    // Calculate session duration
+    const elapsedMs = Date.now() - sessionStartTime;
+    const minutes = Math.floor(elapsedMs / 60000);
+    const seconds = Math.floor((elapsedMs % 60000) / 1000);
+    const durStr = `${minutes}m ${seconds}s`;
+
+    const tagEl = document.getElementById('logout-op-tagline');
+    const durEl = document.getElementById('debrief-duration');
+    const xpEl = document.getElementById('debrief-xp');
+    const labsEl = document.getElementById('debrief-labs');
+
+    const activeProf = (typeof getActiveProfile === 'function') ? getActiveProfile() : activeOperative;
+
+    if (tagEl) tagEl.textContent = `Operative ${activeProf.callsign} // Security Clearance Suspended`;
+    if (durEl) durEl.textContent = durStr;
+    if (xpEl) xpEl.textContent = `+${activeProf.xp || 0} XP`;
+    if (labsEl) labsEl.textContent = `${(activeProf.completedProjects || []).length} / 100 Labs`;
+
+    // Trigger deauth audio power down
+    playDingSound();
+
+    logoutModal.classList.add('active');
+}
+
+function initLogout10x() {
+    const passInput = document.getElementById('signin-passphrase');
+    const entropyScore = document.getElementById('entropy-score-text');
+    const entropyCrack = document.getElementById('entropy-crack-text');
+    const entropyBar = document.getElementById('entropy-bar-fill');
+    const totpGenChip = document.getElementById('totp-generate-chip');
+    const totpFillBtn = document.getElementById('totp-fill-btn');
+    const mfaInput = document.getElementById('signin-mfa');
+
+    // Live Password Entropy Listener
+    if (passInput) {
+        passInput.addEventListener('input', () => {
+            const res = calculatePasswordEntropy(passInput.value);
+            if (entropyScore) entropyScore.textContent = `Entropy: ${res.entropy} bits (${res.strength})`;
+            if (entropyCrack) entropyCrack.textContent = `Crack Time: ${res.crackTime}`;
+            if (entropyBar) entropyBar.style.width = `${res.pct}%`;
+        });
+    }
+
+    // TOTP Auto-fill
+    function fillTotp() {
+        const token = generateLiveTotpToken();
+        if (mfaInput) mfaInput.value = token;
+        if (totpGenChip) {
+            totpGenChip.textContent = `✓ Generated: ${token}`;
+            setTimeout(() => totpGenChip.textContent = '⚡ Auto-Generate TOTP (30s)', 3000);
+        }
+        playDingSound();
+    }
+
+    if (totpGenChip) totpGenChip.addEventListener('click', fillTotp);
+    if (totpFillBtn) totpFillBtn.addEventListener('click', fillTotp);
+
+    // Wire up Operative Signout in Header Dropdown
+    const signoutBtn = document.getElementById('op-signout-btn');
+    if (signoutBtn) {
+        signoutBtn.onclick = (e) => {
+            e.stopPropagation();
+            document.getElementById('operative-dropdown-menu')?.classList.remove('active');
+            triggerLogoutSequence();
+        };
+    }
+
+    // Wire up Logout Modal Buttons
+    const logoutModal = document.getElementById('logout-modal');
+    const logoutClose = document.getElementById('logout-modal-close');
+    const reauthBtn = document.getElementById('logout-reauth-btn');
+    const switchBtn = document.getElementById('logout-switch-btn');
+    const burnBtn = document.getElementById('logout-emergency-burn-btn');
+
+    if (logoutClose) {
+        logoutClose.addEventListener('click', () => {
+            if (logoutModal) logoutModal.classList.remove('active');
+        });
+    }
+
+    if (reauthBtn) {
+        reauthBtn.addEventListener('click', () => {
+            if (logoutModal) logoutModal.classList.remove('active');
+            document.getElementById('auth-modal')?.classList.add('active');
+        });
+    }
+
+    if (switchBtn) {
+        switchBtn.addEventListener('click', () => {
+            if (logoutModal) logoutModal.classList.remove('active');
+            document.querySelector('.nav-link[data-tab="profile"]')?.click();
+            document.querySelector('[data-prof-tab="profiles"]')?.click();
+        });
+    }
+
+    if (burnBtn) {
+        burnBtn.addEventListener('click', () => {
+            if (confirm("🔥 CAUTION: This will purge all local data, cached tokens, and profile states. Proceed?")) {
+                localStorage.clear();
+                sessionStorage.clear();
+                alert("Cryptographic purge complete. Resetting terminal...");
+                window.location.reload();
+            }
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initLogout10x();
+});

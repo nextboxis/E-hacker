@@ -178,7 +178,7 @@
                                 Lock Workstation Terminal
                             </button>
                             <div class="op-dropdown-divider"></div>
-                            <button class="op-dropdown-item text-danger" id="op-signout-btn">
+                            <button class="op-dropdown-item text-danger" id="op-signout-btn" title="Initiate 10x Deauthorization Sequence">
                                 <svg viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
                                 Reset to Guest Mode
                             </button>
@@ -3620,9 +3620,29 @@
                         <label for="signin-callsign" class="tool-input-label">Operative Callsign / Identity Handle:</label>
                         <input type="text" id="signin-callsign" class="search-input" placeholder="e.g. root@nextboxis or phantom_0x" required value="root@nextboxis">
                     </div>
-                    <div class="tool-input-group mb-15">
+                    <div class="tool-input-group mb-10">
                         <label for="signin-passphrase" class="tool-input-label">Passphrase / Access Token:</label>
                         <input type="password" id="signin-passphrase" class="search-input" placeholder="••••••••••••" value="shadowprotocol2026">
+                        <!-- Live Password Entropy & Crack Time Gauge -->
+                        <div class="entropy-gauge-box mt-6">
+                            <div class="flex-space-between-center">
+                                <span class="entropy-label" id="entropy-score-text">Entropy: 64 bits (Very Strong)</span>
+                                <span class="entropy-crack-time" id="entropy-crack-text">Crack Time: ~3,400 Centuries</span>
+                            </div>
+                            <div class="entropy-bar-track">
+                                <div class="entropy-bar-fill" id="entropy-bar-fill" style="width: 85%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tool-input-group mb-15">
+                        <div class="flex-space-between-center mb-4">
+                            <label for="signin-mfa" class="tool-input-label">Hardware MFA / TOTP Token:</label>
+                            <span class="totp-generator-chip" id="totp-generate-chip" title="Click to auto-generate & fill live TOTP token">⚡ Auto-Generate TOTP (30s)</span>
+                        </div>
+                        <div class="flex-gap-10">
+                            <input type="text" id="signin-mfa" class="search-input" placeholder="6-digit token (e.g. 849201)" maxlength="6">
+                            <button type="button" id="totp-fill-btn" class="site-btn tool-btn" style="min-width: 90px;">Fill</button>
+                        </div>
                     </div>
                     <div class="tool-input-group mb-20">
                         <label for="signin-mfa" class="tool-input-label">Hardware MFA / TOTP Token (Optional):</label>
@@ -3714,6 +3734,75 @@
             <button id="lock-bio-btn" class="table-action-link mt-15" style="display: inline-flex; align-items: center; gap: 6px;">
                 👆 Touch Biometric Bypass
             </button>
+        </div>
+    </div>
+
+
+    <!-- 10x CYBERPUNK LOGOUT & DEAUTHORIZATION TERMINAL MODAL -->
+    <div id="logout-modal" class="modal-overlay logout-modal-overlay">
+        <div class="logout-dialog">
+            <div class="logout-header">
+                <div class="logout-warning-badge">
+                    <span class="deauth-pulse-dot"></span>
+                    <span>DEAUTHORIZATION PROTOCOL // MEMORY ZEROIZATION</span>
+                </div>
+                <button class="modal-close-btn" id="logout-modal-close">×</button>
+            </div>
+
+            <div class="logout-body">
+                <div class="text-center mb-20">
+                    <div class="logout-powerdown-icon">⚡</div>
+                    <h2 class="logout-title">SESSION TERMINATED</h2>
+                    <p class="logout-subtitle" id="logout-op-tagline">Operative root@nextboxis // Security Clearance Level 5 Suspended</p>
+                </div>
+
+                <!-- Memory Zeroization Step-by-Step Terminal Box -->
+                <div class="deauth-terminal-card mb-20">
+                    <div class="flex-space-between-center mb-8">
+                        <span class="deauth-terminal-header">CRYPTOGRAPHIC MEMORY SANITIZATION:</span>
+                        <span class="deauth-percent" id="deauth-progress-percent">100% PURGED</span>
+                    </div>
+                    <div class="deauth-progress-bar">
+                        <div class="deauth-progress-fill" id="deauth-progress-fill"></div>
+                    </div>
+                    <div class="deauth-log-stream mt-10" id="deauth-log-stream">
+                        <div class="deauth-log-line">✓ [SYS] Revoking active JWT & REST session tokens...</div>
+                        <div class="deauth-log-line">✓ [CRYPTO] Zeroizing memory buffers & ephemeral keys...</div>
+                        <div class="deauth-log-line">✓ [CACHE] Flushing temporary forensic telemetry...</div>
+                        <div class="deauth-log-line deauth-success-line">✓ [AUTH] Clearance channel decommissioned safely.</div>
+                    </div>
+                </div>
+
+                <!-- Session Mission Debrief Card -->
+                <div class="session-debrief-card mb-20">
+                    <h4 class="debrief-header">OPERATIVE MISSION DEBRIEF:</h4>
+                    <div class="debrief-grid">
+                        <div class="debrief-item">
+                            <span class="debrief-lbl">SESSION DURATION:</span>
+                            <strong class="debrief-val" id="debrief-duration">42m 18s</strong>
+                        </div>
+                        <div class="debrief-item">
+                            <span class="debrief-lbl">XP SECURED:</span>
+                            <strong class="debrief-val" id="debrief-xp">+150 XP</strong>
+                        </div>
+                        <div class="debrief-item">
+                            <span class="debrief-lbl">LABS ACTIVE:</span>
+                            <strong class="debrief-val" id="debrief-labs">3 Projects</strong>
+                        </div>
+                        <div class="debrief-item">
+                            <span class="debrief-lbl">LOCAL STORAGE:</span>
+                            <strong class="debrief-val text-success">Encrypted & Safe</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deauthorization Actions -->
+                <div class="logout-actions-grid">
+                    <button class="site-btn" id="logout-reauth-btn">🔑 Re-Authenticate Callsign</button>
+                    <button class="site-btn tool-btn secondary-btn" id="logout-switch-btn">👥 Switch Profile</button>
+                    <button class="site-btn tool-btn text-danger" id="logout-emergency-burn-btn">🔥 Emergency Clean Burn</button>
+                </div>
+            </div>
         </div>
     </div>
 
