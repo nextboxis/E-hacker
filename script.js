@@ -7414,3 +7414,236 @@ ${decoded}`;
 document.addEventListener('DOMContentLoaded', () => {
     initAiSecuritySuite();
 });
+
+
+// ==========================================================================
+// E-HACKER OPERATIVE AUTHENTICATION & TERMINAL LOCK ENGINE
+// ==========================================================================
+
+const defaultOperative = {
+    callsign: 'root@nextboxis',
+    clearance: 'Level 5 • TOP SECRET',
+    domain: 'full',
+    avatar: '🥷'
+};
+
+let activeOperative = JSON.parse(localStorage.getItem('roadmap-active-operative') || JSON.stringify(defaultOperative));
+
+function syncOperativeUI() {
+    const topAvatar = document.getElementById('topbar-op-avatar');
+    const topCallsign = document.getElementById('topbar-op-callsign');
+    const topClearance = document.getElementById('topbar-op-clearance');
+    const dropName = document.getElementById('dropdown-op-name');
+    const dropDomain = document.getElementById('dropdown-op-domain');
+    const lockAvatar = document.getElementById('lock-user-avatar');
+    const lockName = document.getElementById('lock-user-name');
+    const lockClear = document.getElementById('lock-user-clearance');
+
+    if (topAvatar) topAvatar.textContent = activeOperative.avatar;
+    if (topCallsign) topCallsign.textContent = activeOperative.callsign;
+    if (topClearance) topClearance.textContent = activeOperative.clearance;
+    if (dropName) dropName.textContent = activeOperative.callsign;
+    if (dropDomain) dropDomain.textContent = `Track: ${activeOperative.domain.toUpperCase()}`;
+    if (lockAvatar) lockAvatar.textContent = activeOperative.avatar;
+    if (lockName) lockName.textContent = activeOperative.callsign;
+    if (lockClear) lockClear.textContent = activeOperative.clearance;
+}
+
+function initOperativeAuth() {
+    const profileBtn = document.getElementById('operative-profile-btn');
+    const dropMenu = document.getElementById('operative-dropdown-menu');
+    const authModal = document.getElementById('auth-modal');
+    const authClose = document.getElementById('auth-modal-close');
+    const openLoginBtn = document.getElementById('op-open-login-btn');
+    const lockScreenBtn = document.getElementById('op-lock-screen-btn');
+    const signoutBtn = document.getElementById('op-signout-btn');
+    const lockModal = document.getElementById('lock-screen-modal');
+    const unlockBtn = document.getElementById('lock-unlock-btn');
+    const lockBioBtn = document.getElementById('lock-bio-btn');
+    const lockPassInput = document.getElementById('lock-pass-input');
+
+    // Toggle Dropdown
+    if (profileBtn && dropMenu) {
+        profileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropMenu.classList.toggle('active');
+        });
+        document.addEventListener('click', () => dropMenu.classList.remove('active'));
+    }
+
+    // Auth Modal open/close
+    if (openLoginBtn) {
+        openLoginBtn.addEventListener('click', () => {
+            if (dropMenu) dropMenu.classList.remove('active');
+            if (authModal) authModal.classList.add('active');
+        });
+    }
+
+    if (authClose) {
+        authClose.addEventListener('click', () => {
+            if (authModal) authModal.classList.remove('active');
+        });
+    }
+
+    // Tabs inside Auth Modal
+    const tabSignin = document.getElementById('auth-tab-signin');
+    const tabSignup = document.getElementById('auth-tab-signup');
+    const formSignin = document.getElementById('auth-signin-form');
+    const formSignup = document.getElementById('auth-signup-form');
+
+    if (tabSignin && tabSignup) {
+        tabSignin.addEventListener('click', () => {
+            tabSignin.classList.add('active');
+            tabSignup.classList.remove('active');
+            if (formSignin) formSignin.classList.remove('d-none');
+            if (formSignup) formSignup.classList.add('d-none');
+        });
+        tabSignup.addEventListener('click', () => {
+            tabSignup.classList.add('active');
+            tabSignin.classList.remove('active');
+            if (formSignup) formSignup.classList.remove('d-none');
+            if (formSignin) formSignin.classList.add('d-none');
+        });
+    }
+
+    // Demo Role Chips
+    document.querySelectorAll('.demo-role-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const name = chip.getAttribute('data-role-name');
+            const clear = chip.getAttribute('data-role-clear');
+            const domain = chip.getAttribute('data-role-domain');
+            const avatar = chip.getAttribute('data-role-avatar');
+
+            activeOperative = { callsign: name, clearance: clear, domain: domain, avatar: avatar };
+            localStorage.setItem('roadmap-active-operative', JSON.stringify(activeOperative));
+            syncOperativeUI();
+            if (typeof syncDomainProfile === 'function') syncDomainProfile(domain, true);
+            playDingSound();
+
+            if (authModal) authModal.classList.remove('active');
+        });
+    });
+
+    // Avatar selector inside signup form
+    let selectedAvatar = '🥷';
+    document.querySelectorAll('.avatar-opt').forEach(opt => {
+        opt.addEventListener('click', () => {
+            document.querySelectorAll('.avatar-opt').forEach(o => o.classList.remove('active'));
+            opt.classList.add('active');
+            selectedAvatar = opt.getAttribute('data-avatar');
+        });
+    });
+
+    // Sign in submission
+    if (formSignin) {
+        formSignin.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const callsign = document.getElementById('signin-callsign').value.trim() || 'root@nextboxis';
+            activeOperative = {
+                callsign: callsign,
+                clearance: 'Level 5 • TOP SECRET',
+                domain: 'full',
+                avatar: '🥷'
+            };
+            localStorage.setItem('roadmap-active-operative', JSON.stringify(activeOperative));
+            syncOperativeUI();
+            playDingSound();
+            if (authModal) authModal.classList.remove('active');
+        });
+    }
+
+    // Sign up submission
+    if (formSignup) {
+        formSignup.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const callsign = document.getElementById('signup-callsign').value.trim();
+            const domain = document.getElementById('signup-domain').value;
+            const clearance = document.getElementById('signup-clearance').value;
+
+            activeOperative = {
+                callsign: callsign,
+                clearance: clearance,
+                domain: domain,
+                avatar: selectedAvatar
+            };
+            localStorage.setItem('roadmap-active-operative', JSON.stringify(activeOperative));
+            syncOperativeUI();
+            if (typeof syncDomainProfile === 'function') syncDomainProfile(domain, true);
+            playDingSound();
+            if (authModal) authModal.classList.remove('active');
+        });
+    }
+
+    // Biometric Scanner Simulation
+    const bioBtn = document.getElementById('biometric-scan-btn');
+    if (bioBtn) {
+        bioBtn.addEventListener('click', () => {
+            bioBtn.classList.add('scanning');
+            setTimeout(() => {
+                bioBtn.classList.remove('scanning');
+                activeOperative = {
+                    callsign: 'root@nextboxis',
+                    clearance: 'Level 5 • TOP SECRET // BIOMETRIC VERIFIED',
+                    domain: 'full',
+                    avatar: '🥷'
+                };
+                localStorage.setItem('roadmap-active-operative', JSON.stringify(activeOperative));
+                syncOperativeUI();
+                playDingSound();
+                if (authModal) authModal.classList.remove('active');
+            }, 1200);
+        });
+    }
+
+    // Lock Screen Feature
+    if (lockScreenBtn) {
+        lockScreenBtn.addEventListener('click', () => {
+            if (dropMenu) dropMenu.classList.remove('active');
+            if (lockModal) lockModal.classList.add('active');
+        });
+    }
+
+    function unlockScreen() {
+        if (lockModal) lockModal.classList.remove('active');
+        if (lockPassInput) lockPassInput.value = '';
+        playDingSound();
+    }
+
+    if (unlockBtn) unlockBtn.addEventListener('click', unlockScreen);
+    if (lockBioBtn) lockBioBtn.addEventListener('click', unlockScreen);
+    if (lockPassInput) {
+        lockPassInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') unlockScreen();
+        });
+    }
+
+    // Lock screen live clock ticker
+    setInterval(() => {
+        const clock = document.getElementById('lock-clock');
+        const dateEl = document.getElementById('lock-date');
+        const now = new Date();
+        if (clock) clock.textContent = now.toLocaleTimeString();
+        if (dateEl) dateEl.textContent = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }, 1000);
+
+    // Sign out to guest
+    if (signoutBtn) {
+        signoutBtn.addEventListener('click', () => {
+            activeOperative = {
+                callsign: 'Guest_Operative',
+                clearance: 'Level 1 • UNCLASSIFIED',
+                domain: 'full',
+                avatar: '👤'
+            };
+            localStorage.setItem('roadmap-active-operative', JSON.stringify(activeOperative));
+            syncOperativeUI();
+            if (dropMenu) dropMenu.classList.remove('active');
+        });
+    }
+
+    syncOperativeUI();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initOperativeAuth();
+});

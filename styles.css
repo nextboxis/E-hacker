@@ -5199,3 +5199,407 @@ body.theme-light-adhd .progress-bar-circle {
     line-height: 1.4;
     animation: fadeIn 0.3s ease;
 }
+
+
+/* ==========================================================================
+   CYBERPUNK AUTHENTICATION, OPERATIVE PROFILES & TERMINAL LOCK STYLES
+   ========================================================================== */
+
+.header-operative-wrapper {
+    position: relative;
+}
+
+.operative-badge-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(4, 15, 8, 0.7);
+    border: 1px solid rgba(0, 255, 102, 0.3);
+    border-radius: 20px;
+    padding: 4px 12px 4px 6px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.operative-badge-btn:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.2);
+    transform: translateY(-1px);
+}
+
+.operative-avatar-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0, 255, 102, 0.15);
+    border: 1px solid var(--color-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.operative-details {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 2px;
+}
+
+.operative-callsign {
+    font-size: 0.82rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.operative-clearance-tag {
+    font-size: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--color-accent);
+    letter-spacing: 0.5px;
+}
+
+.op-dropdown-icon {
+    width: 16px;
+    height: 16px;
+    fill: var(--text-muted);
+}
+
+/* Operative Dropdown */
+.operative-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 240px;
+    background: #040e07;
+    border: 1px solid rgba(0, 255, 102, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 255, 102, 0.1);
+    padding: 10px;
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 1000;
+    animation: modalSlideIn 0.2s ease;
+}
+
+.operative-dropdown-menu.active {
+    display: flex;
+}
+
+.op-dropdown-header {
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.op-dropdown-header strong {
+    font-size: 0.9rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--color-accent);
+}
+
+.op-dropdown-header span {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.op-dropdown-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 4px 0;
+}
+
+.op-dropdown-item {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: left;
+}
+
+.op-dropdown-item svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.op-dropdown-item:hover {
+    background: rgba(0, 255, 102, 0.1);
+    color: var(--color-accent);
+}
+
+.op-dropdown-item.text-danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--color-danger);
+}
+
+/* --- Auth Dialog --- */
+.auth-dialog {
+    background: #030a05;
+    border: 1px solid rgba(0, 255, 102, 0.35);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 255, 102, 0.2);
+    overflow: hidden;
+    animation: modalSlideIn 0.3s ease;
+}
+
+.auth-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 20, 10, 0.4);
+}
+
+.auth-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.auth-logo-glitch {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: rgba(0, 255, 102, 0.15);
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-brand h3 {
+    font-size: 1.1rem;
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.auth-subtitle {
+    font-size: 0.68rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--color-accent);
+    letter-spacing: 0.5px;
+}
+
+.auth-body {
+    padding: 24px;
+}
+
+.auth-mode-chips {
+    display: flex;
+    gap: 10px;
+}
+
+.auth-demo-roles-bar {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(0, 255, 102, 0.2);
+    border-radius: 10px;
+    padding: 10px 14px;
+}
+
+.demo-role-label {
+    display: block;
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.demo-chips-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.demo-role-chip {
+    background: rgba(0, 255, 102, 0.06);
+    border: 1px solid rgba(0, 255, 102, 0.2);
+    color: var(--text-secondary);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.demo-role-chip:hover {
+    background: var(--color-accent);
+    color: #000;
+}
+
+.auth-action-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.auth-submit-btn {
+    flex: 1;
+    height: 44px;
+}
+
+.biometric-btn {
+    background: rgba(6, 182, 212, 0.1);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    color: var(--color-secondary);
+    border-radius: 12px;
+    padding: 0 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.biometric-btn:hover {
+    background: rgba(6, 182, 212, 0.2);
+    border-color: var(--color-secondary);
+}
+
+.bio-scanline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--color-secondary);
+    box-shadow: 0 0 8px var(--color-secondary);
+    display: none;
+}
+
+.biometric-btn.scanning .bio-scanline {
+    display: block;
+    animation: scanLineAnim 1.2s infinite;
+}
+
+@keyframes scanLineAnim {
+    0% { top: 0%; }
+    50% { top: 100%; }
+    100% { top: 0%; }
+}
+
+.avatar-select-grid {
+    display: flex;
+    gap: 10px;
+}
+
+.avatar-opt {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-card);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.avatar-opt:hover, .avatar-opt.active {
+    border-color: var(--color-accent);
+    background: rgba(0, 255, 102, 0.15);
+}
+
+.auth-feedback-box {
+    margin-top: 15px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+}
+
+.auth-feedback-box.success {
+    background: rgba(0, 255, 102, 0.1);
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+}
+
+.auth-feedback-box.error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--color-danger);
+    color: var(--color-danger);
+}
+
+/* --- Terminal Screen Locker Overlay --- */
+.lock-screen-overlay {
+    background: rgba(0, 5, 2, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 99999;
+}
+
+.lock-screen-dialog {
+    text-align: center;
+    max-width: 440px;
+    width: 100%;
+}
+
+.lock-icon-glow {
+    font-size: 3.5rem;
+    color: var(--color-accent);
+    text-shadow: 0 0 25px rgba(0, 255, 102, 0.5);
+    margin-bottom: 10px;
+}
+
+.lock-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+}
+
+.lock-time-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--color-accent);
+}
+
+.lock-date-display {
+    font-size: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+}
+
+.lock-user-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-card);
+    padding: 10px 18px;
+    border-radius: 14px;
+    text-align: left;
+}
+
+.lock-input-group {
+    display: flex;
+    gap: 10px;
+}
