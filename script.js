@@ -132,6 +132,7 @@ const tabMeta = {
     toolkit: { title: "Cyber Toolkit & Labs", subtitle: "Interactive client-side calculators, cryptographic encoders, and threat analyzers" },
     'ai-hub': { title: "AI Security Hub & Live Feeds", subtitle: "AI detection rule synthesis, payload deobfuscation, live CVE feeds & threat radar" },
     adhd: { title: "ADHD Focus Hub", subtitle: "Neurodivergent focus aids, gamified quests, and productivity boosters" },
+    profile: { title: "Operative Profile & Dossier", subtitle: "Multi-user profile manager, clearance status, and cyber achievements" },
     about: { title: "About Developer", subtitle: "Connect with the developer of the E-hacker Hub" }
 };
 
@@ -7646,4 +7647,347 @@ function initOperativeAuth() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initOperativeAuth();
+});
+
+
+// ==========================================================================
+// E-HACKER MULTI-OPERATIVE PROFILE & ISOLATION ENGINE
+// ==========================================================================
+
+const DEFAULT_PROFILES = [
+    {
+        id: 'prof_root',
+        callsign: 'root@nextboxis',
+        clearance: 'Level 5 • TOP SECRET',
+        domain: 'full',
+        avatar: '🥷',
+        bio: 'Knowledge is free. We are anonymous. Security is an illusion.',
+        created_at: '2026-08-22',
+        apiKey: 'ehk_live_sec_root9482x',
+        xp: 0,
+        level: 1,
+        completedProjects: [],
+        checkedSkills: [],
+        notes: {}
+    },
+    {
+        id: 'prof_redteam',
+        callsign: 'Ghost_RedTeam',
+        clearance: 'Level 4 • SECRET',
+        domain: 'web',
+        avatar: '🕷️',
+        bio: 'Offensive Security Specialist & External Penetration Tester',
+        created_at: '2026-08-22',
+        apiKey: 'ehk_live_sec_ghost2819y',
+        xp: 150,
+        level: 2,
+        completedProjects: [1, 2],
+        checkedSkills: ['sec-fund', 'linux-cli'],
+        notes: {}
+    },
+    {
+        id: 'prof_soc',
+        callsign: 'Sentinel_SOC',
+        clearance: 'Level 4 • SECRET',
+        domain: 'soc',
+        avatar: '🛡️',
+        bio: 'Blue Team Threat Hunter & SIEM Detection Engineer',
+        created_at: '2026-08-22',
+        apiKey: 'ehk_live_sec_soc8392z',
+        xp: 220,
+        level: 3,
+        completedProjects: [3, 4],
+        checkedSkills: ['wireshark-audit', 'snort-ids'],
+        notes: {}
+    }
+];
+
+let allProfiles = JSON.parse(localStorage.getItem('roadmap-multi-profiles') || JSON.stringify(DEFAULT_PROFILES));
+let activeProfileId = localStorage.getItem('roadmap-active-profile-id') || 'prof_root';
+
+function getActiveProfile() {
+    let p = allProfiles.find(p => p.id === activeProfileId);
+    if (!p) {
+        p = allProfiles[0] || DEFAULT_PROFILES[0];
+        activeProfileId = p.id;
+    }
+    return p;
+}
+
+function saveProfiles() {
+    localStorage.setItem('roadmap-multi-profiles', JSON.stringify(allProfiles));
+    localStorage.setItem('roadmap-active-profile-id', activeProfileId);
+}
+
+function switchProfile(profileId) {
+    const prof = allProfiles.find(p => p.id === profileId);
+    if (!prof) return;
+
+    activeProfileId = profileId;
+    saveProfiles();
+
+    // Sync global active operative
+    activeOperative = {
+        callsign: prof.callsign,
+        clearance: prof.clearance,
+        domain: prof.domain,
+        avatar: prof.avatar
+    };
+    localStorage.setItem('roadmap-active-operative', JSON.stringify(activeOperative));
+
+    // Sync UI
+    syncOperativeUI();
+    renderProfileDossier();
+    renderProfilesList();
+    if (typeof syncDomainProfile === 'function') syncDomainProfile(prof.domain, true);
+    playDingSound();
+}
+
+function renderProfileDossier() {
+    const prof = getActiveProfile();
+
+    // Header & Dossier fields
+    const dAvatar = document.getElementById('profile-dossier-avatar');
+    const dLevelPill = document.getElementById('profile-dossier-level-pill');
+    const dDomainTag = document.getElementById('profile-dossier-domain-tag');
+    const dCallsign = document.getElementById('profile-dossier-callsign');
+    const dBio = document.getElementById('profile-dossier-bio');
+    const dClearance = document.getElementById('profile-dossier-clearance');
+    const dId = document.getElementById('profile-dossier-id');
+    const dLabs = document.getElementById('profile-dossier-labs');
+    const dXp = document.getElementById('profile-dossier-xp');
+    const dApiKey = document.getElementById('prof-active-apikey-display');
+
+    if (dAvatar) dAvatar.textContent = prof.avatar;
+    if (dLevelPill) dLevelPill.textContent = `LEVEL ${prof.level || 1}`;
+    if (dDomainTag) dDomainTag.textContent = `${(prof.domain || 'full').toUpperCase()} TRACK`;
+    if (dCallsign) dCallsign.textContent = prof.callsign;
+    if (dBio) dBio.textContent = `"${prof.bio || 'Offensive Security Enthusiast'}"`;
+    if (dClearance) dClearance.textContent = prof.clearance;
+    if (dId) dId.textContent = `OP-${prof.id.substring(5).toUpperCase()}-X`;
+    if (dLabs) dLabs.textContent = `${(prof.completedProjects || []).length} / 100 Labs`;
+    if (dXp) dXp.textContent = `${prof.xp || 0} XP`;
+    if (dApiKey) dApiKey.textContent = prof.apiKey || 'ehk_live_sec_' + Math.random().toString(36).substring(2, 12);
+
+    // Progress meters in overview
+    const completedProjectsCount = (prof.completedProjects || []).length;
+    const labsProgBar = document.getElementById('dossier-labs-progress-bar');
+    const labsProgText = document.getElementById('dossier-labs-progress-text');
+    if (labsProgBar) labsProgBar.style.width = `${completedProjectsCount}%`;
+    if (labsProgText) labsProgText.textContent = `${completedProjectsCount} / 100 Labs (${completedProjectsCount}%)`;
+
+    // Fill form in edit tab
+    const editCall = document.getElementById('edit-op-callsign');
+    const editBio = document.getElementById('edit-op-bio');
+    const editDomain = document.getElementById('edit-op-domain');
+    const editClear = document.getElementById('edit-op-clearance');
+
+    if (editCall) editCall.value = prof.callsign;
+    if (editBio) editBio.value = prof.bio || '';
+    if (editDomain) editDomain.value = prof.domain || 'full';
+    if (editClear) editClear.value = prof.clearance || 'Level 5 • TOP SECRET';
+
+    renderAchievements();
+}
+
+function renderProfilesList() {
+    const container = document.getElementById('profiles-manager-grid');
+    if (!container) return;
+
+    container.innerHTML = allProfiles.map(p => {
+        const isActive = p.id === activeProfileId;
+        return `
+            <div class="profile-card ${isActive ? 'active-profile' : ''}">
+                <div>
+                    <div class="profile-card-header">
+                        <div class="profile-card-avatar">${p.avatar}</div>
+                        <div>
+                            <div class="profile-card-title">${p.callsign}</div>
+                            <span class="operative-clearance-tag">${p.clearance}</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 8px;">${p.bio || 'Security Operative'}</p>
+                    <div style="font-size: 0.78rem; font-family: monospace; color: var(--color-accent);">
+                        XP: ${p.xp || 0} | Level: ${p.level || 1} | Labs: ${(p.completedProjects || []).length}/100
+                    </div>
+                </div>
+                <div class="profile-card-footer">
+                    ${isActive ? '<span class="channel-badge" style="background: rgba(0, 255, 102, 0.2); color: var(--color-accent);">ACTIVE PROFILE</span>' : `<button class="table-action-link" onclick="switchProfile('${p.id}')">Activate</button>`}
+                    ${allProfiles.length > 1 && !isActive ? `<button class="table-action-link text-danger" onclick="deleteProfile('${p.id}')">Delete</button>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+window.switchProfile = switchProfile;
+window.deleteProfile = function(profileId) {
+    if (confirm("Are you sure you want to decommission this operative profile?")) {
+        allProfiles = allProfiles.filter(p => p.id !== profileId);
+        if (activeProfileId === profileId) activeProfileId = allProfiles[0].id;
+        saveProfiles();
+        renderProfileDossier();
+        renderProfilesList();
+    }
+};
+
+const ACHIEVEMENTS_LIST = [
+    { id: 'first_blood', name: 'First Blood Lab', desc: 'Complete your first hands-on cybersecurity project lab', icon: '🩸', req: (p) => (p.completedProjects || []).length >= 1 },
+    { id: 'hash_master', name: 'Hash Cracker', desc: 'Generate and analyze 5 hashes in the Cyber Toolkit', icon: '🔑', req: (p) => true },
+    { id: 'subnet_ninja', name: 'Subnet Architect', desc: 'Calculate IPv4 network spans and CIDR bounds', icon: '🌐', req: (p) => true },
+    { id: 'cve_hunter', name: 'Zero-Day Hunter', desc: 'Inspect live CVE intelligence and security advisories', icon: '⚡', req: (p) => true },
+    { id: 'terminal_vet', name: 'Terminal Veteran', desc: 'Execute commands inside the CRT Cyber Sandbox Terminal', icon: '💻', req: (p) => true },
+    { id: 'sigma_scribe', name: 'Sigma Rule Scribe', desc: 'Synthesize automated detection rules in the AI Security Suite', icon: '🤖', req: (p) => true },
+    { id: 'quiz_champ', name: 'Quiz Master', desc: 'Score above 80% on the Practice Certification Exam', icon: '🎯', req: (p) => (p.xp || 0) >= 100 },
+    { id: 'century_hacker', name: 'Century Hacker (100 Labs)', desc: 'Conquer all 100 hands-on cybersecurity labs', icon: '👑', req: (p) => (p.completedProjects || []).length >= 100 }
+];
+
+function renderAchievements() {
+    const container = document.getElementById('achievements-badges-grid');
+    if (!container) return;
+    const prof = getActiveProfile();
+
+    container.innerHTML = ACHIEVEMENTS_LIST.map(a => {
+        const isUnlocked = a.req(prof);
+        return `
+            <div class="achievement-card ${isUnlocked ? 'unlocked' : ''}">
+                <div class="achievement-icon">${a.icon}</div>
+                <div class="achievement-info">
+                    <h4>${a.name}</h4>
+                    <p>${a.desc}</p>
+                    <span style="font-size: 0.72rem; font-family: monospace; color: ${isUnlocked ? 'var(--color-accent)' : 'var(--text-muted)'}; font-weight: 700;">
+                        ${isUnlocked ? '✓ UNLOCKED' : '🔒 LOCKED'}
+                    </span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function initProfilePage() {
+    // Tab switching inside profile
+    const profNavBtns = document.querySelectorAll('.profile-nav-btn');
+    const profPanels = document.querySelectorAll('.profile-sub-panel');
+
+    profNavBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.getAttribute('data-prof-tab');
+            profNavBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            profPanels.forEach(p => p.classList.remove('active'));
+            const panel = document.getElementById(`prof-panel-${target}`);
+            if (panel) panel.classList.add('active');
+        });
+    });
+
+    // Quick Action buttons on Dossier card
+    document.getElementById('dossier-switch-profile-btn')?.addEventListener('click', () => {
+        document.querySelector('[data-prof-tab="profiles"]')?.click();
+    });
+    document.getElementById('dossier-edit-profile-btn')?.addEventListener('click', () => {
+        document.querySelector('[data-prof-tab="edit"]')?.click();
+    });
+    document.getElementById('dossier-lock-terminal-btn')?.addEventListener('click', () => {
+        document.getElementById('op-lock-screen-btn')?.click();
+    });
+
+    // Navigation from header dropdown to profile tab
+    document.getElementById('op-nav-profile-btn')?.addEventListener('click', () => {
+        document.querySelector('.nav-link[data-tab="profile"]')?.click();
+    });
+
+    // Edit form submission
+    const editForm = document.getElementById('profile-edit-form');
+    if (editForm) {
+        editForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const prof = getActiveProfile();
+            prof.callsign = document.getElementById('edit-op-callsign').value.trim();
+            prof.bio = document.getElementById('edit-op-bio').value.trim();
+            prof.domain = document.getElementById('edit-op-domain').value;
+            prof.clearance = document.getElementById('edit-op-clearance').value;
+
+            const activeAvatarEl = document.querySelector('#edit-avatar-select-grid .avatar-opt.active');
+            if (activeAvatarEl) prof.avatar = activeAvatarEl.getAttribute('data-avatar');
+
+            saveProfiles();
+            activeOperative = { callsign: prof.callsign, clearance: prof.clearance, domain: prof.domain, avatar: prof.avatar };
+            localStorage.setItem('roadmap-active-operative', JSON.stringify(activeOperative));
+
+            syncOperativeUI();
+            renderProfileDossier();
+            renderProfilesList();
+            playDingSound();
+            alert("Operative dossier updated successfully!");
+        });
+    }
+
+    // Avatar selector in edit form
+    document.querySelectorAll('#edit-avatar-select-grid .avatar-opt').forEach(opt => {
+        opt.addEventListener('click', () => {
+            document.querySelectorAll('#edit-avatar-select-grid .avatar-opt').forEach(o => o.classList.remove('active'));
+            opt.classList.add('active');
+        });
+    });
+
+    // Provision new profile button
+    document.getElementById('prof-create-new-btn')?.addEventListener('click', () => {
+        const name = prompt("Enter Callsign for new Operative Profile:", "Operative_" + Math.random().toString(36).substring(2, 6).toUpperCase());
+        if (!name) return;
+
+        const newProf = {
+            id: 'prof_' + Math.random().toString(36).substring(2, 8),
+            callsign: name,
+            clearance: 'Level 1 • UNCLASSIFIED',
+            domain: 'full',
+            avatar: '🥷',
+            bio: 'Field Operative in Training',
+            created_at: new Date().toISOString().slice(0, 10),
+            apiKey: 'ehk_live_sec_' + Math.random().toString(36).substring(2, 12),
+            xp: 0,
+            level: 1,
+            completedProjects: [],
+            checkedSkills: [],
+            notes: {}
+        };
+        allProfiles.push(newProf);
+        switchProfile(newProf.id);
+    });
+
+    // API Key generation
+    document.getElementById('prof-gen-apikey-btn')?.addEventListener('click', () => {
+        const prof = getActiveProfile();
+        prof.apiKey = 'ehk_live_sec_' + Math.random().toString(36).substring(2, 14);
+        saveProfiles();
+        renderProfileDossier();
+        playDingSound();
+    });
+
+    document.getElementById('prof-copy-apikey-btn')?.addEventListener('click', () => {
+        const prof = getActiveProfile();
+        navigator.clipboard.writeText(prof.apiKey);
+        const btn = document.getElementById('prof-copy-apikey-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy API Key', 1500);
+    });
+
+    // Export JSON Dossier
+    document.getElementById('dossier-export-json-btn')?.addEventListener('click', () => {
+        const prof = getActiveProfile();
+        const blob = new Blob([JSON.stringify(prof, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ehacker-dossier-${prof.callsign.replace(/[^a-z0-9]/gi, '_')}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    renderProfileDossier();
+    renderProfilesList();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initProfilePage();
 });

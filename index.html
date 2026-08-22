@@ -117,6 +117,13 @@
                     ADHD Focus Hub
                 </a>
 
+                <a class="nav-link" data-tab="profile">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                    Operative Profile
+                    <span class="nav-badge" id="nav-profile-badge">Active</span>
+                </a>
                 <a class="nav-link" data-tab="about">
                     <svg viewBox="0 0 24 24">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
@@ -158,6 +165,10 @@
                                 <span id="dropdown-op-domain">Full Spectrum Hacker</span>
                             </div>
                             <div class="op-dropdown-divider"></div>
+                            <button class="op-dropdown-item" id="op-nav-profile-btn">
+                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                Operative Profile & Dossier
+                            </button>
                             <button class="op-dropdown-item" id="op-open-login-btn">
                                 <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                                 Switch / Provision Callsign
@@ -2882,7 +2893,228 @@
 
         
             <!-- TAB 12: ABOUT DEVELOPER PANEL -->
-            <div id="tab-about" class="tab-panel">
+            
+            <!-- TAB: OPERATIVE PROFILE & MULTI-USER MANAGEMENT -->
+            <div id="tab-profile" class="tab-panel">
+                <!-- Profile Header / Dossier Card -->
+                <div class="glass-card operative-dossier-hero mb-25">
+                    <div class="dossier-watermark">TOP SECRET // NOFORN</div>
+                    <div class="dossier-hero-layout">
+                        <!-- Holographic Avatar & Clearance -->
+                        <div class="dossier-avatar-col">
+                            <div class="dossier-avatar-box" id="profile-dossier-avatar">🥷</div>
+                            <div class="dossier-level-pill" id="profile-dossier-level-pill">LEVEL 1</div>
+                        </div>
+
+                        <!-- Operative Info & Tagline -->
+                        <div class="dossier-info-col">
+                            <div class="flex-space-between-center flex-wrap gap-10">
+                                <div>
+                                    <div class="projects-badge-tag" id="profile-dossier-domain-tag">FULL SPECTRUM HACKER</div>
+                                    <h2 class="dossier-callsign" id="profile-dossier-callsign">root@nextboxis</h2>
+                                    <p class="dossier-motto" id="profile-dossier-bio">"Knowledge is free. We are anonymous. Security is an illusion."</p>
+                                </div>
+                                <div class="dossier-actions-group">
+                                    <button class="site-btn tool-btn" id="dossier-switch-profile-btn">👥 Switch Profile</button>
+                                    <button class="site-btn tool-btn secondary-btn" id="dossier-edit-profile-btn">✏️ Edit Details</button>
+                                    <button class="site-btn tool-btn" id="dossier-lock-terminal-btn">🔒 Lock</button>
+                                </div>
+                            </div>
+
+                            <!-- Meta Metrics Grid -->
+                            <div class="dossier-metrics-grid mt-15">
+                                <div class="dossier-metric-item">
+                                    <span class="dossier-metric-label">SECURITY CLEARANCE:</span>
+                                    <strong class="dossier-metric-val" id="profile-dossier-clearance">LEVEL 5 • TOP SECRET</strong>
+                                </div>
+                                <div class="dossier-metric-item">
+                                    <span class="dossier-metric-label">OPERATIVE ID:</span>
+                                    <strong class="dossier-metric-val" id="profile-dossier-id">OP-9482-X</strong>
+                                </div>
+                                <div class="dossier-metric-item">
+                                    <span class="dossier-metric-label">TOTAL LABS COMPLETED:</span>
+                                    <strong class="dossier-metric-val" id="profile-dossier-labs">0 / 100 Labs</strong>
+                                </div>
+                                <div class="dossier-metric-item">
+                                    <span class="dossier-metric-label">TOTAL EXPERIENCE (XP):</span>
+                                    <strong class="dossier-metric-val" id="profile-dossier-xp">0 XP</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Sub-Tab Switcher -->
+                    <div class="ai-nav-chips mt-20">
+                        <button class="profile-nav-btn active" data-prof-tab="dossier">🪪 Operative Dossier</button>
+                        <button class="profile-nav-btn" data-prof-tab="profiles">👥 Multi-Profile Manager</button>
+                        <button class="profile-nav-btn" data-prof-tab="achievements">🏆 Cyber Badges & Achievements</button>
+                        <button class="profile-nav-btn" data-prof-tab="edit">⚙️ Edit Identity</button>
+                        <button class="profile-nav-btn" data-prof-tab="apikeys">🔑 Security API Tokens</button>
+                    </div>
+                </div>
+
+                <!-- SUB-PANEL 1: DOSSIER OVERVIEW -->
+                <div id="prof-panel-dossier" class="profile-sub-panel active">
+                    <div class="overview-grid">
+                        <div class="glass-card">
+                            <h3 class="tool-section-title">📊 Competency & Skill Progress</h3>
+                            <div class="mt-15">
+                                <div class="flex-space-between-center mb-8">
+                                    <span class="subnet-stat-label">Roadmap Milestones:</span>
+                                    <strong id="dossier-roadmap-progress-text" class="subnet-stat-val">0 / 38 Skills (0%)</strong>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" id="dossier-roadmap-progress-bar" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <div class="mt-15">
+                                <div class="flex-space-between-center mb-8">
+                                    <span class="subnet-stat-label">100 Labs Completion:</span>
+                                    <strong id="dossier-labs-progress-text" class="subnet-stat-val">0 / 100 Labs (0%)</strong>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" id="dossier-labs-progress-bar" style="width: 0%; background: linear-gradient(90deg, #06b6d4, #3b82f6);"></div>
+                                </div>
+                            </div>
+                            <div class="mt-15">
+                                <div class="flex-space-between-center mb-8">
+                                    <span class="subnet-stat-label">Hacker Level Progression:</span>
+                                    <strong id="dossier-level-rank-text" class="subnet-stat-val">Rank: Script Kiddie</strong>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" id="dossier-level-progress-bar" style="width: 0%; background: linear-gradient(90deg, #8b5cf6, #ec4899);"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card">
+                            <h3 class="tool-section-title">📜 Operative Mission Record</h3>
+                            <div class="ir-steps-list mt-10" id="dossier-mission-log">
+                                <li><strong>Status:</strong> Active & Authorized</li>
+                                <li><strong>Assigned Terminal:</strong> E-HACKER SOC Workstation v2.5</li>
+                                <li><strong>Data Storage:</strong> Encrypted Local-First IndexedDB Engine</li>
+                                <li><strong>Vercel Edge Gateway:</strong> Connected & Verified</li>
+                            </div>
+                            <div class="mt-20">
+                                <button class="site-btn" id="dossier-export-json-btn">💾 Export Full Profile Dossier (JSON)</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-PANEL 2: MULTI-PROFILE MANAGER -->
+                <div id="prof-panel-profiles" class="profile-sub-panel">
+                    <div class="glass-card">
+                        <div class="flex-space-between-center mb-15 flex-wrap gap-10">
+                            <div>
+                                <h3 class="tool-section-title">👥 Multi-Operative Profile Manager</h3>
+                                <p class="tool-section-desc">Create and manage separate profiles for different jobs, CTF events, or learning tracks with fully isolated data.</p>
+                            </div>
+                            <button class="site-btn" id="prof-create-new-btn">➕ Provision New Profile</button>
+                        </div>
+
+                        <div class="profiles-grid" id="profiles-manager-grid">
+                            <!-- Populated dynamically via script.js -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-PANEL 3: ACHIEVEMENTS & CYBER BADGES -->
+                <div id="prof-panel-achievements" class="profile-sub-panel">
+                    <div class="glass-card">
+                        <h3 class="tool-section-title">🏆 Cyber Achievements & Honor Badges</h3>
+                        <p class="tool-section-desc">Earn badges and honor ribbons as you master tools, complete labs, and conquer cybersecurity challenges.</p>
+
+                        <div class="achievements-grid mt-20" id="achievements-badges-grid">
+                            <!-- Populated dynamically via script.js -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-PANEL 4: EDIT OPERATIVE IDENTITY -->
+                <div id="prof-panel-edit" class="profile-sub-panel">
+                    <div class="glass-card">
+                        <h3 class="tool-section-title">⚙️ Edit Operative Identity & Credentials</h3>
+                        <form id="profile-edit-form" class="mt-15">
+                            <div class="overview-grid">
+                                <div class="tool-input-group mb-15">
+                                    <label class="tool-input-label">Operative Callsign / Handle:</label>
+                                    <input type="text" id="edit-op-callsign" class="search-input" required>
+                                </div>
+                                <div class="tool-input-group mb-15">
+                                    <label class="tool-input-label">Security Clearance Level:</label>
+                                    <select id="edit-op-clearance" class="domain-select" style="width: 100%;">
+                                        <option value="Level 1 • UNCLASSIFIED">Level 1 • UNCLASSIFIED (Recruit)</option>
+                                        <option value="Level 2 • RESTRICTED">Level 2 • RESTRICTED (Apprentice)</option>
+                                        <option value="Level 3 • CONFIDENTIAL">Level 3 • CONFIDENTIAL (Auditor)</option>
+                                        <option value="Level 4 • SECRET">Level 4 • SECRET (Senior Pentester)</option>
+                                        <option value="Level 5 • TOP SECRET">Level 5 • TOP SECRET // NOFORN (Root Lead)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="tool-input-group mb-15">
+                                <label class="tool-input-label">Operative Motto / Bio:</label>
+                                <input type="text" id="edit-op-bio" class="search-input" placeholder="e.g. Offensive Security Specialist">
+                            </div>
+
+                            <div class="overview-grid">
+                                <div class="tool-input-group mb-15">
+                                    <label class="tool-input-label">Specialization Focus Track:</label>
+                                    <select id="edit-op-domain" class="domain-select" style="width: 100%;">
+                                        <option value="full">🌐 Full Spectrum Hacker</option>
+                                        <option value="web">🕷️ Web Pentesting</option>
+                                        <option value="network">🔌 Network & Infrastructure</option>
+                                        <option value="soc">🛡️ SOC & Blue Team Defense</option>
+                                        <option value="malware">🔬 Malware & Reverse Eng</option>
+                                        <option value="osint">🔍 OSINT Specialist</option>
+                                    </select>
+                                </div>
+                                <div class="tool-input-group mb-15">
+                                    <label class="tool-input-label">Choose Avatar:</label>
+                                    <div class="avatar-select-grid" id="edit-avatar-select-grid">
+                                        <span class="avatar-opt active" data-avatar="🥷">🥷</span>
+                                        <span class="avatar-opt" data-avatar="🕷️">🕷️</span>
+                                        <span class="avatar-opt" data-avatar="🛡️">🛡️</span>
+                                        <span class="avatar-opt" data-avatar="🔬">🔬</span>
+                                        <span class="avatar-opt" data-avatar="⚡">⚡</span>
+                                        <span class="avatar-opt" data-avatar="👾">👾</span>
+                                        <span class="avatar-opt" data-avatar="🎯">🎯</span>
+                                        <span class="avatar-opt" data-avatar="🐉">🐉</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-15">
+                                <button type="submit" class="site-btn">Save Operative Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- SUB-PANEL 5: API KEYS & SECURITY TOKENS -->
+                <div id="prof-panel-apikeys" class="profile-sub-panel">
+                    <div class="glass-card">
+                        <div class="flex-space-between-center mb-15">
+                            <div>
+                                <h3 class="tool-section-title">🔑 Security API Tokens & Operative Credentials</h3>
+                                <p class="tool-section-desc">Generate simulated edge API credentials for automated threat hunting scripts and API tools.</p>
+                            </div>
+                            <button class="site-btn tool-btn" id="prof-gen-apikey-btn">⚡ Generate New Key</button>
+                        </div>
+
+                        <div class="ai-code-output-card">
+                            <div class="flex-space-between-center mb-8">
+                                <span class="ai-output-meta-label">ACTIVE OPERATIVE REST API KEY:</span>
+                                <button id="prof-copy-apikey-btn" class="table-action-link">Copy API Key</button>
+                            </div>
+                            <pre class="modal-code-box" style="padding: 12px;"><code id="prof-active-apikey-display">ehk_live_sec_89f3a9d20c481b997e33a1</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<div id="tab-about" class="tab-panel">
                 <p class="tab-subtitle">
                     Explore resources, platforms, and professional channels to connect with the developer of the Roadmap.
                 </p>
