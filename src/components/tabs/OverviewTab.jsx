@@ -30,7 +30,7 @@ function getNextRank(xp) {
 }
 
 export default function OverviewTab() {
-    const { activeProfile, setActiveTab, playChime } = useAuth();
+    const { activeProfile, setActiveTab, playChime, theme, setTheme, THEMES } = useAuth();
     const completedLabs = (activeProfile.completedProjects || []).length;
     const checkedSkills = (activeProfile.checkedSkills || []).length;
     const xp = activeProfile.xp || 0;
@@ -39,8 +39,8 @@ export default function OverviewTab() {
     const progressPct = nextRank ? Math.min(100, ((xp - rank.threshold) / (nextRank.threshold - rank.threshold)) * 100) : 100;
 
     const quickModules = [
-        { label: 'Project Hub', key: 'projects', desc: `${completedLabs} of 100+ hands-on labs completed`, color: '#22c55e' },
-        { label: 'Tools Directory', key: 'tools', desc: `${TOOLS_DATABASE.length} tools, ${OSINT_TOOLS.length} OSINT, ${AI_SECURITY_TOOLS.length} AI weapons`, color: '#06b6d4' },
+        { label: 'Project Hub', key: 'projects', desc: `${completedLabs} of 100+ hands-on labs completed`, color: 'var(--color-accent)' },
+        { label: 'Tools Directory', key: 'tools', desc: `${TOOLS_DATABASE.length} tools, ${OSINT_TOOLS.length} OSINT, ${AI_SECURITY_TOOLS.length} AI weapons`, color: 'var(--color-secondary)' },
         { label: 'AI Security Hub', key: 'ai-hub', desc: 'Sigma, YARA, Snort, KQL rule generator & LLM firewall', color: '#a855f7' },
         { label: 'SOC Threat Hunter', key: 'soc-hunter', desc: 'Live SIEM incident telemetry, Sysmon & Wireshark PCAP dissector', color: '#06b6d4' },
         { label: 'Learning Roadmap', key: 'roadmap', desc: `${checkedSkills} skills mastered across 6 stages`, color: '#eab308' },
@@ -50,12 +50,42 @@ export default function OverviewTab() {
     return (
         <div className="tab-panel active">
             <div className="overview-grid">
+                {/* Workstation Visual Theme Switcher Card */}
+                <div className="glass-card" style={{ gridColumn: 'span 2', background: 'rgba(0,0,0,0.4)', borderColor: 'var(--border-card)' }}>
+                    <div className="flex-space-between-center flex-wrap gap-10 mb-12">
+                        <div>
+                            <span className="projects-badge-tag" style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--color-accent)' }}>COMMAND PALETTE // THEME ENGINE</span>
+                            <h3 style={{ margin: '4px 0 2px 0', fontSize: '1.05rem' }}>Workstation Visual Atmosphere</h3>
+                        </div>
+                        <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                            ACTIVE PALETTE: <strong style={{ color: 'var(--color-accent)' }}>{(THEMES.find(t => t.id === theme)?.name || 'CYBERPUNK').toUpperCase()}</strong>
+                        </span>
+                    </div>
+
+                    <div className="theme-switcher-container">
+                        {THEMES.map(t => (
+                            <button
+                                key={t.id}
+                                className={`theme-pill-btn ${theme === t.id ? 'active' : ''}`}
+                                onClick={() => setTheme(t.id)}
+                            >
+                                <span
+                                    className="theme-color-preview-dot"
+                                    style={{ background: `linear-gradient(135deg, ${t.primary}, ${t.secondary})` }}
+                                ></span>
+                                <span>{t.name}</span>
+                                <span className="theme-tag-mini">{t.tag}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
                 {/* Operative Dossier Welcome Card */}
-                <div className="glass-card welcome-card" style={{ gridColumn: 'span 2', background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.06) 0%, rgba(6, 182, 212, 0.06) 100%)', borderColor: 'rgba(124, 58, 237, 0.3)' }}>
-                    <div className="projects-badge-tag" style={{ background: 'rgba(124, 58, 237, 0.15)', color: '#c4b5fd' }}>OPERATIVE COMMAND BRIEFING</div>
+                <div className="glass-card welcome-card" style={{ gridColumn: 'span 2', background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0.4) 100%)', borderColor: 'var(--border-card)' }}>
+                    <div className="projects-badge-tag" style={{ background: 'rgba(255, 255, 255, 0.08)', color: 'var(--color-accent)' }}>OPERATIVE COMMAND BRIEFING</div>
                     <h2 style={{ margin: '6px 0 4px 0' }}>Welcome back, Operative {activeProfile.callsign}</h2>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', maxWidth: '680px' }}>
-                        This interactive command workstation is your launchpad to master the cybersecurity ecosystem. Progress through structured roadmap stages, complete hands-on labs, generate AI detection rules, and run Python security scripts.
+                        This interactive command workstation is your launchpad to master the cybersecurity ecosystem. Progress through structured roadmap stages, complete hands-on labs, generate AI detection rules, and run security operations.
                     </p>
                     
                     {/* Operative Rank & XP Progress */}

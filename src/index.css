@@ -2,12 +2,49 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
                 :root {
+            --bg-obsidian: #050814;
+            --bg-sidebar: #03050c;
+            --bg-card: rgba(13, 18, 38, 0.55);
+            --border-card: rgba(0, 240, 255, 0.16);
+            --color-accent: #00f0ff;
+            --color-secondary: #a855f7;
+            --color-pink: #ec4899;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-danger: #ef4444;
+            --text-primary: #f0f6fc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-radius-lg: 12px;
+            --border-radius-md: 8px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 1. Cyberpunk Neon Theme (Default) */
+        body.theme-cyberpunk {
+            --bg-obsidian: #050814;
+            --bg-sidebar: #03050c;
+            --bg-card: rgba(13, 18, 38, 0.55);
+            --border-card: rgba(0, 240, 255, 0.16);
+            --color-accent: #00f0ff;
+            --color-secondary: #a855f7;
+            --color-pink: #ec4899;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-danger: #ef4444;
+            --text-primary: #f0f6fc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+        }
+
+        /* 2. Matrix Terminal Theme */
+        body.theme-matrix {
             --bg-obsidian: #020508;
-            --bg-sidebar: #05080c;
-            --bg-card: rgba(4, 15, 8, 0.45);
-            --border-card: rgba(0, 255, 102, 0.12);
+            --bg-sidebar: #040a06;
+            --bg-card: rgba(4, 15, 8, 0.5);
+            --border-card: rgba(0, 255, 102, 0.15);
             --color-accent: #00ff66;
-            --color-secondary: #00cc52;
+            --color-secondary: #22c55e;
             --color-pink: #00ffcc;
             --color-success: #00ff66;
             --color-warning: #f59e0b;
@@ -15,9 +52,57 @@
             --text-primary: #e1ffd6;
             --text-secondary: #729c7b;
             --text-muted: #3e5f46;
-            --border-radius-lg: 12px;
-            --border-radius-md: 8px;
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 3. Deep Space Stealth Theme */
+        body.theme-stealth {
+            --bg-obsidian: #080d1a;
+            --bg-sidebar: #050912;
+            --bg-card: rgba(15, 23, 42, 0.6);
+            --border-card: rgba(56, 189, 248, 0.16);
+            --color-accent: #38bdf8;
+            --color-secondary: #3b82f6;
+            --color-pink: #6366f1;
+            --color-success: #34d399;
+            --color-warning: #fbbf24;
+            --color-danger: #f87171;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #475569;
+        }
+
+        /* 4. Red Team Crimson Theme */
+        body.theme-crimson {
+            --bg-obsidian: #0c0406;
+            --bg-sidebar: #080204;
+            --bg-card: rgba(28, 8, 12, 0.55);
+            --border-card: rgba(239, 68, 68, 0.2);
+            --color-accent: #ef4444;
+            --color-secondary: #f97316;
+            --color-pink: #fb7185;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-danger: #dc2626;
+            --text-primary: #ffe4e6;
+            --text-secondary: #fda4af;
+            --text-muted: #881337;
+        }
+
+        /* 5. Tokyo Sunset Theme */
+        body.theme-tokyo {
+            --bg-obsidian: #0d0614;
+            --bg-sidebar: #08030d;
+            --bg-card: rgba(25, 12, 38, 0.55);
+            --border-card: rgba(244, 63, 94, 0.2);
+            --color-accent: #f43f5e;
+            --color-secondary: #f59e0b;
+            --color-pink: #8b5cf6;
+            --color-success: #10b981;
+            --color-warning: #fbbf24;
+            --color-danger: #e11d48;
+            --text-primary: #fdf2f8;
+            --text-secondary: #d8b4fe;
+            --text-muted: #701a75;
         }
 
         * {
@@ -26,7 +111,7 @@
             box-sizing: border-box;
         }
 
-                body {
+        body {
             background-color: var(--bg-obsidian);
             color: var(--text-primary);
             font-family: 'JetBrains Mono', 'Inter', monospace;
@@ -34,6 +119,7 @@
             overflow-x: hidden;
             display: flex;
             position: relative;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* Ambient Blobs in Background */
@@ -43,11 +129,12 @@
             right: -150px;
             width: 500px;
             height: 500px;
-            background: radial-gradient(circle, rgba(0, 255, 102, 0.08) 0%, transparent 70%);
+            background: radial-gradient(circle, var(--color-accent) 0%, transparent 70%);
+            opacity: 0.12;
             border-radius: 50%;
             pointer-events: none;
             z-index: 0;
-            animation: none;
+            transition: background 0.5s ease;
         }
 
         .ambient-blob-2 {
@@ -56,11 +143,12 @@
             left: -150px;
             width: 500px;
             height: 500px;
-            background: radial-gradient(circle, rgba(0, 255, 204, 0.07) 0%, transparent 70%);
+            background: radial-gradient(circle, var(--color-secondary) 0%, transparent 70%);
+            opacity: 0.1;
             border-radius: 50%;
             pointer-events: none;
             z-index: 0;
-            animation: none;
+            transition: background 0.5s ease;
         }
 
         @keyframes pulse-blob {
@@ -7747,6 +7835,73 @@ body.theme-light-adhd .progress-bar-circle {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
 }
+
+/* ==========================================================================
+   THEME SWITCHER & WORKSTATION PALETTES
+   ========================================================================== */
+
+.theme-switcher-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--border-card);
+    border-radius: 12px;
+}
+
+.theme-pill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-pill-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.theme-pill-btn.active {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--color-accent);
+    color: var(--text-primary);
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.15);
+}
+
+.theme-color-preview-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    flex-shrink: 0;
+}
+
+.theme-tag-mini {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-muted);
+}
+
+.theme-pill-btn.active .theme-tag-mini {
+    background: rgba(0, 240, 255, 0.15);
+    color: var(--color-accent);
+}
+
 
 
 

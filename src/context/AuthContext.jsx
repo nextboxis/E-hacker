@@ -1,5 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+export const THEMES = [
+    { id: 'cyberpunk', name: 'Cyberpunk Neon', primary: '#00f0ff', secondary: '#a855f7', tag: 'SOC AI', bg: '#050814' },
+    { id: 'matrix', name: 'Matrix Terminal', primary: '#00ff66', secondary: '#22c55e', tag: 'OFFENSE', bg: '#020508' },
+    { id: 'stealth', name: 'Deep Space Stealth', primary: '#38bdf8', secondary: '#3b82f6', tag: 'DEFENSE', bg: '#080d1a' },
+    { id: 'crimson', name: 'Red Team Crimson', primary: '#ef4444', secondary: '#f97316', tag: 'EXPLOIT', bg: '#0c0406' },
+    { id: 'tokyo', name: 'Tokyo Sunset', primary: '#f43f5e', secondary: '#f59e0b', tag: 'STEALTH', bg: '#0d0614' }
+];
+
 const DEFAULT_PROFILES = [
     {
         id: 'prof_root',
@@ -103,6 +111,9 @@ export function AuthProvider({ children }) {
 
     const [activeTab, setActiveTab] = useState('overview');
     const [activeDomain, setActiveDomain] = useState('full');
+    const [theme, setThemeState] = useState(() => {
+        return localStorage.getItem('ehacker-theme') || 'cyberpunk';
+    });
     const [isLocked, setIsLocked] = useState(false);
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
     const [isTerminalModalOpen, setIsTerminalModalOpen] = useState(false);
@@ -112,6 +123,11 @@ export function AuthProvider({ children }) {
     const activeProfile = allProfiles.find(p => p.id === activeProfileId) || allProfiles[0];
 
     useEffect(() => {
+        document.body.className = `theme-${theme}`;
+        localStorage.setItem('ehacker-theme', theme);
+    }, [theme]);
+
+    useEffect(() => {
         localStorage.setItem('ehacker-user-accounts', JSON.stringify(userAccounts));
     }, [userAccounts]);
 
@@ -119,6 +135,11 @@ export function AuthProvider({ children }) {
         localStorage.setItem('roadmap-multi-profiles', JSON.stringify(allProfiles));
         localStorage.setItem('roadmap-active-profile-id', activeProfileId);
     }, [allProfiles, activeProfileId]);
+
+    const setTheme = (newTheme) => {
+        setThemeState(newTheme);
+        playChime();
+    };
 
     const playChime = () => {
         try {
@@ -379,6 +400,9 @@ export function AuthProvider({ children }) {
             setActiveTab,
             activeDomain,
             setActiveDomain,
+            theme,
+            setTheme,
+            THEMES,
             isLocked,
             setIsLocked,
             isLogoutModalOpen,

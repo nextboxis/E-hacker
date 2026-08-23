@@ -24,6 +24,9 @@ export default function Header() {
         setActiveDomain,
         setIsSpotlightOpen,
         setIsTerminalModalOpen,
+        theme,
+        setTheme,
+        THEMES,
         logout
     } = useAuth();
 
@@ -53,6 +56,21 @@ export default function Header() {
                     <span className="spotlight-btn-text">Quick Search...</span>
                     <kbd className="spotlight-kbd">Ctrl K</kbd>
                 </button>
+
+                {/* Atmosphere / Theme Picker */}
+                <div className="header-domain-wrapper">
+                    <select
+                        className="domain-select"
+                        value={theme}
+                        onChange={(e) => setTheme(e.target.value)}
+                        title="Visual Theme Atmosphere"
+                        style={{ borderLeft: `3px solid var(--color-accent)` }}
+                    >
+                        {THEMES.map(t => (
+                            <option key={t.id} value={t.id}>{t.name}</option>
+                        ))}
+                    </select>
+                </div>
 
                 <div className="header-domain-wrapper">
                     <select
