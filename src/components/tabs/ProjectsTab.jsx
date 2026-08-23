@@ -15,6 +15,7 @@ export default function ProjectsTab() {
 
     const categories = [
         'ALL',
+        'AI-Era Security (2025/26)',
         'Web Hacking',
         'Network Security',
         'Tool Development',
@@ -24,14 +25,36 @@ export default function ProjectsTab() {
     ];
     const difficulties = ['ALL', 'Beginner', 'Intermediate', 'Advanced'];
 
+    const getCategoryDisplay = (cat) => {
+        switch (cat) {
+            case 'ai-security': return 'AI-Era Security (2025/26)';
+            case 'web-hacking': return 'Web Hacking';
+            case 'network-security': return 'Network Security';
+            case 'tool-development': return 'Tool Development';
+            case 'malware-defense': return 'Malware & Defense';
+            case 'osint-forensics':
+            case 'forensics': return 'OSINT & Forensics';
+            case 'ad-cloud': return 'Active Directory & Cloud';
+            case 'reverse-engineering': return 'Reverse Engineering';
+            default: return cat;
+        }
+    };
+
     const filtered = useMemo(() => {
         return projectsData.filter(p => {
             const isDone = completed.includes(p.id);
-            const matchSearch = p.title.toLowerCase().includes(search.toLowerCase()) || 
-                                p.desc.toLowerCase().includes(search.toLowerCase()) ||
-                                String(p.id).includes(search);
-            const matchCat = selectedCat === 'ALL' || p.cat === selectedCat;
-            const matchDiff = selectedDiff === 'ALL' || p.diff === selectedDiff;
+            const pTitle = p.title || '';
+            const pDesc = p.description || p.desc || '';
+            const pCat = getCategoryDisplay(p.category || p.cat || '');
+            const pDiff = (p.difficulty || p.diff || 'Intermediate').toUpperCase();
+
+            const matchSearch = pTitle.toLowerCase().includes(search.toLowerCase()) || 
+                                pDesc.toLowerCase().includes(search.toLowerCase()) ||
+                                String(p.id).includes(search) ||
+                                (p.guide?.commands || '').toLowerCase().includes(search.toLowerCase());
+            
+            const matchCat = selectedCat === 'ALL' || pCat === selectedCat;
+            const matchDiff = selectedDiff === 'ALL' || pDiff === selectedDiff.toUpperCase();
             const matchStatus = statusFilter === 'ALL' || 
                                 (statusFilter === 'COMPLETED' && isDone) ||
                                 (statusFilter === 'INCOMPLETE' && !isDone);
@@ -42,7 +65,7 @@ export default function ProjectsTab() {
     const totalPages = Math.ceil(filtered.length / pageSize) || 1;
     const paginatedProjects = filtered.slice((page - 1) * pageSize, page * pageSize);
 
-    const completionRate = Math.round((completed.length / 100) * 100);
+    const completionRate = Math.round((completed.length / projectsData.length) * 100);
     const earnedXp = completed.length * 50;
 
     return (
@@ -51,16 +74,16 @@ export default function ProjectsTab() {
             <div className="glass-card mb-25" style={{ background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)', borderColor: 'rgba(6, 182, 212, 0.3)' }}>
                 <div className="flex-space-between-center flex-wrap gap-15">
                     <div>
-                        <div className="projects-badge-tag">100 HANDS-ON CYBERSECURITY LABS</div>
+                        <div className="projects-badge-tag">{projectsData.length} HANDS-ON CYBERSECURITY LABS & AI BLUEPRINTS</div>
                         <h2 style={{ margin: '4px 0 2px 0' }}>Security Project & Exploitation Hub</h2>
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem' }}>
-                            Industry-standard attack vectors, exploitation syntax, and defensive countermeasures mapped across 100 real-world scenarios.
+                            Industry-standard attack vectors, exploitation syntax, AI defense engineering, and hands-on guidebooks mapped across {projectsData.length} real-world scenarios.
                         </p>
                     </div>
 
                     <div className="stat-card-group" style={{ margin: 0 }}>
-                        <div className="stat-box" style={{ minWidth: '100px', padding: '10px 16px' }}>
-                            <div className="stat-value" style={{ fontSize: '1.4rem', color: '#06b6d4' }}>{completed.length}/100</div>
+                        <div className="stat-box" style={{ minWidth: '110px', padding: '10px 16px' }}>
+                            <div className="stat-value" style={{ fontSize: '1.4rem', color: '#06b6d4' }}>{completed.length} / {projectsData.length}</div>
                             <div className="stat-lbl">Labs Done ({completionRate}%)</div>
                         </div>
                         <div className="stat-box" style={{ minWidth: '100px', padding: '10px 16px' }}>
@@ -161,26 +184,46 @@ export default function ProjectsTab() {
             <div className="projects-dynamic-grid">
                 {paginatedProjects.map(p => {
                     const isDone = completed.includes(p.id);
+                    const pTitle = p.title || '';
+                    const pDesc = p.description || p.desc || '';
+                    const pCat = getCategoryDisplay(p.category || p.cat || '');
+                    const pDiff = p.difficulty || p.diff || 'Intermediate';
+                    const isAiProject = p.category === 'ai-security' || p.id >= 1000;
+
                     return (
-                        <div key={p.id} className={'project-card ' + (isDone ? 'lab-completed-card' : '')}>
+                        <div
+                            key={p.id}
+                            className={'project-card ' + (isDone ? 'lab-completed-card ' : '') + (isAiProject ? 'ai-project-card' : '')}
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => { setActiveProjectModal(p); playChime(); }}
+                        >
                             <div>
                                 <div className="project-card-header">
-                                    <span className="project-card-num">LAB #{p.id}</span>
-                                    <span className={'project-diff-badge diff-' + p.diff.toLowerCase()}>{p.diff}</span>
+                                    <span className="project-card-num">
+                                        {isAiProject ? `AI-LAB #${p.id}` : `LAB #${p.id}`}
+                                    </span>
+                                    <span className={'project-diff-badge diff-' + pDiff.toLowerCase()}>{pDiff}</span>
                                 </div>
-                                <h3 className="project-card-title">{p.title}</h3>
-                                <span className="project-card-tag mb-8" style={{ display: 'inline-block' }}>{p.cat}</span>
-                                <p className="project-card-desc">{p.desc.length > 110 ? p.desc.substring(0, 110) + '...' : p.desc}</p>
+                                <h3 className="project-card-title">{pTitle}</h3>
+                                <div className="flex-gap-6 flex-wrap mb-8">
+                                    <span className="project-card-tag" style={{ display: 'inline-block' }}>{pCat}</span>
+                                    {isAiProject && (
+                                        <span className="channel-badge" style={{ background: 'rgba(124, 58, 237, 0.2)', color: '#c4b5fd', border: '1px solid rgba(124, 58, 237, 0.4)' }}>
+                                            2025/26 AI Era
+                                        </span>
+                                    )}
+                                </div>
+                                <p className="project-card-desc">{pDesc.length > 120 ? pDesc.substring(0, 120) + '...' : pDesc}</p>
                             </div>
 
-                            <div className="project-card-footer">
-                                <span className="project-xp-tag">+{p.xp} XP</span>
+                            <div className="project-card-footer" onClick={(e) => e.stopPropagation()}>
+                                <span className="project-xp-tag">+{p.xp || 50} XP</span>
                                 <div className="flex-gap-10 align-center">
                                     <button
                                         className="table-action-link"
                                         onClick={() => { setActiveProjectModal(p); playChime(); }}
                                     >
-                                        Inspect Lab →
+                                        Inspect Guidebook
                                     </button>
                                     <label className="checkbox-container" title="Mark as Completed" style={{ margin: 0 }}>
                                         <input

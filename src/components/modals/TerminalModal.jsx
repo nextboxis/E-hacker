@@ -43,9 +43,6 @@ export default function TerminalModal() {
                 newHist.push({ type: 'output', text: '5d41402abc4b2a76b9719d911017c592 -> MD5 (Hashcat: -m 0, John: raw-md5)' });
                 break;
             case 'python':
-                setActiveTab('python');
-                setIsTerminalModalOpen(false);
-                break;
             case 'tools':
                 setActiveTab('toolkit');
                 setIsTerminalModalOpen(false);

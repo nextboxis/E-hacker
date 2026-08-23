@@ -2,13 +2,12 @@ import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function LogoutModal() {
-    const { isLogoutModalOpen, setIsLogoutModalOpen, activeProfile, setIsAuthModalOpen, setActiveTab } = useAuth();
+    const { isLogoutModalOpen, setIsLogoutModalOpen, activeProfile, logout, setActiveTab } = useAuth();
 
     if (!isLogoutModalOpen) return null;
 
     const handleReauth = () => {
-        setIsLogoutModalOpen(false);
-        setIsAuthModalOpen(true);
+        logout();
     };
 
     const handleSwitch = () => {
@@ -17,8 +16,9 @@ export default function LogoutModal() {
     };
 
     const handleBurn = () => {
-        if (confirm(" CAUTION: This will zeroize all local session cache and reset to default factory state. Proceed?")) {
+        if (confirm("CAUTION: This will zeroize all local session cache and reset to default factory state. Proceed?")) {
             localStorage.clear();
+            logout();
             window.location.reload();
         }
     };
@@ -83,9 +83,9 @@ export default function LogoutModal() {
 
                     {/* Action Buttons */}
                     <div className="logout-actions-grid">
-                        <button className="site-btn" onClick={handleReauth}> Re-Authenticate Callsign</button>
-                        <button className="site-btn tool-btn secondary-btn" onClick={handleSwitch}> Switch Profile</button>
-                        <button className="site-btn tool-btn text-danger" onClick={handleBurn}> Emergency Clean Burn</button>
+                        <button className="site-btn" onClick={handleReauth}>Re-Authenticate Callsign</button>
+                        <button className="site-btn tool-btn secondary-btn" onClick={handleSwitch}>Switch Profile</button>
+                        <button className="site-btn tool-btn text-danger" onClick={handleBurn}>Emergency Clean Burn</button>
                     </div>
                 </div>
             </div>

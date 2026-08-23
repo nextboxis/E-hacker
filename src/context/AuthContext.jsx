@@ -6,7 +6,8 @@ const DEFAULT_PROFILES = [
         callsign: 'root@nextboxis',
         clearance: 'Level 5 • TOP SECRET',
         domain: 'full',
-        avatar: '',
+        avatar: '01',
+        githubAvatar: null,
         bio: 'Knowledge is free. We are anonymous. Security is an illusion.',
         created_at: '2026-08-22',
         apiKey: 'ehk_live_sec_root9482x',
@@ -21,7 +22,8 @@ const DEFAULT_PROFILES = [
         callsign: 'Ghost_RedTeam',
         clearance: 'Level 4 • SECRET',
         domain: 'web',
-        avatar: '️',
+        avatar: '02',
+        githubAvatar: null,
         bio: 'Offensive Security Specialist & External Penetration Tester',
         created_at: '2026-08-22',
         apiKey: 'ehk_live_sec_ghost2819y',
@@ -36,7 +38,8 @@ const DEFAULT_PROFILES = [
         callsign: 'Sentinel_SOC',
         clearance: 'Level 4 • SECRET',
         domain: 'soc',
-        avatar: '️',
+        avatar: '03',
+        githubAvatar: null,
         bio: 'Blue Team Threat Hunter & SIEM Detection Engineer',
         created_at: '2026-08-22',
         apiKey: 'ehk_live_sec_soc8392z',
@@ -48,9 +51,43 @@ const DEFAULT_PROFILES = [
     }
 ];
 
+const DEFAULT_ACCOUNTS = [
+    {
+        username: 'root@nextboxis',
+        password: 'shadowprotocol2026',
+        profileId: 'prof_root',
+        createdAt: '2026-08-22'
+    },
+    {
+        username: 'Ghost_RedTeam',
+        password: 'redteam2026',
+        profileId: 'prof_redteam',
+        createdAt: '2026-08-22'
+    },
+    {
+        username: 'Sentinel_SOC',
+        password: 'soc2026',
+        profileId: 'prof_soc',
+        createdAt: '2026-08-22'
+    }
+];
+
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
+    const [isAuthenticated, setIsAuthenticated] = useState(() => {
+        return localStorage.getItem('ehacker-authenticated') === 'true';
+    });
+
+    const [userAccounts, setUserAccounts] = useState(() => {
+        try {
+            const saved = localStorage.getItem('ehacker-user-accounts');
+            return saved ? JSON.parse(saved) : DEFAULT_ACCOUNTS;
+        } catch (e) {
+            return DEFAULT_ACCOUNTS;
+        }
+    });
+
     const [allProfiles, setAllProfiles] = useState(() => {
         try {
             const saved = localStorage.getItem('roadmap-multi-profiles');
@@ -67,13 +104,16 @@ export function AuthProvider({ children }) {
     const [activeTab, setActiveTab] = useState('overview');
     const [activeDomain, setActiveDomain] = useState('full');
     const [isLocked, setIsLocked] = useState(false);
-    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
     const [isTerminalModalOpen, setIsTerminalModalOpen] = useState(false);
     const [isSpotlightOpen, setIsSpotlightOpen] = useState(false);
     const [activeProjectModal, setActiveProjectModal] = useState(null);
 
     const activeProfile = allProfiles.find(p => p.id === activeProfileId) || allProfiles[0];
+
+    useEffect(() => {
+        localStorage.setItem('ehacker-user-accounts', JSON.stringify(userAccounts));
+    }, [userAccounts]);
 
     useEffect(() => {
         localStorage.setItem('roadmap-multi-profiles', JSON.stringify(allProfiles));
@@ -97,6 +137,129 @@ export function AuthProvider({ children }) {
         } catch (e) {}
     };
 
+    const login = (profileId) => {
+        if (profileId) {
+            const found = allProfiles.find(p => p.id === profileId);
+            if (found) {
+                setActiveProfileId(profileId);
+                setActiveDomain(found.domain || 'full');
+            }
+        }
+        setIsAuthenticated(true);
+        localStorage.setItem('ehacker-authenticated', 'true');
+        playChime();
+    };
+
+    const logout = () => {
+        setIsAuthenticated(false);
+        localStorage.removeItem('ehacker-authenticated');
+        setIsLogoutModalOpen(false);
+        setIsAuthModalOpen(false);
+        setIsLocked(false);
+        setActiveTab('overview');
+    };
+
+    // User credential authentication
+    const loginUser = ({ username, password }) => {
+        const cleanUser = (username || '').trim().toLowerCase();
+        const found = userAccounts.find(u => u.username.toLowerCase() === cleanUser);
+
+        if (!found) {
+            return {
+                success: false,
+                notFound: true,
+                error: `Operative '${username}' is not provisioned. Click 'Sign Up' to create your profile.`
+            };
+        }
+
+        if (found.password !== password) {
+            return {
+                success: false,
+                error: 'Invalid password / access cipher. Authentication rejected.'
+            };
+        }
+
+        // Match or fallback profile
+        const linkedProfile = allProfiles.find(p => p.id === found.profileId) || allProfiles.find(p => p.callsign.toLowerCase() === cleanUser);
+        if (linkedProfile) {
+            setActiveProfileId(linkedProfile.id);
+            setActiveDomain(linkedProfile.domain || 'full');
+        }
+
+        setIsAuthenticated(true);
+        localStorage.setItem('ehacker-authenticated', 'true');
+        playChime();
+        return { success: true };
+    };
+
+    // User registration with GitHub metadata integration
+    const registerUser = async ({ username, password, domain, clearance }) => {
+        const cleanUser = (username || '').trim();
+        const existing = userAccounts.find(u => u.username.toLowerCase() === cleanUser.toLowerCase());
+        
+        if (existing) {
+            return {
+                success: false,
+                error: `Username '${cleanUser}' already exists. Please Sign In.`
+            };
+        }
+
+        let githubData = null;
+        try {
+            // Attempt to query public GitHub profile
+            const res = await fetch(`https://api.github.com/users/${encodeURIComponent(cleanUser)}`, {
+                headers: { 'Accept': 'application/vnd.github.v3+json' }
+            });
+            if (res.ok) {
+                githubData = await res.json();
+            }
+        } catch (e) {
+            // Network fallback
+        }
+
+        const newProfileId = 'prof_' + Math.random().toString(36).substring(2, 8);
+        const newProf = {
+            id: newProfileId,
+            callsign: cleanUser,
+            githubHandle: cleanUser,
+            githubAvatar: githubData?.avatar_url || null,
+            githubBio: githubData?.bio || null,
+            githubRepos: githubData?.public_repos || 0,
+            clearance: clearance || 'Level 2 • RESTRICTED',
+            domain: domain || 'full',
+            avatar: '01',
+            bio: githubData?.bio || `Operative ${cleanUser} // Cyber Defense Division`,
+            created_at: new Date().toISOString().slice(0, 10),
+            apiKey: 'ehk_live_sec_' + Math.random().toString(36).substring(2, 12),
+            xp: 0,
+            level: 1,
+            completedProjects: [],
+            checkedSkills: [],
+            notes: {}
+        };
+
+        const newAccount = {
+            username: cleanUser,
+            password: password,
+            profileId: newProfileId,
+            createdAt: new Date().toISOString()
+        };
+
+        setUserAccounts(prev => [...prev, newAccount]);
+        setAllProfiles(prev => [...prev, newProf]);
+        setActiveProfileId(newProfileId);
+        setActiveDomain(newProf.domain);
+        setIsAuthenticated(true);
+        localStorage.setItem('ehacker-authenticated', 'true');
+        playChime();
+
+        return {
+            success: true,
+            profileId: newProfileId,
+            githubData
+        };
+    };
+
     const switchProfile = (id) => {
         const found = allProfiles.find(p => p.id === id);
         if (found) {
@@ -112,7 +275,8 @@ export function AuthProvider({ children }) {
             callsign: profData.callsign || 'Operative',
             clearance: profData.clearance || 'Level 1 • UNCLASSIFIED',
             domain: profData.domain || 'full',
-            avatar: profData.avatar || '',
+            avatar: profData.avatar || '01',
+            githubAvatar: profData.githubAvatar || null,
             bio: profData.bio || 'Security Operative',
             created_at: new Date().toISOString().slice(0, 10),
             apiKey: 'ehk_live_sec_' + Math.random().toString(36).substring(2, 12),
@@ -125,6 +289,8 @@ export function AuthProvider({ children }) {
         setAllProfiles(prev => [...prev, newProf]);
         setActiveProfileId(newProf.id);
         setActiveDomain(newProf.domain);
+        setIsAuthenticated(true);
+        localStorage.setItem('ehacker-authenticated', 'true');
         playChime();
     };
 
@@ -199,6 +365,13 @@ export function AuthProvider({ children }) {
 
     return (
         <AuthContext.Provider value={{
+            isAuthenticated,
+            setIsAuthenticated,
+            login,
+            logout,
+            loginUser,
+            registerUser,
+            userAccounts,
             activeProfile,
             allProfiles,
             activeProfileId,
@@ -208,8 +381,6 @@ export function AuthProvider({ children }) {
             setActiveDomain,
             isLocked,
             setIsLocked,
-            isAuthModalOpen,
-            setIsAuthModalOpen,
             isLogoutModalOpen,
             setIsLogoutModalOpen,
             isTerminalModalOpen,

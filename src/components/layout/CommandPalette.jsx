@@ -66,7 +66,7 @@ export default function CommandPalette() {
                                 playChime();
                             }}
                         >
-                            <span className="spotlight-item-badge">{t.icon}</span>
+                            <span className="spotlight-item-badge">{t.cat || 'TOOL'}</span>
                             <div className="spotlight-item-info">
                                 <span className="spotlight-item-title">{t.name}</span>
                                 <span className="spotlight-item-desc">{t.desc}</span>

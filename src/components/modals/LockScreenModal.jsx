@@ -33,8 +33,8 @@ export default function LockScreenModal() {
                 <div className="lock-date-display">{date}</div>
 
                 <div className="lock-user-card mt-20">
-                    <div className="operative-avatar-circle" style={{ width: '50px', height: '50px', fontSize: '1.5rem' }}>
-                        {activeProfile.avatar || ''}
+                    <div className="operative-avatar-circle" style={{ width: '50px', height: '50px', fontSize: '1.2rem', fontFamily: 'monospace', fontWeight: 700 }}>
+                        {activeProfile.avatar || '01'}
                     </div>
                     <div>
                         <h4 style={{ color: 'var(--text-primary)', fontSize: '1.1rem' }}>{activeProfile.callsign}</h4>
@@ -61,7 +61,7 @@ export default function LockScreenModal() {
                     style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                     onClick={handleUnlock}
                 >
-                     Touch Biometric Bypass
+                    Touch Biometric Bypass
                 </button>
             </div>
         </div>

@@ -2092,6 +2092,201 @@ export const projectsData = [
         title: "CloudTrail Logs Audit",
         category: "ad-cloud",
         difficulty: "intermediate",
+    },
+    {
+        id: 91,
+        title: "Pass-the-Hash Credential Abuse",
+        category: "ad-cloud",
+        difficulty: "intermediate",
+        duration: "3 Hours",
+        xp: 75,
+        description: "Access remote systems in Active Directory networks using NTLM password hashes without knowing plain-text passwords.",
+        guide: {
+            objective: "Access remote target nodes by passing NTLM hashes directly to authentication services.",
+            labSetup: "Active Directory domain; target server with shared access credentials; compromised NTLM password hash.",
+            steps: [
+                "Identify systems on the network running SMB services.",
+                "Use Mimikatz to inject NTLM hashes into active memory spaces.",
+                "Open elevated terminal commands mapping to target systems.",
+                "Access administrative directories on target hosts (e.g. dir \\\\[Target]\\c$)."
+            ],
+            commands: "Mimikatz Pass-the-Hash execution:\nsekurlsa::pth /user:Administrator /domain:[Domain] /ntlm:[NTLM_Hash] /run:cmd.exe",
+            mitigation: "Restrict local administrator accounts from connecting over network interfaces. Implement LAPS configurations."
+        }
+    },
+    {
+        id: 92,
+        title: "Azure AD Information Disclosure",
+        category: "ad-cloud",
+        difficulty: "intermediate",
+        duration: "3 Hours",
+        xp: 75,
+        description: "Audit Azure AD tenants to identify guest account configurations that expose user directories to external domains.",
+        guide: {
+            objective: "Identify security configurations that expose Azure AD directories to external users.",
+            labSetup: "Azure portal access; guest account login.",
+            steps: [
+                "Log into Azure portals using guest credentials.",
+                "Attempt to search directories to list user records.",
+                "Verify if guest user permissions allow listing other account profiles.",
+                "Document configuration gaps for security auditing."
+            ],
+            commands: "List users via Azure CLI:\naz ad user list --query \"[].{name:displayName, mail:mail}\"",
+            mitigation: "Configure guest user permissions in Azure AD to restrict directory search access."
+        }
+    },
+    {
+        id: 93,
+        title: "AWS Network Security Group Audit",
+        category: "ad-cloud",
+        difficulty: "beginner",
+        duration: "2 Hours",
+        xp: 50,
+        description: "Audit AWS EC2 instances to identify security groups and NACL configurations exposing management ports.",
+        guide: {
+            objective: "Identify and resolve network access gaps on AWS EC2 configurations.",
+            labSetup: "Access to AWS console; EC2 instances running with open security group configurations.",
+            steps: [
+                "List active AWS security groups using CLI tools.",
+                "Identify instances configured with open public access rules (e.g. 0.0.0.0/0).",
+                "Locate exposed management ports (e.g., SSH port 22 or RDP port 3389).",
+                "Apply restrictive access rules to limit connection sources to specific administrative IPs."
+            ],
+            commands: "List security groups via CLI:\naws ec2 describe-security-groups --query \"SecurityGroups[*].{Name:GroupName,Rules:IpPermissions}\"",
+            mitigation: "Avoid configuring open public access rules for administrative ports. Enforce bastion host connections."
+        }
+    },
+    {
+        id: 94,
+        title: "AS-REP Roasting Weak Passwords",
+        category: "ad-cloud",
+        difficulty: "advanced",
+        duration: "3-4 Hours",
+        xp: 100,
+        description: "Identify domain users configured without Kerberos pre-authentication, query their AS-REP hashes, and crack them offline.",
+        guide: {
+            objective: "Harvest domain password hashes by querying Kerberos pre-authentication settings.",
+            labSetup: "Active Directory domain; domain user account access; Hashcat tool.",
+            steps: [
+                "Scan Active Directory domain accounts to locate users configured with 'Do not require Kerberos preauthentication'.",
+                "Query domain controllers to request AS-REP hashes for target accounts.",
+                "Export response hashes to local files.",
+                "Crack hashes offline using dictionary attacks in Hashcat."
+            ],
+            commands: "Query AS-REP hashes via Impacket:\nimpacket-GetNPUsers [Domain]/[User] -request -no-pass -format hashcat -outfile asrep.hash\n\nCrack hashes in Hashcat:\nhashcat -m 18200 asrep.hash wordlist.txt",
+            mitigation: "Enforce Kerberos pre-authentication across all domain user accounts. Implement strong password policies."
+        }
+    },
+    {
+        id: 95,
+        title: "Docker Container Escape Audit",
+        category: "ad-cloud",
+        difficulty: "advanced",
+        duration: "4 Hours",
+        xp: 100,
+        description: "Exploit Docker container configurations like privileged execution modes or writable sockets to escape to host terminals.",
+        guide: {
+            objective: "Gain command execution access on host systems from inside Docker container environments.",
+            labSetup: "A Docker host running container targets configured with privileged access flags.",
+            steps: [
+                "Verify container privileges by checking for disk devices in dev listings.",
+                "Locate the host's root storage directory (e.g. /dev/sda1).",
+                "Mount the host disk to a directory inside the container.",
+                "Access host storage directories from inside the container to verify escape capabilities."
+            ],
+            commands: "Mount host drive from container:\nmount /dev/sda1 /mnt\nchroot /mnt /bin/sh",
+            mitigation: "Avoid running Docker containers with privileged flags. Secure access to Docker socket files."
+        }
+    },
+    {
+        id: 96,
+        title: "Kubernetes API Misconfig Audit",
+        category: "ad-cloud",
+        difficulty: "advanced",
+        duration: "4 Hours",
+        xp: 100,
+        description: "Exploit open Kubernetes API servers with anonymous access enabled to list pods and extract secrets.",
+        guide: {
+            objective: "Access sensitive cluster data by exploiting misconfigured Kubernetes API servers.",
+            labSetup: "Kubernetes cluster setup; API server configured with anonymous access enabled.",
+            steps: [
+                "Verify API endpoint accessibility using curl requests.",
+                "Query pod listings using kubectl tools.",
+                "Locate database connection details and secret tokens inside configuration files.",
+                "Document vulnerabilities for security auditing."
+            ],
+            commands: "Query API server via curl:\ncurl -k -s https://[API_Server_IP]:6443/api/v1/namespaces\n\nQuery pods via kubectl:\nkubectl --server=https://[API_Server_IP]:6443 get pods",
+            mitigation: "Disable anonymous authorization on Kubernetes API servers. Implement robust Role-Based Access Control (RBAC)."
+        }
+    },
+    {
+        id: 97,
+        title: "AD CS Certificate Abuse (ESC1)",
+        category: "ad-cloud",
+        difficulty: "expert",
+        duration: "5 Hours",
+        xp: 150,
+        description: "Exploit Active Directory Certificate Services (AD CS) template misconfigurations (ESC1) to request certificate variables and impersonate admin accounts.",
+        guide: {
+            objective: "Acquire domain administrative privileges by exploiting vulnerable certificate templates.",
+            labSetup: "Active Directory domain with AD CS installed; template configured with CT_FLAG_ENROLLEE_SUPPLIES_SUBJECT permissions.",
+            steps: [
+                "Scan target domains to locate vulnerable certificate templates.",
+                "Request certificates representing target users (e.g. Domain Administrator) using Certify.",
+                "Request Kerberos TGT tickets using the certificate credentials.",
+                "Access domain controller directories to verify administrative access."
+            ],
+            commands: "Query templates via Certify:\n.\\Certify.exe find /vulnerable\n\nRequest certificate:\n.\\Certify.exe request /ca:[CA_Name] /template:[Template] /altname:Administrator\n\nRequest TGT:\nRubeus.exe asktgt /user:Administrator /certificate:[Base64_Cert] /ptt",
+            mitigation: "Disable template options that allow user-supplied subjects in high-privilege certificate configurations."
+        }
+    },
+    {
+        id: 98,
+        title: "AWS Lambda Hardcoded Secrets",
+        category: "ad-cloud",
+        difficulty: "beginner",
+        duration: "2 Hours",
+        xp: 50,
+        description: "Scan AWS Lambda function configurations and code backups to find exposed credentials and hardcoded passwords.",
+        guide: {
+            objective: "Locate hardcoded API keys and secrets in cloud function files.",
+            labSetup: "AWS portal access; Lambda function configurations containing secret environment variables.",
+            steps: [
+                "Query Lambda functions using AWS CLI tools.",
+                "Download Lambda deployment code packages.",
+                "Search code files for secret strings.",
+                "Retrieve credentials from configuration parameters."
+            ],
+            commands: "List Lambda functions:\naws lambda list-functions\n\nRetrieve environment variables:\naws lambda get-function --function-name [Function_Name]",
+            mitigation: "Avoid hardcoding credentials in Lambda function files; use AWS Secrets Manager or KMS encryption instead."
+        }
+    },
+    {
+        id: 99,
+        title: "Active Directory GPP Decryption",
+        category: "ad-cloud",
+        difficulty: "intermediate",
+        duration: "2-3 Hours",
+        xp: 75,
+        description: "Decrypt passwords stored in Active Directory Group Policy Preference files using public AES keys.",
+        guide: {
+            objective: "Recover plain-text credentials from Active Directory Group Policy files.",
+            labSetup: "Domain controller environment; local domain user credentials; GPP configuration XML containing cpassword.",
+            steps: [
+                "Browse domain controller Sysvol shares to locate Groups Policy XML files.",
+                "Locate password parameters (cpassword) in configuration records.",
+                "Decrypt the password parameter using the public AES key.",
+                "Access target systems using the recovered credentials."
+            ],
+            commands: "Search GPP XML files:\ngrep -rn \"cpassword\" /let/lib/samba/sysvol/\n\nDecrypt GPP hash:\ngpp-decrypt [cpassword_string]",
+            mitigation: "Decommission Group Policy Preferences containing local administrator password mappings (apply MS14-025)."
+        }
+    },
+    {
+        id: 100,
+        title: "CloudTrail Logs Audit",
+        category: "ad-cloud",
+        difficulty: "intermediate",
         duration: "3 Hours",
         xp: 75,
         description: "Analyze AWS CloudTrail logs using CLI tools to detect indicators of privilege escalation attempts.",
@@ -2107,12 +2302,10 @@ export const projectsData = [
             commands: "Query policy changes via CLI:\naws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=CreatePolicyVersion",
             mitigation: "Enforce real-time alerts on critical IAM modifications using AWS EventBridge and CloudWatch."
         }
-    }
-,
-    // Add New Sessions
+    },
     {
         id: 9001,
-        title: "Image Steganography Basics 🖼️",
+        title: "Image Steganography Basics",
         category: "forensics",
         difficulty: "beginner",
         duration: "1 Hour",
@@ -2132,7 +2325,7 @@ export const projectsData = [
     },
     {
         id: 9002,
-        title: "Advanced Malware Graph Analysis 📈",
+        title: "Advanced Malware Graph Analysis",
         category: "reverse-engineering",
         difficulty: "advanced",
         duration: "3 Hours",
@@ -2150,4 +2343,136 @@ export const projectsData = [
             mitigation: "Code obfuscation (from a defender perspective to slow analysis)."
         }
     },
+    {
+        id: 1001,
+        title: "AI Autonomous SIEM Log Triage Engine",
+        category: "ai-security",
+        difficulty: "intermediate",
+        duration: "4 Hours",
+        xp: 200,
+        description: "Build an automated SOC incident triage engine that combines Sigma rules with local LLMs (Llama-3 via Ollama) to classify threats and output MITRE ATT&CK reports.",
+        guide: {
+            objective: "Automate Tier-1/Tier-2 SOC alert triage by piping raw Sysmon process events through a local LLM for root-cause analysis and automated containment ticketing.",
+            labSetup: "Python 3.11, Ollama running llama3:8b locally (ollama run llama3:8b), SQLite, pySigma.",
+            steps: [
+                "Step 1: Ingest Windows Sysmon JSON telemetry (Event ID 1: Process Creation, Event ID 3: Network Connection).",
+                "Step 2: Execute Sigma rule engine (pySigma) to flag initial high-confidence threat triggers.",
+                "Step 3: Construct a structured LLM prompt containing ParentImage, CommandLine, User, and file hashes.",
+                "Step 4: Query local Ollama API (/api/generate) with format='json' to produce structured incident JSON.",
+                "Step 5: Output MITRE technique IDs, threat severity (CRITICAL/HIGH), and 3 immediate containment recommendations."
+            ],
+            commands: "ollama run llama3:8b\npip install fastapi uvicorn requests pysigma\npython -m uvicorn triage_api:app --reload --port 8000",
+            mitigation: "Ensure LLM prompts are isolated and cannot be tainted by untrusted log fields (prevent log injection/jailbreaks). Keep model weights local for data privacy."
+        }
+    },
+    {
+        id: 1002,
+        title: "ML Command & Control (C2) Beaconing Detector",
+        category: "ai-security",
+        difficulty: "advanced",
+        duration: "5 Hours",
+        xp: 250,
+        description: "Develop a machine learning network analyzer using Scapy and Isolation Forests to detect covert C2 beaconing callbacks hidden in jittered HTTP/TLS traffic.",
+        guide: {
+            objective: "Identify periodic outbound callbacks from compromised endpoints communicating with adversary C2 infrastructure (Cobalt Strike, Sliver, Havoc) despite randomized jitter.",
+            labSetup: "Python 3.11 with scapy, pandas, scikit-learn, and sample PCAP capture files.",
+            steps: [
+                "Step 1: Parse raw network PCAP files using Scapy and group packets by (Source IP, Dest IP, Dest Port) session flows.",
+                "Step 2: Calculate inter-arrival time deltas (IAT) and payload byte length variance for each flow.",
+                "Step 3: Compute mathematical features: Mean Delta, Standard Deviation, Skewness, and Coefficient of Variation.",
+                "Step 4: Train an Isolation Forest unsupervised anomaly model on baseline network traffic.",
+                "Step 5: Score test flows; flag low-variance flows exhibiting periodic pulse frequencies as suspected C2 beacons."
+            ],
+            commands: "pip install scapy pandas scikit-learn\npython c2_detector.py --pcap network_capture.pcap --threshold 0.85",
+            mitigation: "Implement TLS inspection with JA3/JA4 certificate fingerprinting and enforce egress proxy filtering."
+        }
+    },
+    {
+        id: 1003,
+        title: "LLM Security Firewall & Prompt Injection Shield",
+        category: "ai-security",
+        difficulty: "advanced",
+        duration: "4 Hours",
+        xp: 250,
+        description: "Construct an inbound security proxy that detects direct/indirect prompt injection, jailbreaks, and ChatML tag spoofing per OWASP LLM01:2025.",
+        guide: {
+            objective: "Protect production LLM endpoints from prompt injection attacks, system prompt leakage, and Base64-encoded payload smuggling.",
+            labSetup: "FastAPI, Regex, Python Transformers or local embedding similarity engine.",
+            steps: [
+                "Step 1: Set up a FastAPI reverse proxy between the user client and the upstream LLM API.",
+                "Step 2: Implement a signature matching engine for known jailbreak heuristics ('ignore previous instructions', 'DAN mode').",
+                "Step 3: Add an entropy detector to identify obfuscated Base64/Hex text strings in user inputs.",
+                "Step 4: Implement delimiter sanitization to prevent ChatML tag injection (<|im_start|>, ### Instruction).",
+                "Step 5: Return a 403 Forbidden with SOC security alert telemetry if a hostile injection vector is confirmed."
+            ],
+            commands: "pip install fastapi uvicorn pydantic\npython -m uvicorn firewall_proxy:app --port 8080",
+            mitigation: "Combine heuristic filters with secondary guardrail models (Llama Guard) and strict output encoding before rendering response content."
+        }
+    },
+    {
+        id: 1004,
+        title: "Automated Active Directory Attack Path Grapher",
+        category: "ai-security",
+        difficulty: "advanced",
+        duration: "5 Hours",
+        xp: 250,
+        description: "Build an automated graph intelligence tool that ingests BloodHound Neo4j data and identifies shortest privilege escalation attack paths to Domain Admin.",
+        guide: {
+            objective: "Automate red team reconnaissance and blue team defensive posture auditing across complex Active Directory forest trusts and ACL misconfigurations.",
+            labSetup: "Docker with Neo4j, Python neo4j driver, and bloodhound-python data collector.",
+            steps: [
+                "Step 1: Deploy a local Neo4j graph database container (docker run -p 7687:7687 neo4j:latest).",
+                "Step 2: Collect domain ACLs and session tokens using SharpHound or bloodhound-python.",
+                "Step 3: Ingest JSON node objects (Users, Computers, Groups, GPOs) and relationship edges (MemberOf, GenericAll, WriteDacl, Owns).",
+                "Step 4: Execute Cypher graph queries to calculate the shortest path from any non-privileged user to the 'Domain Admins' group.",
+                "Step 5: Generate an automated remediation report highlighting the exact ACL permissions to revoke."
+            ],
+            commands: "docker run -d -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/password neo4j\npip install neo4j\npython ad_graph_auditor.py --target-group 'Domain Admins'",
+            mitigation: "Enforce Tiered Active Directory administration models and eliminate nested GenericAll permissions on privileged group objects."
+        }
+    },
+    {
+        id: 1005,
+        title: "Dark Web Threat Intelligence & Telegram Alert Scraper",
+        category: "ai-security",
+        difficulty: "intermediate",
+        duration: "3 Hours",
+        xp: 180,
+        description: "Create an automated threat intelligence scraper that routes through Tor SOCKS5 proxy to monitor leak sites for brand keywords and dispatches Telegram alerts.",
+        guide: {
+            objective: "Proactively discover leaked credentials, exposed database dumps, and active ransomware victim announcements targeting your organization on dark web forums.",
+            labSetup: "Local Tor daemon (SOCKS5 proxy on 127.0.0.1:9050), Python Stem, Requests[socks], Telegram Bot API token.",
+            steps: [
+                "Step 1: Start the Tor daemon service locally to enable SOCKS5 onion routing.",
+                "Step 2: Configure Python requests session to route all HTTP traffic through socks5h://127.0.0.1:9050.",
+                "Step 3: Fetch HTML contents of targeted ransomware leak portals (.onion URLs) and paste sites.",
+                "Step 4: Parse page text with BeautifulSoup and match against target organization keyword list and domain regex.",
+                "Step 5: When a match is found, extract post timestamp, description, and fire a real-time alert via Telegram Bot webhook."
+            ],
+            commands: "sudo systemctl start tor\npip install 'requests[socks]' stem beautifulsoup4\npython darkweb_monitor.py --keywords 'mycompany.com,executive_name'",
+            mitigation: "Maintain active credential rotation policies and deploy honeytokens across internal infrastructure to verify breach authenticity."
+        }
+    },
+    {
+        id: 1006,
+        title: "Automated Malware Triage & Dynamic YARA Extractor",
+        category: "ai-security",
+        difficulty: "advanced",
+        duration: "4 Hours",
+        xp: 220,
+        description: "Build an automated static/dynamic PE binary analysis pipeline that inspects import tables, extracts unique byte sequences with Capstone, and generates tailored YARA detection rules.",
+        guide: {
+            objective: "Speed up malware incident triage by automatically analyzing suspicious Windows PE executables, extracting unique code strings, and synthesizing production YARA signatures.",
+            labSetup: "Python 3.11 with pefile, capstone, yara-python, and isolated test sandbox directory.",
+            steps: [
+                "Step 1: Parse the target binary's Portable Executable (PE) headers using pefile to inspect sections (.text, .rdata, .data) and calculate section entropy.",
+                "Step 2: Extract the Import Address Table (IAT) to flag suspicious API calls (VirtualAlloc, WriteProcessMemory, CreateRemoteThread).",
+                "Step 3: Disassemble executable sections using Capstone engine to locate unique opcode sequences.",
+                "Step 4: Extract meaningful ASCII and Wide strings, filtering out common Microsoft runtime libraries.",
+                "Step 5: Assemble extracted opcodes and strings into a synthesized, syntactically valid YARA detection rule file."
+            ],
+            commands: "pip install pefile capstone yara-python\npython auto_yara_generator.py --sample suspicious_malware.bin --output threat.yar",
+            mitigation: "Integrate generated YARA signatures into endpoint detection and response (EDR) agents and email gateway scanners."
+        }
+    }
 ];
