@@ -193,7 +193,7 @@ await dbHandler({ method: 'POST', body: { targets: [{ id: 'tgt_001' }], findings
 assert(dbPostRes.statusCode === 200 && (dbPostRes.data.status === 'success' || dbPostRes.data.status === 'synced'), 'api/database POST saves snapshot');
 
 const dbResetRes = createMockRes();
-await dbHandler({ method: 'POST', body: { action: 'reset_all' } }, dbResetRes);
+await dbHandler({ method: 'POST', body: { action: 'reset_all' }, headers: { authorization: 'Bearer ehk_live_sec_root9482x' } }, dbResetRes);
 assert(dbResetRes.statusCode === 200 && dbResetRes.data.status === 'reset_success', 'api/database POST action: reset_all rebuilds persistent database cleanly');
 
 // [SUITE 8] Enhanced Authentication & Operative Registration Validation
@@ -259,7 +259,7 @@ assert(goodLoginRes.statusCode === 200 && goodLoginRes.data.user.username === te
 
 // 6. Clean up database state back to standard seed
 const cleanupRes = createMockRes();
-await dbHandler({ method: 'POST', body: { action: 'reset_all' } }, cleanupRes);
+await dbHandler({ method: 'POST', body: { action: 'reset_all' }, headers: { authorization: 'Bearer ehk_live_sec_root9482x' } }, cleanupRes);
 assert(cleanupRes.statusCode === 200, 'Database reset cleans test operatives to preserve production integrity');
 
 // [SUITE 9] Topic Resources & Curriculum Mapping Verification
@@ -318,6 +318,69 @@ assert(Array.isArray(vercelContent.rewrites) && vercelContent.rewrites.length >=
 
 const hasSpaGuard = vercelContent.rewrites.some(r => r.source && r.source.includes('?!api/'));
 assert(hasSpaGuard, 'vercel.json SPA fallback correctly guards /api routes from being swallowed by /index.html');
+
+// [SUITE 11] Security Hardening & Vulnerability Verification (Multi-Skill Assessment)
+console.log('\n\x1b[36m[SUITE 11] Security Hardening & Vulnerability Verification\x1b[0m');
+
+// 1. VULN-01: Reject missing password on login
+const noPwdLoginRes = createMockRes();
+await authHandler({
+    method: 'POST',
+    body: { action: 'login', username: 'root@nextboxis' }
+}, noPwdLoginRes);
+assert(noPwdLoginRes.statusCode === 401 && noPwdLoginRes.data.success === false, 'api/auth strictly rejects login requests missing password (VULN-01 remediated)');
+
+// 2. VULN-03: Reject credentials in GET query parameters
+const getAuthRes = createMockRes();
+await authHandler({
+    method: 'GET',
+    query: { action: 'login', username: 'root@nextboxis', password: 'shadowprotocol2026' }
+}, getAuthRes);
+assert(getAuthRes.statusCode === 405, 'api/auth rejects credentials passed in GET query parameters (VULN-03 remediated)');
+
+// 3. VULN-04: Cryptographically secure PRNG session tokens
+const secTokenLogin = createMockRes();
+await authHandler({
+    method: 'POST',
+    body: { action: 'login', username: 'root@nextboxis', password: 'shadowprotocol2026' }
+}, secTokenLogin);
+const token = secTokenLogin.data?.user?.session_token || '';
+assert(token.startsWith('ehk_tok_') && token.length >= 48, `api/auth issues cryptographically secure PRNG session token (Length: ${token.length})`);
+
+// 4. VULN-02: Block unauthenticated database reset attempts
+const unauthResetRes = createMockRes();
+await dbHandler({
+    method: 'POST',
+    body: { action: 'reset_all' }
+}, unauthResetRes);
+assert(unauthResetRes.statusCode === 403, 'api/database blocks unauthenticated database reset attempts with 403 Forbidden (VULN-02 remediated)');
+
+// 5. Block GET-based reset triggers
+const getDbResetRes = createMockRes();
+await dbHandler({
+    method: 'GET',
+    query: { action: 'reset' }
+}, getDbResetRes);
+assert(getDbResetRes.statusCode === 405, 'api/database blocks GET-based database reset attempts with 405 Method Not Allowed');
+
+// 6. VULN-05: HTTP Security Headers in vercel.json
+const globalHeaders = vercelContent.headers?.find(h => h.source === '/(.*)')?.headers || [];
+const hstsHeader = globalHeaders.find(h => h.key === 'Strict-Transport-Security');
+const cspHeader = globalHeaders.find(h => h.key === 'Content-Security-Policy');
+assert(Boolean(hstsHeader && hstsHeader.value.includes('max-age=31536000')), 'vercel.json enforces Strict-Transport-Security (HSTS) max-age=31536000');
+assert(Boolean(cspHeader && cspHeader.value.includes("default-src 'self'")), 'vercel.json enforces strict Content-Security-Policy (CSP)');
+
+// 7. VULN-06: Cache-Control: no-store on sensitive API endpoints
+const apiHeaderRule = vercelContent.headers?.find(h => h.source === '/api/(.*)');
+const apiCacheControl = apiHeaderRule?.headers?.find(h => h.key === 'Cache-Control');
+assert(Boolean(apiCacheControl && apiCacheControl.value.includes('no-store')), 'vercel.json sets Cache-Control: no-store on sensitive API endpoints');
+
+// 8. VULN-08: Repository governance & secret protection
+const gitignoreContent = fs.readFileSync(path.resolve('.gitignore'), 'utf-8');
+assert(gitignoreContent.includes('.env') && gitignoreContent.includes('*.pem') && gitignoreContent.includes('*.key'), '.gitignore excludes .env, private keys, certificates and database dumps');
+
+const securityMd = fs.readFileSync(path.resolve('SECURITY.md'), 'utf-8');
+assert(securityMd.includes('Security Policy') && securityMd.includes('Reporting a Vulnerability'), 'SECURITY.md provides official responsible disclosure and vulnerability reporting policy');
 
 // Summary
 console.log('\n======================================================');

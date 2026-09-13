@@ -63,7 +63,8 @@ function apiDevServerPlugin() {
             return handler(req, res);
           }
           if (pathname === '/api/analyze') {
-            const target = (req.body?.target || req.query?.target || '');
+            const rawTarget = (req.body?.target || req.query?.target || '');
+            const target = String(rawTarget).slice(0, 5000);
             const results = {
               status: "success",
               runtime: "Node.js / Python 3.11 Emulated Security Gateway",
@@ -78,6 +79,8 @@ function apiDevServerPlugin() {
                 is_command_injection: Boolean(/(;|&&|\|\||`|\$\()/i.test(target))
               }
             };
+            res.setHeader('X-Content-Type-Options', 'nosniff');
+            res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
             return res.status(200).json(results);
           }
           next();

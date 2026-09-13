@@ -2,13 +2,17 @@
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Content-Type', 'application/json');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
 
     if (req.method === 'OPTIONS') {
         res.status(200).end();
         return;
     }
 
-    const { prompt = '', type = 'sigma' } = req.body || req.query || {};
+    const rawPrompt = (req.body?.prompt || req.query?.prompt || '');
+    const prompt = String(rawPrompt).slice(0, 5000);
+    const type = String(req.body?.type || req.query?.type || 'sigma').slice(0, 50);
     const queryLower = prompt.toLowerCase();
 
     let output = '';

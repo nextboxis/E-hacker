@@ -4,3 +4,25 @@ dist/
 *.log
 .DS_Store
 Thumbs.db
+
+# Secrets & Environment Files (NIST CSF PR.DS-10 / OWASP A02:2021)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+credentials.json
+client_secrets.json
+id_rsa
+id_ed25519
+
+# Backup & Transient DB dumps
+*.bak
+*.swp
+*~
+database/*.bak
+database/backup/

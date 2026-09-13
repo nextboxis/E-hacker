@@ -21,7 +21,8 @@ class handler(BaseHTTPRequestHandler):
             req_json = {}
 
         action = req_json.get('action', 'analyze')
-        target = req_json.get('target', '')
+        # Enforce max input length to prevent ReDoS / CPU resource exhaustion
+        target = str(req_json.get('target', ''))[:5000]
         results = {
             "status": "success",
             "runtime": "Python 3.11 Serverless Engine",
@@ -31,7 +32,7 @@ class handler(BaseHTTPRequestHandler):
                 "md5": hashlib.md5(target.encode("utf-8")).hexdigest(),
                 "sha256": hashlib.sha256(target.encode("utf-8")).hexdigest(),
                 "length": len(target),
-                "is_sql_injection": bool(re.search(r"(?i)(\b(SELECT|UNION|INSERT|UPDATE|DELETE|DROP)\b|['"]\s*OR\s*['"]?1)", target)),
+                "is_sql_injection": bool(re.search(r"(?i)(\b(SELECT|UNION|INSERT|UPDATE|DELETE|DROP)\b|['\"]\\s*OR\\s*['\"]?1)", target)),
                 "is_xss": bool(re.search(r"(?i)(<script|javascript:|onerror=|onload=)", target)),
                 "is_command_injection": bool(re.search(r"(;|&&|\|\||`|\$\()", target))
             }
@@ -39,6 +40,8 @@ class handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Content-Type', 'application/json')
+        self.send_header('X-Content-Type-Options', 'nosniff')
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
         self.end_headers()
         self.wfile.write(json.dumps(results, indent=2).encode('utf-8'))
 

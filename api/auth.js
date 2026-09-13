@@ -1,7 +1,8 @@
-// Serverless API: Operative Authentication & Clearance Verification
+// Serverless API: Operative Authentication & Clearance Verification (Hardened)
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import crypto from 'crypto';
 
 function getDbFilePath() {
     try {
@@ -41,13 +42,23 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
 
     if (req.method === 'OPTIONS') {
         res.status(200).end();
         return;
     }
 
-    const { action, callsign, username, password, domain, clearance, role } = req.body || req.query || {};
+    // Reject transmission of sensitive credentials via GET query parameters (OWASP A02 & API2)
+    if (req.method === 'GET' && (req.query?.password || req.query?.action === 'login' || req.query?.action === 'register')) {
+        return res.status(405).json({
+            success: false,
+            status: "error",
+            error: "Authentication credentials must NOT be transmitted via GET query parameters. Use POST with a secure JSON body."
+        });
+    }
+
+    const { action, callsign, username, password, domain, clearance, role } = req.body || {};
     const effectiveUser = (username || callsign || '').trim();
     const db = readDatabase() || {
         users: [
@@ -68,6 +79,14 @@ export default async function handler(req, res) {
             });
         }
 
+        if (!password || typeof password !== 'string' || password.length < 4) {
+            return res.status(400).json({
+                success: false,
+                status: "error",
+                error: "Passphrase must be at least 4 characters long."
+            });
+        }
+
         const existing = (db.users || []).find(u => u.username.toLowerCase() === effectiveUser.toLowerCase());
         if (existing) {
             return res.status(400).json({
@@ -77,11 +96,12 @@ export default async function handler(req, res) {
             });
         }
 
-        const cleanId = 'usr_' + effectiveUser.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 16) + '_' + Math.random().toString(36).substring(2, 6);
+        const randSuffix = crypto.randomBytes(4).toString('hex');
+        const cleanId = 'usr_' + effectiveUser.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 16) + '_' + randSuffix;
         const newUser = {
             id: cleanId,
             username: effectiveUser,
-            password: password || 'cyber2026',
+            password: password,
             role: role || 'Operative',
             status: 'active',
             created_at: new Date().toISOString()
@@ -96,7 +116,7 @@ export default async function handler(req, res) {
             avatar: '01',
             githubAvatar: null,
             bio: `Operative ${effectiveUser} // Cyber Defense Division`,
-            apiKey: 'ehk_live_sec_' + Math.random().toString(36).substring(2, 12),
+            apiKey: 'ehk_live_sec_' + crypto.randomBytes(12).toString('hex'),
             xp: 0,
             level: 1,
             completedProjects: [],
@@ -109,7 +129,7 @@ export default async function handler(req, res) {
         db.profiles = [...(db.profiles || []), newProfile];
         if (Array.isArray(db.audit_logs)) {
             db.audit_logs.unshift({
-                id: 'log_' + Math.random().toString(36).substring(2, 9),
+                id: 'log_' + crypto.randomBytes(6).toString('hex'),
                 user_id: cleanId,
                 action: 'OPERATIVE_REGISTERED',
                 details: { username: effectiveUser, domain: domain || 'full' },
@@ -118,6 +138,9 @@ export default async function handler(req, res) {
         }
 
         writeDatabase(db);
+
+        // Generate cryptographically secure session token
+        const secureSessionToken = 'ehk_tok_' + crypto.randomBytes(24).toString('hex');
 
         return res.status(200).json({
             success: true,
@@ -130,14 +153,31 @@ export default async function handler(req, res) {
                 clearance: newProfile.clearance,
                 domain: newProfile.domain,
                 role: newUser.role,
-                session_token: 'ehk_tok_' + Math.random().toString(36).substring(2, 16)
+                session_token: secureSessionToken
             }
         });
     }
 
     if (action === 'login') {
+        if (!effectiveUser) {
+            return res.status(400).json({
+                success: false,
+                status: "error",
+                error: "Operative username or callsign is required."
+            });
+        }
+
+        // Strict password check: reject empty or missing passwords
+        if (!password || typeof password !== 'string' || password.length === 0) {
+            return res.status(401).json({
+                success: false,
+                status: "error",
+                error: "Password / access cipher is strictly required. Authentication rejected."
+            });
+        }
+
         const matched = (db.users || []).find(u => u.username.toLowerCase() === effectiveUser.toLowerCase());
-        if (!matched && effectiveUser !== 'root@nextboxis') {
+        if (!matched) {
             return res.status(401).json({
                 success: false,
                 status: "error",
@@ -145,7 +185,7 @@ export default async function handler(req, res) {
             });
         }
 
-        if (matched && password && matched.password !== password) {
+        if (matched.password !== password) {
             return res.status(401).json({
                 success: false,
                 status: "error",
@@ -153,8 +193,9 @@ export default async function handler(req, res) {
             });
         }
 
-        const userId = matched ? matched.id : 'usr_root_001';
+        const userId = matched.id;
         const matchedProfile = (db.profiles || []).find(p => p.id === userId || p.user_id === userId);
+        const secureSessionToken = 'ehk_tok_' + crypto.randomBytes(24).toString('hex');
 
         return res.status(200).json({
             success: true,
@@ -162,12 +203,12 @@ export default async function handler(req, res) {
             message: "Authentication verified. Security clearances unlocked.",
             user: {
                 id: userId,
-                username: matched ? matched.username : effectiveUser,
-                callsign: matchedProfile ? matchedProfile.callsign : (effectiveUser || 'root@nextboxis'),
+                username: matched.username,
+                callsign: matchedProfile ? matchedProfile.callsign : matched.username,
                 clearance: matchedProfile ? matchedProfile.clearance : (clearance || 'Level 5 • TOP SECRET'),
                 domain: matchedProfile ? matchedProfile.domain : (domain || 'full'),
-                role: matched ? matched.role : 'Lead Architect',
-                session_token: 'ehk_tok_' + Math.random().toString(36).substring(2, 16)
+                role: matched.role || 'Operative',
+                session_token: secureSessionToken
             }
         });
     }
@@ -175,9 +216,9 @@ export default async function handler(req, res) {
     res.status(200).json({
         success: true,
         status: "healthy",
-        service: "E-Hacker Cyber Authentication Gateway v3.0",
+        service: "E-Hacker Cyber Authentication Gateway v3.0 (Hardened)",
         timestamp: new Date().toISOString(),
-        supported_actions: ["login", "register", "verify"],
+        supported_actions: ["login", "register"],
         database_users_registered: (db.users || []).length
     });
 }
