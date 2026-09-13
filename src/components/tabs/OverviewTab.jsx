@@ -39,7 +39,7 @@ export default function OverviewTab() {
     const progressPct = nextRank ? Math.min(100, ((xp - rank.threshold) / (nextRank.threshold - rank.threshold)) * 100) : 100;
 
     const quickModules = [
-        { label: 'Project Hub', key: 'projects', desc: `${completedLabs} of 100+ hands-on labs completed`, color: 'var(--color-accent)' },
+        { label: 'Project Hub', key: 'projects', desc: `${completedLabs} of 118 hands-on labs completed`, color: 'var(--color-accent)' },
         { label: 'Tools Directory', key: 'tools', desc: `${TOOLS_DATABASE.length} tools, ${OSINT_TOOLS.length} OSINT, ${AI_SECURITY_TOOLS.length} AI weapons`, color: 'var(--color-secondary)' },
         { label: 'AI Security Hub', key: 'ai-hub', desc: 'Sigma, YARA, Snort, KQL rule generator & LLM firewall', color: '#a855f7' },
         { label: 'SOC Threat Hunter', key: 'soc-hunter', desc: 'Live SIEM incident telemetry, Sysmon & Wireshark PCAP dissector', color: '#06b6d4' },

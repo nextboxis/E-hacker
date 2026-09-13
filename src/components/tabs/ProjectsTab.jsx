@@ -21,7 +21,8 @@ export default function ProjectsTab() {
         'Tool Development',
         'Malware & Defense',
         'OSINT & Forensics',
-        'Active Directory & Cloud'
+        'Active Directory & Cloud',
+        'Reverse Engineering'
     ];
     const difficulties = ['ALL', 'Beginner', 'Intermediate', 'Advanced'];
 
@@ -29,8 +30,10 @@ export default function ProjectsTab() {
         switch (cat) {
             case 'ai-security': return 'AI-Era Security (2025/26)';
             case 'web-hacking': return 'Web Hacking';
-            case 'network-security': return 'Network Security';
-            case 'tool-development': return 'Tool Development';
+            case 'network-security':
+            case 'network-sec': return 'Network Security';
+            case 'tool-development':
+            case 'tool-dev': return 'Tool Development';
             case 'malware-defense': return 'Malware & Defense';
             case 'osint-forensics':
             case 'forensics': return 'OSINT & Forensics';

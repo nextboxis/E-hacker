@@ -71,6 +71,26 @@ level: high`;
     condition:
         uint16(0) == 0x5A4D and (2 of ($pipe*) or all of ($s*) or ($s2 and $malleable1))
 }`;
+    } else if (type === 'snort' || queryLower.includes('snort')) {
+        output = `alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS $HTTP_PORTS (
+    msg:"AI-DETECT: Suspicious Remote Command Execution In HTTP Request [${prompt || 'Threat Vector'}]";
+    flow:to_server,established;
+    content:"/bin/sh"; nocase; http_uri;
+    content:"cmd.exe"; nocase; http_header;
+    classtype:web-application-attack;
+    sid:${Math.floor(Math.random() * 900000 + 100000)}; rev:1;
+    metadata:created_at ${new Date().toISOString().slice(0, 10)};
+)`;
+    } else if (type === 'kql' || queryLower.includes('kql') || queryLower.includes('sentinel')) {
+        output = `// Microsoft Sentinel KQL Detection Query
+// Threat: ${prompt || 'Suspicious Process Lineage'}
+DeviceProcessEvents
+| where InitiatingProcessFileName in~ ("w3wp.exe", "httpd.exe", "nginx.exe", "tomcat8.exe")
+| where FileName in~ ("cmd.exe", "powershell.exe", "whoami.exe", "net.exe", "certutil.exe", "pwsh.exe")
+| project Timestamp, DeviceName, AccountName, InitiatingProcessFileName, InitiatingProcessCommandLine, FileName, ProcessCommandLine
+| summarize EventCount = count(), FirstSeen = min(Timestamp), LastSeen = max(Timestamp) by DeviceName, AccountName, ProcessCommandLine
+| where EventCount > 0
+| order by EventCount desc`;
     } else {
         // Python Security Automation Script
         output = `#!/usr/bin/env python3
@@ -103,10 +123,12 @@ print("[*] Audit scan cycle complete.")`;
     }
 
     res.status(200).json({
+        success: true,
         status: "success",
         type: type,
         prompt: prompt,
         timestamp: new Date().toISOString(),
+        rule: output,
         result: output
     });
 }

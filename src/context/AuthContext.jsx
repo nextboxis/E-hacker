@@ -175,13 +175,12 @@ export function AuthProvider({ children }) {
         setIsAuthenticated(false);
         localStorage.removeItem('ehacker-authenticated');
         setIsLogoutModalOpen(false);
-        setIsAuthModalOpen(false);
         setIsLocked(false);
         setActiveTab('overview');
     };
 
     // User credential authentication
-    const loginUser = ({ username, password }) => {
+    const loginUser = ({ username, password, autoAuth = true }) => {
         const cleanUser = (username || '').trim().toLowerCase();
         const found = userAccounts.find(u => u.username.toLowerCase() === cleanUser);
 
@@ -202,19 +201,22 @@ export function AuthProvider({ children }) {
 
         // Match or fallback profile
         const linkedProfile = allProfiles.find(p => p.id === found.profileId) || allProfiles.find(p => p.callsign.toLowerCase() === cleanUser);
+        const resolvedProfileId = linkedProfile ? linkedProfile.id : found.profileId;
         if (linkedProfile) {
             setActiveProfileId(linkedProfile.id);
             setActiveDomain(linkedProfile.domain || 'full');
         }
 
-        setIsAuthenticated(true);
-        localStorage.setItem('ehacker-authenticated', 'true');
-        playChime();
-        return { success: true };
+        if (autoAuth) {
+            setIsAuthenticated(true);
+            localStorage.setItem('ehacker-authenticated', 'true');
+            playChime();
+        }
+        return { success: true, profileId: resolvedProfileId };
     };
 
     // User registration with GitHub metadata integration
-    const registerUser = async ({ username, password, domain, clearance }) => {
+    const registerUser = async ({ username, password, domain, clearance, autoAuth = true }) => {
         const cleanUser = (username || '').trim();
         const existing = userAccounts.find(u => u.username.toLowerCase() === cleanUser.toLowerCase());
         
@@ -270,14 +272,52 @@ export function AuthProvider({ children }) {
         setAllProfiles(prev => [...prev, newProf]);
         setActiveProfileId(newProfileId);
         setActiveDomain(newProf.domain);
-        setIsAuthenticated(true);
-        localStorage.setItem('ehacker-authenticated', 'true');
-        playChime();
+
+        if (autoAuth) {
+            setIsAuthenticated(true);
+            localStorage.setItem('ehacker-authenticated', 'true');
+            playChime();
+        }
 
         return {
             success: true,
             profileId: newProfileId,
             githubData
+        };
+    };
+
+    // User password reset
+    const resetUserPassword = ({ username, newPassword }) => {
+        const cleanUser = (username || '').trim().toLowerCase();
+        const foundIndex = userAccounts.findIndex(u => u.username.toLowerCase() === cleanUser);
+
+        if (foundIndex === -1) {
+            return {
+                success: false,
+                error: `Operative '${username}' not found in registry.`
+            };
+        }
+
+        if (!newPassword || newPassword.length < 4) {
+            return {
+                success: false,
+                error: 'New password must be at least 4 characters.'
+            };
+        }
+
+        const updatedAccounts = [...userAccounts];
+        updatedAccounts[foundIndex] = {
+            ...updatedAccounts[foundIndex],
+            password: newPassword,
+            updatedAt: new Date().toISOString()
+        };
+
+        setUserAccounts(updatedAccounts);
+        localStorage.setItem('ehacker-user-accounts', JSON.stringify(updatedAccounts));
+        playChime();
+        return { 
+            success: true, 
+            profileId: updatedAccounts[foundIndex].profileId 
         };
     };
 
@@ -341,11 +381,12 @@ export function AuthProvider({ children }) {
         });
     };
 
-    const toggleProjectComplete = (projId) => {
+    const toggleProjectComplete = (projId, customXp) => {
         const current = activeProfile.completedProjects || [];
         const isDone = current.includes(projId);
         const updated = isDone ? current.filter(id => id !== projId) : [...current, projId];
-        const xpDelta = isDone ? -50 : 50;
+        const awardedXp = typeof customXp === 'number' && customXp > 0 ? customXp : 50;
+        const xpDelta = isDone ? -awardedXp : awardedXp;
         updateActiveProfile({
             completedProjects: updated,
             xp: Math.max(0, (activeProfile.xp || 0) + xpDelta),
@@ -374,7 +415,6 @@ export function AuthProvider({ children }) {
                 setIsSpotlightOpen(prev => !prev);
             } else if (e.key === 'Escape') {
                 setIsSpotlightOpen(false);
-                setIsAuthModalOpen(false);
                 setIsLogoutModalOpen(false);
                 setIsTerminalModalOpen(false);
                 setActiveProjectModal(null);
@@ -392,6 +432,7 @@ export function AuthProvider({ children }) {
             logout,
             loginUser,
             registerUser,
+            resetUserPassword,
             userAccounts,
             activeProfile,
             allProfiles,

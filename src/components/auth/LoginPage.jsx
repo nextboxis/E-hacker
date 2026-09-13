@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function LoginPage() {
-    const { loginUser, registerUser, playChime } = useAuth();
-    const [mode, setMode] = useState('signin'); // 'signin' or 'signup'
+    const { login, loginUser, registerUser, resetUserPassword, playChime } = useAuth();
+    const [mode, setMode] = useState('signin'); // 'signin', 'signup', or 'forgot'
     const [username, setUsername] = useState('root@nextboxis');
     const [password, setPassword] = useState('shadowprotocol2026');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [domain, setDomain] = useState('full');
     const [authError, setAuthError] = useState('');
+    const [authSuccess, setAuthSuccess] = useState('');
     const [isBooting, setIsBooting] = useState(false);
     const [bootStep, setBootStep] = useState('');
     const [ghPreview, setGhPreview] = useState(null);
@@ -66,16 +68,19 @@ export default function LoginPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setAuthError('');
+        setAuthSuccess('');
 
         if (mode === 'signin') {
-            const res = loginUser({ username, password });
+            const res = loginUser({ username, password, autoAuth: false });
             if (res.success) {
-                startBootSequence();
+                startBootSequence(() => {
+                    login(res.profileId);
+                });
             } else {
                 setAuthError(res.error || 'Authentication failed.');
                 playChime();
             }
-        } else {
+        } else if (mode === 'signup') {
             // Sign Up / Register
             if (!password || password.length < 4) {
                 setAuthError('Password must be at least 4 characters.');
@@ -86,26 +91,42 @@ export default function LoginPage() {
                 username,
                 password,
                 domain,
-                clearance: 'Level 2 • RESTRICTED'
+                clearance: 'Level 2 • RESTRICTED',
+                autoAuth: false
             });
 
             if (res.success) {
-                startBootSequence();
+                startBootSequence(() => {
+                    login(res.profileId);
+                });
             } else {
                 setAuthError(res.error || 'Registration failed.');
                 playChime();
             }
-        }
-    };
+        } else if (mode === 'forgot') {
+            // Reset / Update Password
+            if (!password || password.length < 4) {
+                setAuthError('New password must be at least 4 characters.');
+                return;
+            }
+            if (confirmPassword && password !== confirmPassword) {
+                setAuthError('Passwords do not match. Please verify.');
+                return;
+            }
 
-    const handleQuickRole = (user, pass) => {
-        setUsername(user);
-        setPassword(pass);
-        setMode('signin');
-        setAuthError('');
-        const res = loginUser({ username: user, password: pass });
-        if (res.success) {
-            startBootSequence();
+            const res = resetUserPassword({ username, newPassword: password });
+            if (res.success) {
+                setAuthSuccess('Passphrase updated successfully in registry! Launching workstation...');
+                playChime();
+                setTimeout(() => {
+                    startBootSequence(() => {
+                        login(res.profileId);
+                    });
+                }, 700);
+            } else {
+                setAuthError(res.error || 'Passphrase reset failed.');
+                playChime();
+            }
         }
     };
 
@@ -134,7 +155,7 @@ export default function LoginPage() {
                         <div className="split-form-content">
                             <div className="flex-space-between-center align-center mb-10">
                                 <h1 className="split-form-title" style={{ margin: 0 }}>
-                                    {mode === 'signin' ? 'Welcome back' : 'Create account'}
+                                    {mode === 'signin' ? 'Welcome back' : mode === 'signup' ? 'Create account' : 'Reset Passphrase'}
                                 </h1>
                                 {ghPreview && (
                                     <div className="github-user-preview-chip">
@@ -146,12 +167,20 @@ export default function LoginPage() {
                             <p style={{ color: 'var(--text-muted)', fontSize: '0.84rem', margin: '0 0 20px 0' }}>
                                 {mode === 'signin' 
                                     ? 'Sign in with your GitHub username or operative callsign.' 
-                                    : 'Create your custom operative account with your GitHub handle and password.'}
+                                    : mode === 'signup'
+                                    ? 'Create your custom operative account with your GitHub handle and password.'
+                                    : 'Enter your operative callsign and choose a new passphrase.'}
                             </p>
 
                             {authError && (
                                 <div className="auth-feedback-box error mb-15">
                                     {authError}
+                                </div>
+                            )}
+
+                            {authSuccess && (
+                                <div className="auth-feedback-box success mb-15">
+                                    {authSuccess}
                                 </div>
                             )}
 
@@ -169,7 +198,7 @@ export default function LoginPage() {
                                         className="pill-input-field"
                                         placeholder="GitHub Username / Callsign"
                                         value={username}
-                                        onChange={(e) => { setUsername(e.target.value); setAuthError(''); }}
+                                        onChange={(e) => { setUsername(e.target.value); setAuthError(''); setAuthSuccess(''); }}
                                         required
                                     />
                                 </div>
@@ -184,12 +213,31 @@ export default function LoginPage() {
                                     <input
                                         type="password"
                                         className="pill-input-field"
-                                        placeholder="Password"
+                                        placeholder={mode === 'forgot' ? 'New Passphrase (min 4 chars)' : 'Password'}
                                         value={password}
-                                        onChange={(e) => { setPassword(e.target.value); setAuthError(''); }}
+                                        onChange={(e) => { setPassword(e.target.value); setAuthError(''); setAuthSuccess(''); }}
                                         required
                                     />
                                 </div>
+
+                                {/* Confirm Password on Reset */}
+                                {mode === 'forgot' && (
+                                    <div className="pill-input-group">
+                                        <div className="pill-input-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                                            </svg>
+                                        </div>
+                                        <input
+                                            type="password"
+                                            className="pill-input-field"
+                                            placeholder="Confirm New Passphrase"
+                                            value={confirmPassword}
+                                            onChange={(e) => { setConfirmPassword(e.target.value); setAuthError(''); setAuthSuccess(''); }}
+                                            required
+                                        />
+                                    </div>
+                                )}
 
                                 {/* Specialization track on Sign Up */}
                                 {mode === 'signup' && (
@@ -214,10 +262,22 @@ export default function LoginPage() {
                                     </div>
                                 )}
 
-                                {/* Forgot Password helper */}
+                                {/* Forgot Password helper link */}
                                 {mode === 'signin' && (
                                     <div className="split-forgot-row">
-                                        <a href="#forgot" className="split-forgot-link" onClick={(e) => { e.preventDefault(); alert("Passphrase reset token dispatched to local operative keystore."); }}>
+                                        <a
+                                            href="#forgot"
+                                            className="split-forgot-link"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                setMode('forgot');
+                                                setPassword('');
+                                                setConfirmPassword('');
+                                                setAuthError('');
+                                                setAuthSuccess('');
+                                                playChime();
+                                            }}
+                                        >
                                             Forgot Password?
                                         </a>
                                     </div>
@@ -225,7 +285,9 @@ export default function LoginPage() {
 
                                 {/* Primary Purple Button */}
                                 <button type="submit" className="purple-pill-btn">
-                                    <span>{mode === 'signin' ? 'Log In' : 'Sign Up & Save Account'}</span>
+                                    <span>
+                                        {mode === 'signin' ? 'Log In' : mode === 'signup' ? 'Sign Up & Save Account' : 'Update Passphrase & Launch'}
+                                    </span>
                                     <svg viewBox="0 0 24 24" className="purple-btn-icon">
                                         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
                                     </svg>
@@ -240,51 +302,34 @@ export default function LoginPage() {
                                         <button
                                             type="button"
                                             className="split-toggle-btn"
-                                            onClick={() => { setMode('signup'); setAuthError(''); playChime(); }}
+                                            onClick={() => { setMode('signup'); setAuthError(''); setAuthSuccess(''); playChime(); }}
                                         >
                                             Sign Up
                                         </button>
                                     </p>
-                                ) : (
+                                ) : mode === 'signup' ? (
                                     <p>
                                         Already have an account?{' '}
                                         <button
                                             type="button"
                                             className="split-toggle-btn"
-                                            onClick={() => { setMode('signin'); setAuthError(''); playChime(); }}
+                                            onClick={() => { setMode('signin'); setAuthError(''); setAuthSuccess(''); playChime(); }}
                                         >
                                             Log In
                                         </button>
                                     </p>
+                                ) : (
+                                    <p>
+                                        Remembered your passphrase?{' '}
+                                        <button
+                                            type="button"
+                                            className="split-toggle-btn"
+                                            onClick={() => { setMode('signin'); setAuthError(''); setAuthSuccess(''); playChime(); }}
+                                        >
+                                            Back to Log In
+                                        </button>
+                                    </p>
                                 )}
-                            </div>
-
-                            {/* Quick Presets / Demo Logins */}
-                            <div className="split-quick-roles">
-                                <span className="split-quick-label">QUICK SIMULATION PRESETS:</span>
-                                <div className="split-quick-chips">
-                                    <button
-                                        type="button"
-                                        className="split-role-chip"
-                                        onClick={() => handleQuickRole('root@nextboxis', 'shadowprotocol2026')}
-                                    >
-                                        root@nextboxis
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="split-role-chip"
-                                        onClick={() => handleQuickRole('Ghost_RedTeam', 'redteam2026')}
-                                    >
-                                        Ghost_RedTeam
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="split-role-chip"
-                                        onClick={() => handleQuickRole('Sentinel_SOC', 'soc2026')}
-                                    >
-                                        Sentinel_SOC
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     )}

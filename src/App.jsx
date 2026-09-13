@@ -7,6 +7,9 @@ import CommandPalette from './components/layout/CommandPalette';
 import TerminalErrorBoundary from './components/common/TerminalErrorBoundary';
 import ProjectModal from './components/modals/ProjectModal';
 import TerminalModal from './components/modals/TerminalModal';
+import LockScreenModal from './components/modals/LockScreenModal';
+import LogoutModal from './components/modals/LogoutModal';
+import { useIdleTimer } from './hooks/useIdleTimer';
 
 // Lazy-load tabs for optimal performance and chunk-splitting
 const OverviewTab = lazy(() => import('./components/tabs/OverviewTab'));
@@ -66,6 +69,8 @@ function MainContent() {
 }
 
 function DashboardLayout() {
+    useIdleTimer(10); // Auto-locks workstation after 10m of inactivity
+
     return (
         <div className="app-container" style={{ display: 'flex', minHeight: '100vh' }}>
             <Sidebar />
@@ -73,6 +78,8 @@ function DashboardLayout() {
             <CommandPalette />
             <ProjectModal />
             <TerminalModal />
+            <LockScreenModal />
+            <LogoutModal />
         </div>
     );
 }

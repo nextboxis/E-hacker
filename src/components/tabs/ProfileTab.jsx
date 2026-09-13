@@ -103,7 +103,7 @@ export default function ProfileTab() {
                             </div>
                             <div className="dossier-metric-item">
                                 <span className="dossier-metric-label">COMPLETED LABS:</span>
-                                <strong className="dossier-metric-val">{completedLabs} / 100 Labs</strong>
+                                <strong className="dossier-metric-val">{completedLabs} / 118 Labs</strong>
                             </div>
                             <div className="dossier-metric-item">
                                 <span className="dossier-metric-label">TOTAL XP:</span>

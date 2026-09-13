@@ -486,14 +486,25 @@ export default function ToolsDirectoryTab() {
                             </div>
 
                             <div className="flex-gap-10 mt-20 flex-wrap">
+                                {inspectedPdf.file && (
+                                    <a
+                                        href={`/pdfs/${inspectedPdf.file}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="site-btn tool-btn"
+                                        style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'linear-gradient(135deg, #10b981, #06b6d4)' }}
+                                    >
+                                        📄 Open Bundled PDF ({inspectedPdf.file})
+                                    </a>
+                                )}
                                 <a
                                     href={inspectedPdf.url}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="site-btn tool-btn"
+                                    className="site-btn tool-btn secondary-btn"
                                     style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                                 >
-                                    Open Full PDF / Online Reference ↗
+                                    Online Reference ↗
                                 </a>
                                 <button
                                     className="site-btn tool-btn secondary-btn"

@@ -40,7 +40,7 @@ export default function ProjectModal() {
         if (input.toLowerCase() === targetFlag.toLowerCase() || input.startsWith('FLAG{')) {
             setFlagStatus({ success: true, msg: `[SUCCESS] Cryptographic Proof-of-Work Verified! +${xp} XP Claimed.` });
             if (!isCompleted) {
-                toggleProjectComplete(p.id);
+                toggleProjectComplete(p.id, xp);
             }
             playChime();
         } else {
@@ -202,7 +202,7 @@ export default function ProjectModal() {
                         <input
                             type="checkbox"
                             checked={isCompleted}
-                            onChange={() => toggleProjectComplete(p.id)}
+                            onChange={() => toggleProjectComplete(p.id, xp)}
                         />
                         <span className="checkmark"></span>
                         <span className="checkbox-text">

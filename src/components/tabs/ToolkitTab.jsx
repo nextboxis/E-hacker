@@ -342,6 +342,70 @@ export default function ToolkitTab() {
     // Payloads Playground state
     const [payloadCat, setPayloadCat] = useState('sqli');
     const [testPayload, setTestPayload] = useState("' OR '1'='1' -- ");
+    const [isAnalyzingPayload, setIsAnalyzingPayload] = useState(false);
+    const [payloadAnalysisResult, setPayloadAnalysisResult] = useState(null);
+
+    const handleAnalyzePayload = async (payloadToTest) => {
+        const inputStr = payloadToTest || testPayload;
+        if (!inputStr) return;
+        setIsAnalyzingPayload(true);
+        playChime();
+
+        // 1. Attempt serverless threat analysis endpoint /api/analyze
+        try {
+            const res = await fetch('/api/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: inputStr })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setPayloadAnalysisResult({ ...data, engine: 'Serverless Edge API (/api/analyze)' });
+                setIsAnalyzingPayload(false);
+                return;
+            }
+        } catch (e) {
+            // fallback to client-side heuristics
+        }
+
+        // 2. Client-Side Heuristic Fallback
+        const lower = inputStr.toLowerCase();
+        let score = 0;
+        const detected = [];
+        if (/('|--|union|select|sleep|pg_sleep|insert|drop)/i.test(lower)) {
+            score += 45;
+            detected.push('SQL Injection Pattern');
+        }
+        if (/(<script|onerror|onload|javascript:|eval\(|<img|<svg)/i.test(lower)) {
+            score += 45;
+            detected.push('Cross-Site Scripting (XSS)');
+        }
+        if (/(;|&&|\|\||`|\$\(|\/etc\/passwd|whoami|powershell)/i.test(lower)) {
+            score += 50;
+            detected.push('Command Injection / RCE Syntax');
+        }
+        if (/(169\.254\.169\.254|metadata\.google|localhost|127\.0\.0\.1)/i.test(lower)) {
+            score += 40;
+            detected.push('SSRF / Cloud Metadata Reconnaissance');
+        }
+        if (/(\.\.\/|\.\.\\)/i.test(lower)) {
+            score += 35;
+            detected.push('Path Traversal Vector');
+        }
+
+        const finalScore = Math.min(100, score);
+        const riskLevel = finalScore >= 70 ? 'CRITICAL' : finalScore >= 40 ? 'HIGH' : finalScore > 0 ? 'MEDIUM' : 'LOW';
+
+        setPayloadAnalysisResult({
+            threatScore: finalScore,
+            riskLevel,
+            detectedAttacks: detected.length > 0 ? detected : ['No critical malicious indicators identified'],
+            sanitized: inputStr.replace(/[<>'";&]/g, ''),
+            timestamp: new Date().toISOString(),
+            engine: 'Local Client-Side Heuristics'
+        });
+        setIsAnalyzingPayload(false);
+    };
 
     // Web Exploit PoC Suite state
     const [csrfAction, setCsrfAction] = useState('http://target.corp/api/user/update-email');
@@ -1426,18 +1490,53 @@ export default function ToolkitTab() {
                         </div>
 
                         <div>
-                            <label className="tool-input-label">PAYLOAD INSPECTOR & VERIFIER:</label>
+                            <label className="tool-input-label">PAYLOAD INSPECTOR & THREAT ENGINE:</label>
                             <textarea
                                 className="notes-textarea mt-10 mb-10"
                                 rows="3"
                                 value={testPayload}
                                 onChange={(e) => setTestPayload(e.target.value)}
                             />
-                            <div className="flex-gap-10">
+                            <div className="flex-gap-10 flex-wrap">
                                 <button className="site-btn tool-btn" onClick={() => handleCopy(testPayload, 'custom_pl')}>
                                     {copiedKey === 'custom_pl' ? 'Copied!' : 'Copy Payload'}
                                 </button>
+                                <button
+                                    className="site-btn tool-btn"
+                                    style={{ background: 'linear-gradient(135deg, #7c3aed, #06b6d4)' }}
+                                    disabled={isAnalyzingPayload}
+                                    onClick={() => handleAnalyzePayload(testPayload)}
+                                >
+                                    {isAnalyzingPayload ? 'Analyzing...' : 'Deep Analyze (/api/analyze)'}
+                                </button>
                             </div>
+
+                            {payloadAnalysisResult && (
+                                <div className="glass-card mt-15" style={{ margin: '15px 0 0 0', padding: '14px', background: 'rgba(0, 0, 0, 0.45)', borderColor: payloadAnalysisResult.riskLevel === 'CRITICAL' ? 'rgba(239, 68, 68, 0.4)' : 'rgba(6, 182, 212, 0.4)' }}>
+                                    <div className="flex-space-between-center flex-wrap gap-10 mb-8">
+                                        <span className="channel-badge" style={{
+                                            background: payloadAnalysisResult.riskLevel === 'CRITICAL' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(249, 115, 22, 0.2)',
+                                            color: payloadAnalysisResult.riskLevel === 'CRITICAL' ? '#fca5a5' : '#fdba74'
+                                        }}>
+                                            {payloadAnalysisResult.riskLevel} RISK ({payloadAnalysisResult.threatScore}/100)
+                                        </span>
+                                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{payloadAnalysisResult.engine}</span>
+                                    </div>
+                                    <div className="flex-gap-6 flex-wrap mb-8">
+                                        {payloadAnalysisResult.detectedAttacks.map((att, idx) => (
+                                            <span key={idx} className="projects-badge-tag" style={{ fontSize: '0.72rem' }}>
+                                                {att}
+                                            </span>
+                                        ))}
+                                    </div>
+                                    {payloadAnalysisResult.sanitized && (
+                                        <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                                            <strong style={{ color: '#38bdf8' }}>Sanitized Output: </strong>
+                                            <code style={{ color: '#4ade80' }}>{payloadAnalysisResult.sanitized || '(cleared)'}</code>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

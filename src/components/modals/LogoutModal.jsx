@@ -72,7 +72,7 @@ export default function LogoutModal() {
                             </div>
                             <div className="debrief-item">
                                 <span className="debrief-lbl">LABS COMPLETED:</span>
-                                <strong className="debrief-val">{(activeProfile.completedProjects || []).length} / 100 Labs</strong>
+                                <strong className="debrief-val">{(activeProfile.completedProjects || []).length} / 118 Labs</strong>
                             </div>
                             <div className="debrief-item">
                                 <span className="debrief-lbl">LOCAL STORAGE:</span>

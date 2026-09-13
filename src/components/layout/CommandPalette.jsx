@@ -27,7 +27,7 @@ export default function CommandPalette() {
                     <input
                         type="text"
                         className="spotlight-input"
-                        placeholder="Search 100 labs, toolkit utilities, tools, CVEs, or commands..."
+                        placeholder="Search 118 labs, toolkit utilities, tools, CVEs, or commands..."
                         autoFocus
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
