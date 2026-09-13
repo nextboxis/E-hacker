@@ -1,6 +1,68 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
+const PRESET_OPERATIVES = [
+    {
+        id: 'usr_root_001',
+        title: 'Root Architect',
+        username: 'root@nextboxis',
+        password: 'shadowprotocol2026',
+        clearance: 'Level 5 • TOP SECRET',
+        role: 'Lead Architect',
+        icon: '🛡️',
+        badgeColor: '#c084fc'
+    },
+    {
+        id: 'usr_red_002',
+        title: 'Red Team Infiltrator',
+        username: 'Ghost_RedTeam',
+        password: 'redteam2026',
+        clearance: 'Level 4 • SECRET',
+        role: 'Offensive Specialist',
+        icon: '⚡',
+        badgeColor: '#f87171'
+    },
+    {
+        id: 'usr_soc_003',
+        title: 'SOC Blue Defender',
+        username: 'Sentinel_SOC',
+        password: 'soc2026',
+        clearance: 'Level 4 • SECRET',
+        role: 'Defense Analyst',
+        icon: '👁️',
+        badgeColor: '#38bdf8'
+    }
+];
+
+const HUD_LOG_ENTRIES = [
+    { time: '00:01:04', tag: 'SYS_AUTH', msg: 'Kernel integrity verified. Hash: 0x9f82c7...OK' },
+    { time: '00:01:12', tag: 'TLS_1.3', msg: 'Cipher: TLS_AES_256_GCM_SHA384 active.' },
+    { time: '00:01:19', tag: 'CRYPTO', msg: 'Post-Quantum Lattice KEM initialized.' },
+    { time: '00:01:28', tag: 'NET_SURV', msg: 'Perimeter scanning: 0 intrusive probes detected.' },
+    { time: '00:01:35', tag: 'DB_STORE', msg: 'Persistent JSON database mounted at /database.' },
+    { time: '00:01:42', tag: 'DEFENSE', msg: 'EDR telemetry feed synchronized across 118 labs.' }
+];
+
+function getPasswordStrength(pwd) {
+    if (!pwd) return { score: 0, label: 'NONE', color: '#6b7280', percent: 0 };
+    let score = 0;
+    if (pwd.length >= 4) score += 1;
+    if (pwd.length >= 8) score += 1;
+    if (/[A-Z]/.test(pwd)) score += 1;
+    if (/[0-9]/.test(pwd)) score += 1;
+    if (/[^A-Za-z0-9]/.test(pwd)) score += 1;
+
+    if (score <= 1) {
+        return { score: 1, label: 'WEAK', color: '#ef4444', percent: 25 };
+    } else if (score === 2 || score === 3) {
+        return { score: 2, label: 'MEDIUM', color: '#f59e0b', percent: 55 };
+    } else if (score === 4) {
+        return { score: 3, label: 'STRONG', color: '#10b981', percent: 80 };
+    } else {
+        return { score: 4, label: 'MILITARY GRADE', color: '#38bdf8', percent: 100 };
+    }
+}
+
 export default function LoginPage() {
     const { login, loginUser, registerUser, resetUserPassword, playChime } = useAuth();
     const [mode, setMode] = useState('signin'); // 'signin', 'signup', or 'forgot'
@@ -8,11 +70,14 @@ export default function LoginPage() {
     const [password, setPassword] = useState('shadowprotocol2026');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [domain, setDomain] = useState('full');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [authError, setAuthError] = useState('');
     const [authSuccess, setAuthSuccess] = useState('');
     const [isBooting, setIsBooting] = useState(false);
     const [bootStep, setBootStep] = useState('');
     const [ghPreview, setGhPreview] = useState(null);
+    const [activePreset, setActivePreset] = useState('usr_root_001');
 
     // Live GitHub user lookup preview
     useEffect(() => {
@@ -43,6 +108,17 @@ export default function LoginPage() {
 
         return () => clearTimeout(timer);
     }, [username]);
+
+    const pwdStrength = getPasswordStrength(password);
+
+    const handleSelectPreset = (preset) => {
+        setActivePreset(preset.id);
+        setUsername(preset.username);
+        setPassword(preset.password);
+        setAuthError('');
+        setAuthSuccess('');
+        playChime();
+    };
 
     const startBootSequence = (onComplete) => {
         setIsBooting(true);
@@ -77,13 +153,18 @@ export default function LoginPage() {
                     login(res.profileId);
                 });
             } else {
-                setAuthError(res.error || 'Authentication failed.');
+                setAuthError(res.error || 'Authentication failed. Please verify credentials.');
                 playChime();
             }
         } else if (mode === 'signup') {
             // Sign Up / Register
             if (!password || password.length < 4) {
                 setAuthError('Password must be at least 4 characters.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                setAuthError('Passphrase confirmation does not match. Please verify.');
                 return;
             }
 
@@ -96,11 +177,15 @@ export default function LoginPage() {
             });
 
             if (res.success) {
-                startBootSequence(() => {
-                    login(res.profileId);
-                });
+                setAuthSuccess('Operative account provisioned and synchronized to database!');
+                playChime();
+                setTimeout(() => {
+                    startBootSequence(() => {
+                        login(res.profileId);
+                    });
+                }, 750);
             } else {
-                setAuthError(res.error || 'Registration failed.');
+                setAuthError(res.error || 'Registration failed. Callsign may already be taken.');
                 playChime();
             }
         } else if (mode === 'forgot') {
@@ -109,8 +194,8 @@ export default function LoginPage() {
                 setAuthError('New password must be at least 4 characters.');
                 return;
             }
-            if (confirmPassword && password !== confirmPassword) {
-                setAuthError('Passwords do not match. Please verify.');
+            if (password !== confirmPassword) {
+                setAuthError('Passphrases do not match. Please verify.');
                 return;
             }
 
@@ -122,9 +207,9 @@ export default function LoginPage() {
                     startBootSequence(() => {
                         login(res.profileId);
                     });
-                }, 700);
+                }, 750);
             } else {
-                setAuthError(res.error || 'Passphrase reset failed.');
+                setAuthError(res.error || 'Passphrase reset failed. Callsign not found.');
                 playChime();
             }
         }
@@ -132,15 +217,15 @@ export default function LoginPage() {
 
     return (
         <div className="split-login-wrapper">
-            {/* Background Ambient Glow */}
+            {/* Ambient Background Glows */}
             <div className="split-login-ambient">
                 <div className="ambient-blob blob-left"></div>
                 <div className="ambient-blob blob-right"></div>
             </div>
 
-            {/* Split Authentication Card */}
-            <div className="split-card-container">
-                {/* Left Side: Form */}
+            {/* Main Cyber Authentication Container */}
+            <div className="split-card-container cyber-auth-card">
+                {/* Left Side: Form Panel */}
                 <div className="split-form-panel">
                     {isBooting ? (
                         <div className="split-boot-loader">
@@ -153,9 +238,44 @@ export default function LoginPage() {
                         </div>
                     ) : (
                         <div className="split-form-content">
-                            <div className="flex-space-between-center align-center mb-10">
-                                <h1 className="split-form-title" style={{ margin: 0 }}>
-                                    {mode === 'signin' ? 'Welcome back' : mode === 'signup' ? 'Create account' : 'Reset Passphrase'}
+                            {/* Header Security Status Pill */}
+                            <div className="auth-system-badge mb-15">
+                                <span className="auth-status-dot"></span>
+                                <span className="auth-status-text">AUTH_DAEMON v3.2.0 • TLS 1.3 • DEFCON 1</span>
+                            </div>
+
+                            {/* Mode Segmented Tab Switcher */}
+                            <div className="auth-mode-tabs mb-20">
+                                <button
+                                    type="button"
+                                    className={`auth-mode-tab ${mode === 'signin' ? 'active' : ''}`}
+                                    onClick={() => {
+                                        setMode('signin');
+                                        setAuthError('');
+                                        setAuthSuccess('');
+                                        playChime();
+                                    }}
+                                >
+                                    ⚡ Sign In
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`auth-mode-tab ${mode === 'signup' ? 'active' : ''}`}
+                                    onClick={() => {
+                                        setMode('signup');
+                                        setConfirmPassword('');
+                                        setAuthError('');
+                                        setAuthSuccess('');
+                                        playChime();
+                                    }}
+                                >
+                                    🛡️ Register Operative
+                                </button>
+                            </div>
+
+                            <div className="flex-space-between-center align-center mb-8">
+                                <h1 className="split-form-title" style={{ margin: 0, fontSize: '1.85rem' }}>
+                                    {mode === 'signin' ? 'Operative Sign In' : mode === 'signup' ? 'Provision Identity' : 'Reset Passphrase'}
                                 </h1>
                                 {ghPreview && (
                                     <div className="github-user-preview-chip">
@@ -164,31 +284,63 @@ export default function LoginPage() {
                                     </div>
                                 )}
                             </div>
-                            <p style={{ color: 'var(--text-muted)', fontSize: '0.84rem', margin: '0 0 20px 0' }}>
+
+                            <p style={{ color: 'var(--text-muted)', fontSize: '0.84rem', margin: '0 0 16px 0' }}>
                                 {mode === 'signin' 
-                                    ? 'Sign in with your GitHub username or operative callsign.' 
+                                    ? 'Authenticate credentials to unlock terminal clearance and active cyber labs.' 
                                     : mode === 'signup'
-                                    ? 'Create your custom operative account with your GitHub handle and password.'
-                                    : 'Enter your operative callsign and choose a new passphrase.'}
+                                    ? 'Create an operative dossier with your GitHub handle or callsign.'
+                                    : 'Verify callsign and provision a replacement encryption passphrase.'}
                             </p>
 
+                            {/* Quick Deploy Operative Cards (In Sign-in mode) */}
+                            {mode === 'signin' && (
+                                <div className="quick-deploy-section mb-15">
+                                    <div className="quick-deploy-header">
+                                        <span className="quick-deploy-label">QUICK DEPLOY PRESET OPERATIVES:</span>
+                                    </div>
+                                    <div className="quick-deploy-grid">
+                                        {PRESET_OPERATIVES.map(p => (
+                                            <button
+                                                key={p.id}
+                                                type="button"
+                                                className={`quick-deploy-card ${activePreset === p.id && username === p.username ? 'active' : ''}`}
+                                                onClick={() => handleSelectPreset(p)}
+                                                title={`Click to load ${p.title} credentials`}
+                                            >
+                                                <div className="quick-deploy-card-top">
+                                                    <span className="quick-deploy-icon">{p.icon}</span>
+                                                    <span className="quick-deploy-badge" style={{ color: p.badgeColor, borderColor: p.badgeColor }}>
+                                                        {p.role}
+                                                    </span>
+                                                </div>
+                                                <span className="quick-deploy-name">{p.title}</span>
+                                                <span className="quick-deploy-user">{p.username}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Error & Success Feedback Banners */}
                             {authError && (
                                 <div className="auth-feedback-box error mb-15">
-                                    {authError}
+                                    <span className="auth-feedback-icon">⚠️</span>
+                                    <span>{authError}</span>
                                 </div>
                             )}
 
                             {authSuccess && (
                                 <div className="auth-feedback-box success mb-15">
-                                    {authSuccess}
+                                    <span className="auth-feedback-icon">✔</span>
+                                    <span>{authSuccess}</span>
                                 </div>
                             )}
 
                             <form onSubmit={handleSubmit} className="split-auth-form">
-                                {/* GitHub Username / Handle Input */}
+                                {/* Callsign / Username Input */}
                                 <div className="pill-input-group">
                                     <div className="pill-input-icon">
-                                        {/* GitHub / User vector icon */}
                                         <svg viewBox="0 0 24 24">
                                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
                                         </svg>
@@ -196,50 +348,19 @@ export default function LoginPage() {
                                     <input
                                         type="text"
                                         className="pill-input-field"
-                                        placeholder="GitHub Username / Callsign"
+                                        placeholder="Callsign / GitHub Username"
                                         value={username}
-                                        onChange={(e) => { setUsername(e.target.value); setAuthError(''); setAuthSuccess(''); }}
+                                        onChange={(e) => { 
+                                            setUsername(e.target.value); 
+                                            setActivePreset(null);
+                                            setAuthError(''); 
+                                            setAuthSuccess(''); 
+                                        }}
                                         required
                                     />
                                 </div>
 
-                                {/* Custom Password Input */}
-                                <div className="pill-input-group">
-                                    <div className="pill-input-icon">
-                                        <svg viewBox="0 0 24 24">
-                                            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
-                                        </svg>
-                                    </div>
-                                    <input
-                                        type="password"
-                                        className="pill-input-field"
-                                        placeholder={mode === 'forgot' ? 'New Passphrase (min 4 chars)' : 'Password'}
-                                        value={password}
-                                        onChange={(e) => { setPassword(e.target.value); setAuthError(''); setAuthSuccess(''); }}
-                                        required
-                                    />
-                                </div>
-
-                                {/* Confirm Password on Reset */}
-                                {mode === 'forgot' && (
-                                    <div className="pill-input-group">
-                                        <div className="pill-input-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
-                                            </svg>
-                                        </div>
-                                        <input
-                                            type="password"
-                                            className="pill-input-field"
-                                            placeholder="Confirm New Passphrase"
-                                            value={confirmPassword}
-                                            onChange={(e) => { setConfirmPassword(e.target.value); setAuthError(''); setAuthSuccess(''); }}
-                                            required
-                                        />
-                                    </div>
-                                )}
-
-                                {/* Specialization track on Sign Up */}
+                                {/* Specialization Track (Sign Up mode only) */}
                                 {mode === 'signup' && (
                                     <div className="pill-input-group">
                                         <div className="pill-input-icon">
@@ -252,17 +373,109 @@ export default function LoginPage() {
                                             value={domain}
                                             onChange={(e) => setDomain(e.target.value)}
                                         >
-                                            <option value="full">Full Spectrum Hacker</option>
-                                            <option value="web">Web Pentesting</option>
-                                            <option value="network">Network & Infrastructure</option>
+                                            <option value="full">Full Spectrum Hacker (All Labs)</option>
+                                            <option value="web">Web Application Pentesting</option>
+                                            <option value="network">Network & Infrastructure Exploitation</option>
                                             <option value="soc">SOC & Blue Team Defense</option>
-                                            <option value="malware">Malware & Reverse Eng</option>
-                                            <option value="osint">OSINT Specialist</option>
+                                            <option value="malware">Malware Analysis & Reverse Engineering</option>
+                                            <option value="osint">OSINT & Recon Specialist</option>
                                         </select>
                                     </div>
                                 )}
 
-                                {/* Forgot Password helper link */}
+                                {/* Password Input with Show/Hide Toggle */}
+                                <div className="pill-input-group">
+                                    <div className="pill-input-icon">
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                                        </svg>
+                                    </div>
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        className="pill-input-field"
+                                        placeholder={mode === 'forgot' ? 'New Passphrase (min 4 chars)' : 'Encryption Passphrase'}
+                                        value={password}
+                                        onChange={(e) => { 
+                                            setPassword(e.target.value); 
+                                            setAuthError(''); 
+                                            setAuthSuccess(''); 
+                                        }}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className="password-toggle-btn"
+                                        onClick={() => setShowPassword(prev => !prev)}
+                                        title={showPassword ? 'Hide passphrase' : 'Show passphrase'}
+                                    >
+                                        {showPassword ? '👁️' : '👁️‍🗨️'}
+                                    </button>
+                                </div>
+
+                                {/* Password Strength Meter in Sign Up / Reset mode */}
+                                {(mode === 'signup' || mode === 'forgot') && password && (
+                                    <div className="pwd-strength-container mb-12">
+                                        <div className="flex-space-between-center mb-4">
+                                            <span className="pwd-strength-label">SECURITY ENTROPY:</span>
+                                            <span className="pwd-strength-val" style={{ color: pwdStrength.color }}>
+                                                {pwdStrength.label}
+                                            </span>
+                                        </div>
+                                        <div className="pwd-strength-track">
+                                            <div
+                                                className="pwd-strength-fill"
+                                                style={{
+                                                    width: `${pwdStrength.percent}%`,
+                                                    backgroundColor: pwdStrength.color
+                                                }}
+                                            ></div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Confirm Password Field (Sign Up & Reset mode) */}
+                                {(mode === 'signup' || mode === 'forgot') && (
+                                    <div className="pill-input-group">
+                                        <div className="pill-input-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                                            </svg>
+                                        </div>
+                                        <input
+                                            type={showConfirmPassword ? 'text' : 'password'}
+                                            className="pill-input-field"
+                                            placeholder="Confirm Passphrase"
+                                            value={confirmPassword}
+                                            onChange={(e) => { 
+                                                setConfirmPassword(e.target.value); 
+                                                setAuthError(''); 
+                                                setAuthSuccess(''); 
+                                            }}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            className="password-toggle-btn"
+                                            onClick={() => setShowConfirmPassword(prev => !prev)}
+                                            title={showConfirmPassword ? 'Hide passphrase' : 'Show passphrase'}
+                                        >
+                                            {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* Password Match Feedback Badge */}
+                                {(mode === 'signup' || mode === 'forgot') && confirmPassword && (
+                                    <div className="pwd-match-pill mb-12">
+                                        {password === confirmPassword ? (
+                                            <span style={{ color: '#4ade80' }}>✔ Passphrases match</span>
+                                        ) : (
+                                            <span style={{ color: '#f87171' }}>✖ Passphrases do not match</span>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Forgot Password Link */}
                                 {mode === 'signin' && (
                                     <div className="split-forgot-row">
                                         <a
@@ -278,15 +491,15 @@ export default function LoginPage() {
                                                 playChime();
                                             }}
                                         >
-                                            Forgot Password?
+                                            Forgot Passphrase?
                                         </a>
                                     </div>
                                 )}
 
-                                {/* Primary Purple Button */}
-                                <button type="submit" className="purple-pill-btn">
+                                {/* Primary Submit Button */}
+                                <button type="submit" className="purple-pill-btn mt-6">
                                     <span>
-                                        {mode === 'signin' ? 'Log In' : mode === 'signup' ? 'Sign Up & Save Account' : 'Update Passphrase & Launch'}
+                                        {mode === 'signin' ? 'Authenticate & Enter' : mode === 'signup' ? 'Provision Operative & Sync' : 'Update Passphrase & Launch'}
                                     </span>
                                     <svg viewBox="0 0 24 24" className="purple-btn-icon">
                                         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
@@ -294,22 +507,22 @@ export default function LoginPage() {
                                 </button>
                             </form>
 
-                            {/* Mode Toggle Footer */}
+                            {/* Mode Toggle Footer Link */}
                             <div className="split-toggle-footer">
                                 {mode === 'signin' ? (
                                     <p>
-                                        Don't have an account?{' '}
+                                        Need a new operative profile?{' '}
                                         <button
                                             type="button"
                                             className="split-toggle-btn"
-                                            onClick={() => { setMode('signup'); setAuthError(''); setAuthSuccess(''); playChime(); }}
+                                            onClick={() => { setMode('signup'); setConfirmPassword(''); setAuthError(''); setAuthSuccess(''); playChime(); }}
                                         >
                                             Sign Up
                                         </button>
                                     </p>
-                                ) : mode === 'signup' ? (
+                                ) : (
                                     <p>
-                                        Already have an account?{' '}
+                                        Already have provisioned credentials?{' '}
                                         <button
                                             type="button"
                                             className="split-toggle-btn"
@@ -318,144 +531,99 @@ export default function LoginPage() {
                                             Log In
                                         </button>
                                     </p>
-                                ) : (
-                                    <p>
-                                        Remembered your passphrase?{' '}
-                                        <button
-                                            type="button"
-                                            className="split-toggle-btn"
-                                            onClick={() => { setMode('signin'); setAuthError(''); setAuthSuccess(''); playChime(); }}
-                                        >
-                                            Back to Log In
-                                        </button>
-                                    </p>
                                 )}
                             </div>
                         </div>
                     )}
                 </div>
 
-                {/* Right Side: Scenic Vector Illustration Panel */}
-                <div className="split-art-panel">
-                    <div className="split-art-inner">
-                        <svg
-                            viewBox="0 0 500 500"
-                            className="scenic-illustration-svg"
-                            preserveAspectRatio="xMidYMid slice"
-                        >
-                            <defs>
-                                <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" stopColor="#fca5a5" />
-                                    <stop offset="35%" stopColor="#fb923c" />
-                                    <stop offset="65%" stopColor="#c084fc" />
-                                    <stop offset="100%" stopColor="#7e22ce" />
-                                </linearGradient>
+                {/* Right Side: Cyber Tactical Command HUD */}
+                <div className="split-art-panel cyber-tactical-hud">
+                    <div className="hud-overlay-grid"></div>
 
-                                <linearGradient id="mountGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" stopColor="#6b21a8" />
-                                    <stop offset="100%" stopColor="#3b0764" />
-                                </linearGradient>
+                    {/* Top HUD Telemetry Bar */}
+                    <div className="hud-top-telemetry">
+                        <div className="hud-brand-tag">
+                            <span className="hud-brand-glow">E-HACKER</span>
+                            <span className="hud-brand-sub">TACTICAL C2 HUD</span>
+                        </div>
+                        <div className="hud-defcon-badge">
+                            DEFCON 1 // ARMED
+                        </div>
+                    </div>
 
-                                <linearGradient id="mountGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" stopColor="#7e22ce" />
-                                    <stop offset="100%" stopColor="#4c1d95" />
-                                </linearGradient>
+                    {/* Central Radar & Shield Scanner Vector */}
+                    <div className="hud-central-display">
+                        <div className="hud-radar-circle">
+                            <div className="hud-radar-sweep-arm"></div>
+                            <div className="hud-radar-ring ring-1"></div>
+                            <div className="hud-radar-ring ring-2"></div>
+                            <div className="hud-radar-ring ring-3"></div>
+                            <div className="hud-radar-crosshair crosshair-h"></div>
+                            <div className="hud-radar-crosshair crosshair-v"></div>
 
-                                <linearGradient id="terraceGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" stopColor="#c4b5fd" />
-                                    <stop offset="100%" stopColor="#818cf8" />
-                                </linearGradient>
+                            {/* Defensive Shield Hexagon */}
+                            <svg viewBox="0 0 160 160" className="hud-hex-shield-svg">
+                                <polygon
+                                    points="80,10 145,45 145,115 80,150 15,115 15,45"
+                                    fill="rgba(124, 58, 237, 0.1)"
+                                    stroke="#8b5cf6"
+                                    strokeWidth="2"
+                                />
+                                <polygon
+                                    points="80,25 130,55 130,105 80,135 30,105 30,55"
+                                    fill="none"
+                                    stroke="#38bdf8"
+                                    strokeWidth="1.5"
+                                    strokeDasharray="4,4"
+                                />
+                                <circle cx="80" cy="80" r="18" fill="rgba(56, 189, 248, 0.2)" stroke="#38bdf8" strokeWidth="2" />
+                                <circle cx="80" cy="80" r="6" fill="#38bdf8" />
+                            </svg>
 
-                                <linearGradient id="terraceGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" stopColor="#a5b4fc" />
-                                    <stop offset="100%" stopColor="#6366f1" />
-                                </linearGradient>
+                            {/* Blip Indicators */}
+                            <span className="hud-blip blip-1"></span>
+                            <span className="hud-blip blip-2"></span>
+                            <span className="hud-blip blip-3"></span>
+                        </div>
 
-                                <linearGradient id="terraceGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" stopColor="#93c5fd" />
-                                    <stop offset="100%" stopColor="#4f46e5" />
-                                </linearGradient>
+                        <div className="hud-status-text-row mt-12">
+                            <span className="hud-status-pill pill-cyan">ENCRYPTED LATTICE</span>
+                            <span className="hud-status-pill pill-purple">ZERO-TRUST ACTIVE</span>
+                        </div>
+                    </div>
 
-                                <linearGradient id="terraceGrad4" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" stopColor="#bfdbfe" />
-                                    <stop offset="100%" stopColor="#3730a3" />
-                                </linearGradient>
+                    {/* Live Scrolling Terminal Telemetry Logs */}
+                    <div className="hud-terminal-feed">
+                        <div className="hud-terminal-header">
+                            <span className="hud-terminal-dot"></span>
+                            <span className="hud-terminal-title">LIVE C2 TELEMETRY STREAM</span>
+                        </div>
+                        <div className="hud-terminal-logs">
+                            {HUD_LOG_ENTRIES.map((log, i) => (
+                                <div key={i} className="hud-log-line">
+                                    <span className="hud-log-time">[{log.time}]</span>
+                                    <span className="hud-log-tag">{log.tag}:</span>
+                                    <span className="hud-log-msg">{log.msg}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
 
-                                <linearGradient id="terraceGrad5" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" stopColor="#dbeafe" />
-                                    <stop offset="100%" stopColor="#312e81" />
-                                </linearGradient>
-
-                                <linearGradient id="terraceBorder" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" stopColor="#2e1065" />
-                                    <stop offset="100%" stopColor="#1e1b4b" />
-                                </linearGradient>
-                            </defs>
-
-                            <rect width="500" height="500" fill="url(#skyGrad)" />
-                            <ellipse cx="400" cy="45" rx="55" ry="18" fill="#ffedd5" opacity="0.85" />
-                            <ellipse cx="445" cy="40" rx="40" ry="16" fill="#ffffff" opacity="0.9" />
-                            <ellipse cx="365" cy="50" rx="35" ry="14" fill="#fed7aa" opacity="0.8" />
-                            <ellipse cx="40" cy="110" rx="25" ry="9" fill="#ffedd5" opacity="0.75" />
-
-                            <path d="M220 180 Q320 60 480 120 L500 180 L500 300 L220 300 Z" fill="url(#mountGrad1)" />
-                            <path d="M0 160 Q120 70 280 150 Q380 200 500 170 L500 320 L0 320 Z" fill="url(#mountGrad2)" />
-                            <path d="M-20 200 Q70 220 130 260 Q80 320 -20 340 Z" fill="#2e1065" />
-
-                            <path
-                                d="M60 220 Q80 200 95 190 M80 200 Q100 185 110 175 M85 205 Q110 200 125 195 M90 215 Q115 220 130 225"
-                                stroke="#1e1b4b"
-                                strokeWidth="3"
-                                strokeLinecap="round"
-                                fill="none"
-                            />
-
-                            <path d="M450 160 C400 165 370 185 390 200 C430 210 490 200 500 190 L500 160 Z" fill="url(#terraceGrad1)" />
-                            <path d="M450 160 C400 165 370 185 390 200 C430 210 490 200 500 190" stroke="url(#terraceBorder)" strokeWidth="12" strokeLinecap="round" fill="none" />
-
-                            <path d="M370 195 C310 200 270 225 295 245 C350 260 480 235 500 220 L500 190 C450 200 400 210 370 195 Z" fill="url(#terraceGrad2)" />
-                            <path d="M370 195 C310 200 270 225 295 245 C350 260 480 235 500 220" stroke="url(#terraceBorder)" strokeWidth="14" strokeLinecap="round" fill="none" />
-
-                            <path d="M280 240 C200 250 160 275 190 300 C270 320 450 285 500 270 L500 220 C420 250 330 255 280 240 Z" fill="url(#terraceGrad3)" />
-                            <path d="M280 240 C200 250 160 275 190 300 C270 320 450 285 500 270" stroke="url(#terraceBorder)" strokeWidth="16" strokeLinecap="round" fill="none" />
-
-                            <path d="M180 295 C80 305 40 340 70 370 C170 395 440 350 500 330 L500 270 C410 305 240 315 180 295 Z" fill="url(#terraceGrad4)" />
-                            <path d="M180 295 C80 305 40 340 70 370 C170 395 440 350 500 330" stroke="url(#terraceBorder)" strokeWidth="20" strokeLinecap="round" fill="none" />
-
-                            <path d="M60 365 C-20 375 -40 420 -10 460 C120 490 400 440 500 410 L500 330 C380 370 120 380 60 365 Z" fill="url(#terraceGrad5)" />
-                            <path d="M60 365 C-20 375 -40 420 -10 460 C120 490 400 440 500 410" stroke="url(#terraceBorder)" strokeWidth="24" strokeLinecap="round" fill="none" />
-
-                            <g stroke="#312e81" strokeWidth="1.2" strokeLinecap="round" opacity="0.65">
-                                <line x1="410" y1="180" x2="410" y2="187" />
-                                <line x1="430" y1="182" x2="430" y2="189" />
-                                <line x1="450" y1="178" x2="450" y2="185" />
-                                <line x1="470" y1="180" x2="470" y2="187" />
-                                <line x1="320" y1="220" x2="320" y2="230" />
-                                <line x1="345" y1="224" x2="345" y2="234" />
-                                <line x1="375" y1="220" x2="375" y2="230" />
-                                <line x1="405" y1="225" x2="405" y2="235" />
-                                <line x1="435" y1="220" x2="435" y2="230" />
-                                <line x1="220" y1="265" x2="220" y2="278" />
-                                <line x1="250" y1="270" x2="250" y2="283" />
-                                <line x1="285" y1="268" x2="285" y2="281" />
-                                <line x1="320" y1="275" x2="320" y2="288" />
-                                <line x1="360" y1="270" x2="360" y2="283" />
-                                <line x1="400" y1="272" x2="400" y2="285" />
-                                <line x1="110" y1="330" x2="110" y2="345" />
-                                <line x1="145" y1="335" x2="145" y2="350" />
-                                <line x1="185" y1="340" x2="185" y2="355" />
-                                <line x1="230" y1="342" x2="230" y2="357" />
-                                <line x1="275" y1="338" x2="275" y2="353" />
-                                <line x1="320" y1="340" x2="320" y2="355" />
-                                <line x1="20" y1="410" x2="20" y2="430" />
-                                <line x1="60" y1="415" x2="60" y2="435" />
-                                <line x1="105" y1="425" x2="105" y2="445" />
-                                <line x1="155" y1="430" x2="155" y2="450" />
-                                <line x1="210" y1="428" x2="210" y2="448" />
-                                <line x1="270" y1="420" x2="270" y2="440" />
-                                <line x1="330" y1="415" x2="330" y2="435" />
-                            </g>
-                        </svg>
+                    {/* Bottom HUD Metrics Footer */}
+                    <div className="hud-metrics-footer">
+                        <div className="hud-metric-box">
+                            <span className="hud-metric-label">THREAT STATUS</span>
+                            <span className="hud-metric-val" style={{ color: '#f87171' }}>ELEVATED</span>
+                        </div>
+                        <div className="hud-metric-box">
+                            <span className="hud-metric-label">ARSENAL</span>
+                            <span className="hud-metric-val" style={{ color: '#38bdf8' }}>64 ENGINES</span>
+                        </div>
+                        <div className="hud-metric-box">
+                            <span className="hud-metric-label">LAB MODULES</span>
+                            <span className="hud-metric-val" style={{ color: '#4ade80' }}>118 ACTIVE</span>
+                        </div>
                     </div>
                 </div>
             </div>

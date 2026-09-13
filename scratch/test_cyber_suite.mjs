@@ -195,6 +195,72 @@ const dbResetRes = createMockRes();
 await dbHandler({ method: 'POST', body: { action: 'reset_all' } }, dbResetRes);
 assert(dbResetRes.statusCode === 200 && dbResetRes.data.status === 'reset_success', 'api/database POST action: reset_all rebuilds persistent database cleanly');
 
+// [SUITE 8] Enhanced Authentication & Operative Registration Validation
+console.log('\n\x1b[36m[SUITE 8] Enhanced Authentication, Registration & Database Sync\x1b[0m');
+
+// 1. Register a new operative via api/auth
+const testUsername = 'Specter_Agent_' + Math.random().toString(36).substring(2, 6);
+const registerRes = createMockRes();
+await authHandler({
+    method: 'POST',
+    body: {
+        action: 'register',
+        username: testUsername,
+        password: 'securePassphrase2026!',
+        domain: 'soc',
+        clearance: 'Level 3 • SECRET'
+    }
+}, registerRes);
+
+assert(registerRes.statusCode === 200 && registerRes.data.success === true, 'api/auth registers new operative successfully');
+assert(registerRes.data.user && registerRes.data.user.id.startsWith('usr_'), `api/auth assigns standardized usr_ ID prefix: ${registerRes.data.user?.id}`);
+
+// 2. Verify new operative was persisted to database/ehacker_db.json
+const updatedDbJson = JSON.parse(fs.readFileSync(jsonDbPath, 'utf8'));
+const foundInDb = (updatedDbJson.users || []).find(u => u.username === testUsername);
+assert(Boolean(foundInDb), 'Newly registered operative is persistently saved into database/ehacker_db.json');
+
+// 3. Duplicate username prevention
+const dupRegisterRes = createMockRes();
+await authHandler({
+    method: 'POST',
+    body: {
+        action: 'register',
+        username: testUsername,
+        password: 'anotherPassword123'
+    }
+}, dupRegisterRes);
+assert(dupRegisterRes.statusCode === 400 && dupRegisterRes.data.success === false, 'api/auth rejects duplicate operative registration with 400');
+
+// 4. Test login with wrong password
+const badLoginRes = createMockRes();
+await authHandler({
+    method: 'POST',
+    body: {
+        action: 'login',
+        username: testUsername,
+        password: 'wrong_password_attempt'
+    }
+}, badLoginRes);
+assert(badLoginRes.statusCode === 401 && badLoginRes.data.success === false, 'api/auth rejects invalid password attempt with 401');
+
+// 5. Test login with valid password
+const goodLoginRes = createMockRes();
+await authHandler({
+    method: 'POST',
+    body: {
+        action: 'login',
+        username: testUsername,
+        password: 'securePassphrase2026!'
+    }
+}, goodLoginRes);
+assert(goodLoginRes.statusCode === 200 && goodLoginRes.data.user.username === testUsername, 'api/auth successfully authenticates newly registered operative');
+
+// 6. Clean up database state back to standard seed
+const cleanupRes = createMockRes();
+await dbHandler({ method: 'POST', body: { action: 'reset_all' } }, cleanupRes);
+assert(cleanupRes.statusCode === 200, 'Database reset cleans test operatives to preserve production integrity');
+
 // Summary
 console.log('\n======================================================');
 if (failedTests === 0) {

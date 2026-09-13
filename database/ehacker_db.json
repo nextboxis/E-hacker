@@ -1,8 +1,8 @@
 {
   "version": "3.0.0",
   "database_name": "ehacker_sec_db",
-  "created_at": "2026-09-13T07:35:01.434Z",
-  "last_synced": "2026-09-13T07:35:01.434Z",
+  "created_at": "2026-09-13T07:45:48.514Z",
+  "last_synced": "2026-09-13T07:45:48.514Z",
   "users": [
     {
       "id": "usr_root_001",
@@ -147,6 +147,46 @@
   "field_notes": "# Operative Engagement Field Notes\\n- **Target Network**: 10.10.11.0/24\\n- **Primary Objective**: Active Directory Domain Dominance & Sensitive Data Identification\\n- **Key Pivots**:\\n  1. Compromised initial access via web portal SQLi.\\n  2. Dumped NTLM hashes from memory.\\n  3. Escalated to Domain Admin using DCSync abuse.",
   "audit_logs": [
     {
+      "id": "log_a0iqkju",
+      "user_id": "usr_specter_agent_3n_x55x",
+      "action": "OPERATIVE_REGISTERED",
+      "details": {
+        "username": "Specter_Agent_3n3w",
+        "domain": "soc"
+      },
+      "timestamp": "2026-09-13T07:45:48.504Z"
+    },
+    {
+      "id": "log_8ebmak9",
+      "user_id": "usr_root_001",
+      "action": "STATE_SNAPSHOT_SYNCED",
+      "details": {
+        "targets": 1,
+        "findings": 1
+      },
+      "timestamp": "2026-09-13T07:45:48.498Z"
+    },
+    {
+      "id": "log_3wqzy4l",
+      "user_id": "usr_specter_agent_ab_vzec",
+      "action": "OPERATIVE_REGISTERED",
+      "details": {
+        "username": "Specter_Agent_abhn",
+        "domain": "soc"
+      },
+      "timestamp": "2026-09-13T07:43:52.648Z"
+    },
+    {
+      "id": "log_oe1zyre",
+      "user_id": "usr_root_001",
+      "action": "STATE_SNAPSHOT_SYNCED",
+      "details": {
+        "targets": 1,
+        "findings": 1
+      },
+      "timestamp": "2026-09-13T07:43:52.642Z"
+    },
+    {
       "id": "log_g36sp4j",
       "user_id": "usr_root_001",
       "action": "STATE_SNAPSHOT_SYNCED",
@@ -176,6 +216,42 @@
         "message": "All user IDs reset to usr_root_001, usr_red_002, usr_soc_003. Schema re-seeded."
       },
       "timestamp": "2026-09-13T07:35:01.434Z"
+    },
+    {
+      "id": "log_wy16u5j",
+      "user_id": "usr_root_001",
+      "action": "USER_IDS_RESET_AND_DATABASE_REBUILT",
+      "details": {
+        "message": "All user IDs reset to usr_root_001, usr_red_002, usr_soc_003. Schema re-seeded."
+      },
+      "timestamp": "2026-09-13T07:43:52.645Z"
+    },
+    {
+      "id": "log_fmp0jui",
+      "user_id": "usr_root_001",
+      "action": "USER_IDS_RESET_AND_DATABASE_REBUILT",
+      "details": {
+        "message": "All user IDs reset to usr_root_001, usr_red_002, usr_soc_003. Schema re-seeded."
+      },
+      "timestamp": "2026-09-13T07:43:52.658Z"
+    },
+    {
+      "id": "log_ojozy9u",
+      "user_id": "usr_root_001",
+      "action": "USER_IDS_RESET_AND_DATABASE_REBUILT",
+      "details": {
+        "message": "All user IDs reset to usr_root_001, usr_red_002, usr_soc_003. Schema re-seeded."
+      },
+      "timestamp": "2026-09-13T07:45:48.501Z"
+    },
+    {
+      "id": "log_ofiouq8",
+      "user_id": "usr_root_001",
+      "action": "USER_IDS_RESET_AND_DATABASE_REBUILT",
+      "details": {
+        "message": "All user IDs reset to usr_root_001, usr_red_002, usr_soc_003. Schema re-seeded."
+      },
+      "timestamp": "2026-09-13T07:45:48.514Z"
     }
   ]
 }

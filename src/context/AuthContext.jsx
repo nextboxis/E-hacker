@@ -279,6 +279,24 @@ export function AuthProvider({ children }) {
             playChime();
         }
 
+        // Persist to serverless backend database
+        try {
+            await fetch('/api/auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'register',
+                    username: cleanUser,
+                    password: password,
+                    domain: domain || 'full',
+                    clearance: clearance || 'Level 2 • RESTRICTED',
+                    role: 'Operative'
+                })
+            });
+        } catch (e) {
+            // Offline fallback - state is preserved in localStorage
+        }
+
         return {
             success: true,
             profileId: newProfileId,
