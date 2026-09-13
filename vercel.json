@@ -6,6 +6,15 @@
   "framework": "vite",
   "headers": [
     {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         {
@@ -23,6 +32,10 @@
         {
           "key": "Referrer-Policy",
           "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
         }
       ]
     }
@@ -33,7 +46,15 @@
       "destination": "/api/cve-feed"
     },
     {
+      "source": "/api/cve/(.*)",
+      "destination": "/api/cve-feed"
+    },
+    {
       "source": "/api/threats",
+      "destination": "/api/threat-intel"
+    },
+    {
+      "source": "/api/threats/(.*)",
       "destination": "/api/threat-intel"
     },
     {
@@ -41,11 +62,15 @@
       "destination": "/api/ai-assistant"
     },
     {
-      "source": "/api/auth",
-      "destination": "/api/auth"
+      "source": "/api/ai/(.*)",
+      "destination": "/api/ai-assistant"
     },
     {
       "source": "/api/db",
+      "destination": "/api/database"
+    },
+    {
+      "source": "/api/db/(.*)",
       "destination": "/api/database"
     },
     {
@@ -53,7 +78,7 @@
       "destination": "/api/python-analyzer.py"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/|assets/|favicon|robots|logo).*)",
       "destination": "/index.html"
     }
   ]

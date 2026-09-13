@@ -8,6 +8,8 @@ export const THEMES = [
     { id: 'tokyo', name: 'Tokyo Sunset', primary: '#f43f5e', secondary: '#f59e0b', tag: 'STEALTH', bg: '#0d0614' }
 ];
 
+const CURRENT_DATE = new Date().toISOString().slice(0, 10);
+
 export const DEFAULT_PROFILES = [
     {
         id: 'usr_root_001',
@@ -17,7 +19,7 @@ export const DEFAULT_PROFILES = [
         avatar: '01',
         githubAvatar: null,
         bio: 'Knowledge is free. We are anonymous. Security is an illusion.',
-        created_at: '2026-09-13',
+        created_at: CURRENT_DATE,
         apiKey: 'ehk_live_sec_root9482x',
         xp: 0,
         level: 1,
@@ -33,7 +35,7 @@ export const DEFAULT_PROFILES = [
         avatar: '02',
         githubAvatar: null,
         bio: 'Offensive Security Specialist & External Penetration Tester',
-        created_at: '2026-09-13',
+        created_at: CURRENT_DATE,
         apiKey: 'ehk_live_sec_ghost2819y',
         xp: 0,
         level: 1,
@@ -49,7 +51,7 @@ export const DEFAULT_PROFILES = [
         avatar: '03',
         githubAvatar: null,
         bio: 'Blue Team Threat Hunter & SIEM Detection Engineer',
-        created_at: '2026-09-13',
+        created_at: CURRENT_DATE,
         apiKey: 'ehk_live_sec_soc8392z',
         xp: 0,
         level: 1,
@@ -64,19 +66,19 @@ export const DEFAULT_ACCOUNTS = [
         username: 'root@nextboxis',
         password: 'shadowprotocol2026',
         profileId: 'usr_root_001',
-        createdAt: '2026-09-13'
+        createdAt: CURRENT_DATE
     },
     {
         username: 'Ghost_RedTeam',
         password: 'redteam2026',
         profileId: 'usr_red_002',
-        createdAt: '2026-09-13'
+        createdAt: CURRENT_DATE
     },
     {
         username: 'Sentinel_SOC',
         password: 'soc2026',
         profileId: 'usr_soc_003',
-        createdAt: '2026-09-13'
+        createdAt: CURRENT_DATE
     }
 ];
 

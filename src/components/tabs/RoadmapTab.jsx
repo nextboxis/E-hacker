@@ -1,105 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { TOPIC_RESOURCES } from '../../data/resourcesData';
+import { STAGES } from '../../data/roadmapData';
 
-const STAGES = [
-    {
-        num: 1,
-        code: "STG-01",
-        title: "Pre-Security & Core Fundamentals",
-        desc: "Master Linux terminal navigation, core TCP/IP networking, DNS resolution, HTTP/S request-response lifecycle, and basic Python scripting.",
-        color: "#38bdf8",
-        cert: "CompTIA Security+ / Linux+",
-        skills: [
-            { id: "sec-fund", name: "Security Architecture & CIA Triad", xp: 25 },
-            { id: "linux-cli", name: "Linux Bash CLI & File Permissions (chmod/chown)", xp: 25 },
-            { id: "net-tcp", name: "TCP/IP 3-Way Handshake & OSI Model", xp: 25 },
-            { id: "web-http", name: "HTTP/1.1 & HTTP/2 Request/Response Anatomy", xp: 25 },
-            { id: "dns-recon", name: "DNS Record Types & Resolution Mechanics", xp: 25 },
-            { id: "py-basics", name: "Python Scripting for Sockets & Automation", xp: 25 }
-        ]
-    },
-    {
-        num: 2,
-        code: "STG-02",
-        title: "Network Auditing & Traffic Forensics",
-        desc: "Port scanning, service fingerprinting, protocol dissection, PCAP traffic analysis, and vulnerability exploitation.",
-        color: "#22c55e",
-        cert: "eJPT / CompTIA CySA+",
-        skills: [
-            { id: "nmap-audit", name: "Nmap SYN, UDP & NSE Script Scanning", xp: 25 },
-            { id: "wireshark-audit", name: "Wireshark Display Filters & TCP Stream Reassembly", xp: 25 },
-            { id: "metasploit-exploit", name: "Metasploit Multi-Handler & Staged Payloads", xp: 25 },
-            { id: "mitm-arp", name: "ARP Spoofing & SSL Stripping MitM Attacks", xp: 25 },
-            { id: "ssh-hydra", name: "Hydra Automated Service Credential Auditing", xp: 25 },
-            { id: "snmp-enum", name: "SNMP Community String MIB Enumeration", xp: 25 }
-        ]
-    },
-    {
-        num: 3,
-        code: "STG-03",
-        title: "Web Application Penetration Testing",
-        desc: "Systematic auditing of OWASP Top 10 vulnerabilities, intercepting proxies, business logic flaws, and API security.",
-        color: "#eab308",
-        cert: "PortSwigger BSCP / OSWE",
-        skills: [
-            { id: "sqli-mastery", name: "SQL Injection (UNION, Blind, Time-Based)", xp: 25 },
-            { id: "xss-audit", name: "Cross-Site Scripting (Reflected, Stored, DOM)", xp: 25 },
-            { id: "ssrf-cloud", name: "Server-Side Request Forgery & Cloud IMDS Theft", xp: 25 },
-            { id: "idor-access", name: "Insecure Direct Object References (IDOR/BOLA)", xp: 25 },
-            { id: "xxe-injection", name: "XML External Entity (XXE) File Exfiltration", xp: 25 },
-            { id: "jwt-bypass", name: "JWT Signature Stripping & None Algorithm Abuse", xp: 25 },
-            { id: "ssti-rce", name: "Server-Side Template Injection to Remote Code Exec", xp: 25 }
-        ]
-    },
-    {
-        num: 4,
-        code: "STG-04",
-        title: "Active Directory & Enterprise Exploitation",
-        desc: "Kerberos ticket attacks, ACL abuse, LDAP enumeration, DCSync, pass-the-hash, and ADCS escalation.",
-        color: "#f97316",
-        cert: "PNPT / CRTP / OSCP",
-        skills: [
-            { id: "ad-kerberoast", name: "Kerberoasting SPN Service Account Hashes", xp: 25 },
-            { id: "ad-dcsync", name: "DCSync Replication NTDS.dit Password Extraction", xp: 25 },
-            { id: "ad-bloodhound", name: "BloodHound Neo4j Shortest Attack Path Graphing", xp: 25 },
-            { id: "ad-asrep", name: "AS-REP Roasting No-Preauth User Accounts", xp: 25 },
-            { id: "ad-adcs", name: "Active Directory Certificate Services (ESC1-ESC8)", xp: 25 },
-            { id: "ad-pth", name: "Pass-the-Hash & Pass-the-Ticket Lateral Movement", xp: 25 },
-            { id: "ad-responder", name: "LLMNR / NBT-NS Poisoning with Responder", xp: 25 }
-        ]
-    },
-    {
-        num: 5,
-        code: "STG-05",
-        title: "Threat Hunting & Blue Team Detection",
-        desc: "SIEM log analysis, Sigma rule engineering, volatile memory forensics, YARA scanning, and incident triage.",
-        color: "#a855f7",
-        cert: "BTL1 / CCD / GCIH",
-        skills: [
-            { id: "siem-hunting", name: "Splunk & Elastic SIEM Event Correlation", xp: 25 },
-            { id: "sigma-rules", name: "Sigma Generic Detection Rule Authoring", xp: 25 },
-            { id: "yara-scans", name: "YARA Rule Memory & Binary Pattern Matching", xp: 25 },
-            { id: "volatility-mem", name: "Volatility 3 Kernel Object & VAD Forensics", xp: 25 },
-            { id: "zeek-hunting", name: "Zeek Network Threat & DNS Tunneling Analysis", xp: 25 },
-            { id: "sysmon-audit", name: "Sysmon Process Creation & Parent-Child Lineage", xp: 25 }
-        ]
-    },
-    {
-        num: 6,
-        code: "STG-06",
-        title: "Exploit Dev, Reversing & AI Security",
-        desc: "Ghidra decompilation, buffer overflow development, x86_64 assembly, and LLM adversarial red teaming.",
-        color: "#ec4899",
-        cert: "OSEP / OSED / CRTO",
-        skills: [
-            { id: "ghidra-re", name: "Ghidra Static Decompilation & P-Code Reversing", xp: 25 },
-            { id: "bof-exploit", name: "Stack-Based Buffer Overflow & EIP Control", xp: 25 },
-            { id: "shellcode-dev", name: "x86_64 Assembly Shellcode Development", xp: 25 },
-            { id: "llm-redteam", name: "LLM Prompt Injection, Jailbreaking & PyRIT", xp: 25 },
-            { id: "edr-evasion", name: "AMSI Bypass & Process Hollowing Techniques", xp: 25 }
-        ]
-    }
-];
+export { STAGES };
 
 export default function RoadmapTab() {
     const { activeProfile, toggleSkill, playChime, setActiveTab } = useAuth();
@@ -107,6 +11,30 @@ export default function RoadmapTab() {
     const totalSkills = STAGES.reduce((acc, s) => acc + s.skills.length, 0);
     const masteredSkills = checked.length;
     const overallProgress = Math.round((masteredSkills / totalSkills) * 100);
+
+    const [selectedTrack, setSelectedTrack] = useState('all');
+    const [searchTopic, setSearchTopic] = useState('');
+    const [inspectedTopicKey, setInspectedTopicKey] = useState(null);
+    const [copiedCmd, setCopiedCmd] = useState(false);
+
+    const tracks = [
+        { id: 'all', label: 'Full Spectrum (All Stages)', color: 'var(--color-accent)' },
+        { id: 'web', label: 'Web Pentest', color: '#eab308' },
+        { id: 'network', label: 'Infrastructure & AD', color: '#22c55e' },
+        { id: 'soc', label: 'SOC Defense', color: '#a855f7' },
+        { id: 'malware', label: 'Malware & Reversing', color: '#ec4899' },
+        { id: 'osint', label: 'OSINT Recon', color: '#38bdf8' }
+    ];
+
+    const inspectedData = inspectedTopicKey ? TOPIC_RESOURCES[inspectedTopicKey] : null;
+
+    const handleCopyCommand = (cmd) => {
+        if (!cmd) return;
+        navigator.clipboard.writeText(cmd);
+        setCopiedCmd(true);
+        playChime();
+        setTimeout(() => setCopiedCmd(false), 2000);
+    };
 
     return (
         <div className="tab-panel active">
@@ -117,7 +45,7 @@ export default function RoadmapTab() {
                         <div className="projects-badge-tag">CYBERSECURITY CURRICULUM & CAREER TREE</div>
                         <h2 style={{ margin: '4px 0 2px 0' }}>6-Stage Specialization & Skill Mastery Roadmap</h2>
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem' }}>
-                            Comprehensive progression tree spanning pre-security fundamentals through advanced Active Directory exploitation, digital forensics, and AI-era red teaming.
+                            Comprehensive progression tree with verified learning resources, official specs, cheatsheets, and hands-on wargames for every skill title.
                         </p>
                     </div>
 
@@ -130,11 +58,47 @@ export default function RoadmapTab() {
                         </div>
                     </div>
                 </div>
+
+                {/* Filter Track Buttons & Search */}
+                <div className="mt-20 flex-space-between-center flex-wrap gap-10">
+                    <div className="flex-gap-8 flex-wrap">
+                        {tracks.map(t => (
+                            <button
+                                key={t.id}
+                                className={`filter-chip ${selectedTrack === t.id ? 'active' : ''}`}
+                                style={{ fontSize: '0.8rem', padding: '5px 12px' }}
+                                onClick={() => { setSelectedTrack(t.id); playChime(); }}
+                            >
+                                {t.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <input
+                        type="text"
+                        className="search-input"
+                        placeholder="Search skill titles or topics..."
+                        style={{ maxWidth: '320px' }}
+                        value={searchTopic}
+                        onChange={(e) => setSearchTopic(e.target.value)}
+                    />
+                </div>
             </div>
 
             {/* Stages Grid */}
             <div className="roadmap-stages-grid">
                 {STAGES.map(stage => {
+                    // Filter skills by track and search
+                    const visibleSkills = stage.skills.filter(sk => {
+                        const matchTrack = selectedTrack === 'all' || sk.track === selectedTrack || stage.track === selectedTrack;
+                        const matchSearch = !searchTopic || sk.name.toLowerCase().includes(searchTopic.toLowerCase());
+                        return matchTrack && matchSearch;
+                    });
+
+                    if (visibleSkills.length === 0 && (selectedTrack !== 'all' || searchTopic)) {
+                        return null;
+                    }
+
                     const stageSkillIds = stage.skills.map(s => s.id);
                     const stageMastered = stageSkillIds.filter(id => checked.includes(id)).length;
                     const stagePct = Math.round((stageMastered / stage.skills.length) * 100);
@@ -179,40 +143,88 @@ export default function RoadmapTab() {
                                 <div style={{ width: `${stagePct}%`, height: '100%', background: isStageComplete ? '#22c55e' : stage.color, borderRadius: '4px', transition: 'width 0.4s ease' }}></div>
                             </div>
 
-                            {/* Skills Checklist */}
-                            <div className="skills-checklist" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '8px' }}>
-                                {stage.skills.map(sk => {
+                            {/* Skills Checklist with Dedicated Resource Triggers */}
+                            <div className="skills-checklist" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '10px' }}>
+                                {visibleSkills.map(sk => {
                                     const isChecked = checked.includes(sk.id);
+                                    const resInfo = TOPIC_RESOURCES[sk.id];
+
                                     return (
-                                        <label
+                                        <div
                                             key={sk.id}
-                                            className="checkbox-container"
                                             style={{
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                padding: '8px 12px',
-                                                borderRadius: '6px',
-                                                background: isChecked ? 'rgba(34, 197, 94, 0.06)' : 'rgba(255,255,255,0.02)',
-                                                border: isChecked ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid rgba(255,255,255,0.04)',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.2s ease'
+                                                justifyContent: 'space-between',
+                                                padding: '9px 12px',
+                                                borderRadius: '8px',
+                                                background: isChecked ? 'rgba(34, 197, 94, 0.07)' : 'rgba(255,255,255,0.02)',
+                                                border: isChecked ? '1px solid rgba(34, 197, 94, 0.25)' : '1px solid rgba(255,255,255,0.05)',
+                                                transition: 'all 0.2s ease',
+                                                gap: '8px'
                                             }}
                                         >
-                                            <input
-                                                type="checkbox"
-                                                checked={isChecked}
-                                                onChange={() => { toggleSkill(sk.id); playChime(); }}
-                                            />
-                                            <span className="checkmark"></span>
-                                            <div style={{ marginLeft: '8px', display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                                                <span style={{ fontSize: '0.85rem', color: isChecked ? '#22c55e' : 'var(--text-primary)' }}>
-                                                    {sk.name}
-                                                </span>
-                                                <span style={{ fontSize: '0.72rem', color: isChecked ? '#22c55e' : 'var(--text-muted)', fontFamily: 'monospace' }}>
-                                                    +{sk.xp} XP
-                                                </span>
+                                            {/* Checkbox and Skill Title */}
+                                            <label
+                                                className="checkbox-container"
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    cursor: 'pointer',
+                                                    flex: 1,
+                                                    margin: 0
+                                                }}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isChecked}
+                                                    onChange={() => { toggleSkill(sk.id); playChime(); }}
+                                                />
+                                                <span className="checkmark"></span>
+                                                <div style={{ marginLeft: '10px' }}>
+                                                    <span style={{ fontSize: '0.86rem', color: isChecked ? '#22c55e' : 'var(--text-primary)', fontWeight: 500, display: 'block' }}>
+                                                        {sk.name}
+                                                    </span>
+                                                    <span style={{ fontSize: '0.72rem', color: isChecked ? '#22c55e' : 'var(--text-muted)', fontFamily: 'monospace' }}>
+                                                        +{sk.xp} XP {isChecked ? '• Mastered' : ''}
+                                                    </span>
+                                                </div>
+                                            </label>
+
+                                            {/* Interactive Resources Action Button */}
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                <button
+                                                    type="button"
+                                                    className="resource-badge-btn"
+                                                    style={{
+                                                        background: 'rgba(6, 182, 212, 0.1)',
+                                                        border: '1px solid rgba(6, 182, 212, 0.3)',
+                                                        color: '#38bdf8',
+                                                        borderRadius: '6px',
+                                                        padding: '4px 8px',
+                                                        fontSize: '0.74rem',
+                                                        cursor: 'pointer',
+                                                        display: 'inline-flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px',
+                                                        fontWeight: 600,
+                                                        whiteSpace: 'nowrap'
+                                                    }}
+                                                    onClick={() => {
+                                                        setInspectedTopicKey(sk.id);
+                                                        playChime();
+                                                    }}
+                                                    title={`Explore resources and learning guide for ${sk.name}`}
+                                                >
+                                                    <span>📖 Resources</span>
+                                                    {resInfo?.resources?.length && (
+                                                        <span style={{ background: 'rgba(56, 189, 248, 0.25)', padding: '1px 5px', borderRadius: '10px', fontSize: '0.68rem' }}>
+                                                            {resInfo.resources.length}
+                                                        </span>
+                                                    )}
+                                                </button>
                                             </div>
-                                        </label>
+                                        </div>
                                     );
                                 })}
                             </div>
@@ -220,6 +232,146 @@ export default function RoadmapTab() {
                     );
                 })}
             </div>
+
+            {/* TOPIC LEARNING RESOURCE MODAL / FLYOUT */}
+            {inspectedData && (
+                <div className="modal-backdrop active" onClick={() => setInspectedTopicKey(null)}>
+                    <div
+                        className="modal-container glass-card"
+                        style={{ maxWidth: '640px', width: '92%', maxHeight: '85vh', overflowY: 'auto', border: '1px solid var(--border-focus)' }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Modal Header */}
+                        <div className="modal-header">
+                            <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                                    <span className="channel-badge" style={{ background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8' }}>
+                                        {inspectedData.stage}
+                                    </span>
+                                    <span className="projects-badge-tag" style={{ textTransform: 'uppercase' }}>
+                                        {inspectedData.track} TRACK
+                                    </span>
+                                </div>
+                                <h2 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--text-primary)' }}>
+                                    {inspectedData.title}
+                                </h2>
+                            </div>
+                            <button
+                                className="modal-close-btn"
+                                onClick={() => setInspectedTopicKey(null)}
+                                title="Close Resources Modal"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div className="modal-body" style={{ padding: '20px 24px' }}>
+                            {/* Technical Concept Summary */}
+                            <div className="mb-20">
+                                <h4 style={{ margin: '0 0 6px 0', fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                    Core Concept & Objectives
+                                </h4>
+                                <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', lineHeight: '1.5', margin: 0 }}>
+                                    {inspectedData.summary}
+                                </p>
+                            </div>
+
+                            {/* Quick Study / Cheat Command */}
+                            {inspectedData.commandTip && (
+                                <div className="tool-dir-cmd-box mb-20" style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '12px 14px' }}>
+                                    <div className="flex-space-between-center mb-6">
+                                        <span style={{ fontSize: '0.74rem', color: '#38bdf8', fontFamily: 'monospace', fontWeight: 600 }}>
+                                            TACTICAL CLI CHEAT:
+                                        </span>
+                                        <button
+                                            type="button"
+                                            className="copy-btn"
+                                            style={{ fontSize: '0.72rem', padding: '2px 8px' }}
+                                            onClick={() => handleCopyCommand(inspectedData.commandTip)}
+                                        >
+                                            {copiedCmd ? '✔ COPIED' : 'COPY'}
+                                        </button>
+                                    </div>
+                                    <code style={{ fontSize: '0.84rem', color: '#4ade80', wordBreak: 'break-all', display: 'block' }}>
+                                        {inspectedData.commandTip}
+                                    </code>
+                                </div>
+                            )}
+
+                            {/* Curated External Resources & Links */}
+                            <div className="mb-20">
+                                <h4 style={{ margin: '0 0 10px 0', fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                    Verified Documentation & Learning Labs
+                                </h4>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    {inspectedData.resources?.map((r, idx) => (
+                                        <a
+                                            key={idx}
+                                            href={r.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                padding: '10px 14px',
+                                                borderRadius: '6px',
+                                                background: 'rgba(255,255,255,0.03)',
+                                                border: '1px solid rgba(255,255,255,0.06)',
+                                                textDecoration: 'none',
+                                                color: 'var(--text-primary)',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.4)'}
+                                            onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <span style={{ fontSize: '1rem' }}>
+                                                    {r.type === 'lab' ? '🧪' : r.type === 'cheatsheet' ? '⚡' : r.type === 'video' ? '🎥' : r.type === 'tool' ? '🛠️' : '📄'}
+                                                </span>
+                                                <span style={{ fontSize: '0.88rem', fontWeight: 500 }}>
+                                                    {r.name}
+                                                </span>
+                                            </div>
+                                            <span style={{ fontSize: '0.72rem', color: '#38bdf8', fontFamily: 'monospace' }}>
+                                                OPEN ↗
+                                            </span>
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Modal Action Buttons */}
+                            <div className="modal-footer" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <button
+                                    type="button"
+                                    className={`btn ${checked.includes(inspectedTopicKey) ? 'btn-danger' : 'btn-success'}`}
+                                    style={{ fontSize: '0.85rem' }}
+                                    onClick={() => {
+                                        toggleSkill(inspectedTopicKey);
+                                        playChime();
+                                    }}
+                                >
+                                    {checked.includes(inspectedTopicKey) ? '✖ Mark Incomplete' : '✔ Mark Completed (+25 XP)'}
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    style={{ fontSize: '0.85rem' }}
+                                    onClick={() => {
+                                        setInspectedTopicKey(null);
+                                        setActiveTab('projects');
+                                        playChime();
+                                    }}
+                                >
+                                    Open Related Lab 🚀
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -10,7 +10,8 @@ import {
 import {
     PRACTICE_PLATFORMS,
     STANDARDS_AND_CHEATSHEETS,
-    CERTIFICATIONS_ROADMAP
+    CERTIFICATIONS_ROADMAP,
+    TOPIC_RESOURCES
 } from '../../data/resourcesData';
 import { useAuth } from '../../context/AuthContext';
 
@@ -80,6 +81,15 @@ export default function ToolsDirectoryTab() {
         p.cat.toLowerCase().includes(search.toLowerCase())
     );
 
+    const topicList = Object.entries(TOPIC_RESOURCES).map(([id, t]) => ({ id, ...t }));
+    const filteredTopics = topicList.filter(tp =>
+        tp.title.toLowerCase().includes(search.toLowerCase()) ||
+        tp.summary.toLowerCase().includes(search.toLowerCase()) ||
+        (tp.commandTip || '').toLowerCase().includes(search.toLowerCase()) ||
+        (tp.stage || '').toLowerCase().includes(search.toLowerCase()) ||
+        tp.track.toLowerCase().includes(search.toLowerCase())
+    );
+
     const toolCategories = [
         'ALL',
         'Recon & Network',
@@ -129,6 +139,9 @@ export default function ToolsDirectoryTab() {
                         </button>
                         <button className={'ai-nav-btn ' + (subTab === 'platforms' ? 'active' : '')} onClick={() => { setSubTab('platforms'); playChime(); }}>
                             Wargames ({PRACTICE_PLATFORMS.length})
+                        </button>
+                        <button className={'ai-nav-btn ' + (subTab === 'topics' ? 'active' : '')} onClick={() => { setSubTab('topics'); playChime(); }}>
+                            Topic Guides ({Object.keys(TOPIC_RESOURCES).length})
                         </button>
                         <button className={'ai-nav-btn ' + (subTab === 'standards' ? 'active' : '')} onClick={() => { setSubTab('standards'); playChime(); }}>
                             Standards ({STANDARDS_AND_CHEATSHEETS.length})
@@ -439,6 +452,64 @@ export default function ToolsDirectoryTab() {
                                 >
                                     Official Source
                                 </a>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* 10. Topic Knowledge & Roadmap Curriculum Guides SubTab */}
+            {subTab === 'topics' && (
+                <div className="tools-directory-grid">
+                    {filteredTopics.map((topic, i) => (
+                        <div key={i} className="glass-card tool-dir-card" style={{ borderColor: 'rgba(56, 189, 248, 0.25)' }}>
+                            <div className="flex-space-between-center mb-8">
+                                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                    <span className="channel-badge" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8' }}>
+                                        {topic.stage}
+                                    </span>
+                                    <span className="projects-badge-tag" style={{ textTransform: 'uppercase' }}>
+                                        {topic.track}
+                                    </span>
+                                </div>
+                                <span className="operative-clearance-tag" style={{ color: '#22c55e' }}>
+                                    {topic.resources?.length || 0} LINKS
+                                </span>
+                            </div>
+                            <h3 className="tool-dir-name">{topic.title}</h3>
+                            <p className="tool-dir-desc">{topic.summary}</p>
+
+                            {topic.commandTip && (
+                                <div className="tool-dir-cmd-box mt-10">
+                                    <div className="flex-space-between-center mb-4">
+                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>QUICK CLI SYNTAX:</span>
+                                        <button
+                                            className="table-action-link"
+                                            onClick={() => handleCopyCode(topic.commandTip, `top_${i}`)}
+                                        >
+                                            {copiedScriptIndex === `top_${i}` ? 'Copied!' : 'Copy'}
+                                        </button>
+                                    </div>
+                                    <code>{topic.commandTip}</code>
+                                </div>
+                            )}
+
+                            <div className="tool-dir-links-row mt-15 flex-wrap gap-6">
+                                {topic.docs && (
+                                    <a href={topic.docs} target="_blank" rel="noreferrer" className="site-btn tool-btn" style={{ padding: '5px 10px', fontSize: '0.78rem' }}>
+                                        Documentation ↗
+                                    </a>
+                                )}
+                                {topic.cheatsheet && (
+                                    <a href={topic.cheatsheet} target="_blank" rel="noreferrer" className="site-btn tool-btn secondary-btn" style={{ padding: '5px 10px', fontSize: '0.78rem' }}>
+                                        Cheatsheet ⚡
+                                    </a>
+                                )}
+                                {topic.lab && (
+                                    <a href={topic.lab} target="_blank" rel="noreferrer" className="table-action-link" style={{ padding: '5px 8px', fontSize: '0.78rem' }}>
+                                        Practice Lab 🧪
+                                    </a>
+                                )}
                             </div>
                         </div>
                     ))}

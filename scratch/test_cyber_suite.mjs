@@ -1,10 +1,13 @@
 // E-HACKER Cyber Operations Test Suite
 // Validates lab integrity, tool directories, MITRE matrix mappings, subnet arithmetic, and security schemas.
 
+import fs from 'fs';
+import path from 'path';
 import { projectsData } from '../src/data/projectsData.js';
 import { TOOLS_DATABASE, OSINT_TOOLS, AI_SECURITY_TOOLS, PDF_CHEAT_SHEETS } from '../src/data/toolsData.js';
 import { CURATED_CVES, THREAT_BULLETINS } from '../src/data/cveData.js';
-import { PRACTICE_PLATFORMS, CERTIFICATIONS_ROADMAP, STANDARDS_AND_CHEATSHEETS } from '../src/data/resourcesData.js';
+import { PRACTICE_PLATFORMS, CERTIFICATIONS_ROADMAP, STANDARDS_AND_CHEATSHEETS, TOPIC_RESOURCES } from '../src/data/resourcesData.js';
+import { STAGES } from '../src/data/roadmapData.js';
 import { PYTHON_TEMPLATES } from '../src/data/pythonTemplates.js';
 
 let passedTests = 0;
@@ -156,8 +159,6 @@ await threatHandler({ method: 'GET', query: {} }, threatRes);
 assert(threatRes.statusCode === 200 && Array.isArray(threatRes.data.bulletins) && threatRes.data.bulletins.length >= 3, 'api/threat-intel returns threat bulletins');
 
 // 5. Database API (GET & POST) & Persistent DB Verification
-import fs from 'fs';
-import path from 'path';
 
 console.log('\n\x1b[36m[SUITE 7] Persistent Database & Standardized Operative ID Verification\x1b[0m');
 
@@ -260,6 +261,63 @@ assert(goodLoginRes.statusCode === 200 && goodLoginRes.data.user.username === te
 const cleanupRes = createMockRes();
 await dbHandler({ method: 'POST', body: { action: 'reset_all' } }, cleanupRes);
 assert(cleanupRes.statusCode === 200, 'Database reset cleans test operatives to preserve production integrity');
+
+// [SUITE 9] Topic Resources & Curriculum Mapping Verification
+console.log('\n\x1b[36m[SUITE 9] Curriculum Topics & Resource Verification\x1b[0m');
+assert(Array.isArray(STAGES) && STAGES.length === 6, `STAGES contains all 6 curriculum stages (Found: ${STAGES.length})`);
+
+const allStageSkills = STAGES.flatMap(s => s.skills);
+assert(allStageSkills.length === 37, `All 37 skill topics defined in roadmap curriculum (Found: ${allStageSkills.length})`);
+
+let missingTopicResources = 0;
+let invalidResourceLinks = 0;
+
+for (const skill of allStageSkills) {
+    const res = TOPIC_RESOURCES[skill.id];
+    if (!res) {
+        missingTopicResources++;
+        console.error(`  Missing resource mapping for skill ID: ${skill.id}`);
+    } else {
+        if (!res.title || !res.summary || !res.stage) {
+            missingTopicResources++;
+        }
+        if (!Array.isArray(res.resources) || res.resources.length < 2) {
+            invalidResourceLinks++;
+        }
+        for (const r of (res.resources || [])) {
+            if (!r.url || !r.url.startsWith('http')) {
+                invalidResourceLinks++;
+            }
+        }
+    }
+}
+
+assert(missingTopicResources === 0, `All 37 skills have complete TOPIC_RESOURCES definitions (Missing: ${missingTopicResources})`);
+assert(invalidResourceLinks === 0, `All topic resources have verified external HTTPS URLs (Invalid: ${invalidResourceLinks})`);
+assert(Object.keys(TOPIC_RESOURCES).length >= 37, `TOPIC_RESOURCES contains comprehensive curriculum + OSINT tracks (Found: ${Object.keys(TOPIC_RESOURCES).length})`);
+
+// [SUITE 10] Authentication Privacy & Vercel Configuration Verification
+console.log('\n\x1b[36m[SUITE 10] Auth Privacy Hardening & Vercel Configuration\x1b[0m');
+const loginPageContent = fs.readFileSync(path.resolve('src/components/auth/LoginPage.jsx'), 'utf-8');
+
+// Verify username keystroke leak is completely eliminated
+assert(!loginPageContent.includes('https://api.github.com/users/'), 'LoginPage eliminates unsolicited GitHub API keystroke leakage');
+
+// Verify preset buttons and exposed credentials are removed
+assert(!loginPageContent.includes('PRESET_OPERATIVES'), 'LoginPage does not expose PRESET_OPERATIVES credential list');
+assert(!loginPageContent.includes("useState('root@nextboxis')"), 'LoginPage username input starts empty (no preset prefill)');
+assert(!loginPageContent.includes("useState('shadowprotocol2026')"), 'LoginPage password input starts empty (no preset password)');
+
+// Verify password masking defaults to false
+assert(loginPageContent.includes('const [showPassword, setShowPassword] = useState(false);'), 'Password input defaults strictly to masked (showPassword: false)');
+
+// Verify vercel.json configuration
+const vercelContent = JSON.parse(fs.readFileSync(path.resolve('vercel.json'), 'utf-8'));
+assert(vercelContent.version === 2, 'vercel.json specifies valid Vercel v2 schema');
+assert(Array.isArray(vercelContent.rewrites) && vercelContent.rewrites.length >= 6, `vercel.json contains API rewrites (Found: ${vercelContent.rewrites?.length})`);
+
+const hasSpaGuard = vercelContent.rewrites.some(r => r.source && r.source.includes('?!api/'));
+assert(hasSpaGuard, 'vercel.json SPA fallback correctly guards /api routes from being swallowed by /index.html');
 
 // Summary
 console.log('\n======================================================');

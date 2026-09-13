@@ -1,48 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
-const PRESET_OPERATIVES = [
-    {
-        id: 'usr_root_001',
-        title: 'Root Architect',
-        username: 'root@nextboxis',
-        password: 'shadowprotocol2026',
-        clearance: 'Level 5 • TOP SECRET',
-        role: 'Lead Architect',
-        icon: '🛡️',
-        badgeColor: '#c084fc'
-    },
-    {
-        id: 'usr_red_002',
-        title: 'Red Team Infiltrator',
-        username: 'Ghost_RedTeam',
-        password: 'redteam2026',
-        clearance: 'Level 4 • SECRET',
-        role: 'Offensive Specialist',
-        icon: '⚡',
-        badgeColor: '#f87171'
-    },
-    {
-        id: 'usr_soc_003',
-        title: 'SOC Blue Defender',
-        username: 'Sentinel_SOC',
-        password: 'soc2026',
-        clearance: 'Level 4 • SECRET',
-        role: 'Defense Analyst',
-        icon: '👁️',
-        badgeColor: '#38bdf8'
-    }
-];
-
-const HUD_LOG_ENTRIES = [
-    { time: '00:01:04', tag: 'SYS_AUTH', msg: 'Kernel integrity verified. Hash: 0x9f82c7...OK' },
-    { time: '00:01:12', tag: 'TLS_1.3', msg: 'Cipher: TLS_AES_256_GCM_SHA384 active.' },
-    { time: '00:01:19', tag: 'CRYPTO', msg: 'Post-Quantum Lattice KEM initialized.' },
-    { time: '00:01:28', tag: 'NET_SURV', msg: 'Perimeter scanning: 0 intrusive probes detected.' },
-    { time: '00:01:35', tag: 'DB_STORE', msg: 'Persistent JSON database mounted at /database.' },
-    { time: '00:01:42', tag: 'DEFENSE', msg: 'EDR telemetry feed synchronized across 118 labs.' }
-];
-
 function getPasswordStrength(pwd) {
     if (!pwd) return { score: 0, label: 'NONE', color: '#6b7280', percent: 0 };
     let score = 0;
@@ -66,59 +24,44 @@ function getPasswordStrength(pwd) {
 export default function LoginPage() {
     const { login, loginUser, registerUser, resetUserPassword, playChime } = useAuth();
     const [mode, setMode] = useState('signin'); // 'signin', 'signup', or 'forgot'
-    const [username, setUsername] = useState('root@nextboxis');
-    const [password, setPassword] = useState('shadowprotocol2026');
+    
+    // Clean, empty default inputs (no hardcoded presets or exposed IDs)
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [domain, setDomain] = useState('full');
+    
+    // Password visibility defaults strictly to false (masked)
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    
     const [authError, setAuthError] = useState('');
     const [authSuccess, setAuthSuccess] = useState('');
     const [isBooting, setIsBooting] = useState(false);
     const [bootStep, setBootStep] = useState('');
-    const [ghPreview, setGhPreview] = useState(null);
-    const [activePreset, setActivePreset] = useState('usr_root_001');
 
-    // Live GitHub user lookup preview
+    // Dynamic date and real-time live clock (no hardcoded dates)
+    const [liveTime, setLiveTime] = useState(() => new Date().toTimeString().slice(0, 8));
+    const [todayIso, setTodayIso] = useState(() => new Date().toISOString().slice(0, 10));
+
     useEffect(() => {
-        const clean = username.trim();
-        if (!clean || clean.length < 2 || clean.includes('@')) {
-            setGhPreview(null);
-            return;
-        }
-
-        const timer = setTimeout(async () => {
-            try {
-                const res = await fetch(`https://api.github.com/users/${encodeURIComponent(clean)}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setGhPreview({
-                        avatar: data.avatar_url,
-                        name: data.name || data.login,
-                        bio: data.bio,
-                        repos: data.public_repos
-                    });
-                } else {
-                    setGhPreview(null);
-                }
-            } catch (e) {
-                setGhPreview(null);
-            }
-        }, 400);
-
-        return () => clearTimeout(timer);
-    }, [username]);
+        const timer = setInterval(() => {
+            const now = new Date();
+            setLiveTime(now.toTimeString().slice(0, 8));
+            setTodayIso(now.toISOString().slice(0, 10));
+        }, 1000);
+        return () => clearInterval(timer);
+    }, []);
 
     const pwdStrength = getPasswordStrength(password);
 
-    const handleSelectPreset = (preset) => {
-        setActivePreset(preset.id);
-        setUsername(preset.username);
-        setPassword(preset.password);
-        setAuthError('');
-        setAuthSuccess('');
-        playChime();
-    };
+    const hudLogEntries = [
+        { time: liveTime, tag: 'SYS_AUTH', msg: 'Kernel integrity verified. TLS 1.3 active.' },
+        { time: liveTime, tag: 'CRYPTO', msg: 'Post-Quantum Lattice KEM initialized.' },
+        { time: liveTime, tag: 'NET_SURV', msg: 'Perimeter scanning: 0 intrusive probes detected.' },
+        { time: liveTime, tag: 'DB_STORE', msg: 'Persistent database mounted & secured.' },
+        { time: liveTime, tag: 'DEFENSE', msg: 'EDR telemetry feed synchronized across 118 labs.' }
+    ];
 
     const startBootSequence = (onComplete) => {
         setIsBooting(true);
@@ -146,8 +89,14 @@ export default function LoginPage() {
         setAuthError('');
         setAuthSuccess('');
 
+        const cleanUser = username.trim();
+        if (!cleanUser) {
+            setAuthError('Please enter a valid operative callsign or username.');
+            return;
+        }
+
         if (mode === 'signin') {
-            const res = loginUser({ username, password, autoAuth: false });
+            const res = loginUser({ username: cleanUser, password, autoAuth: false });
             if (res.success) {
                 startBootSequence(() => {
                     login(res.profileId);
@@ -159,7 +108,7 @@ export default function LoginPage() {
         } else if (mode === 'signup') {
             // Sign Up / Register
             if (!password || password.length < 4) {
-                setAuthError('Password must be at least 4 characters.');
+                setAuthError('Passphrase must be at least 4 characters.');
                 return;
             }
 
@@ -169,7 +118,7 @@ export default function LoginPage() {
             }
 
             const res = await registerUser({
-                username,
+                username: cleanUser,
                 password,
                 domain,
                 clearance: 'Level 2 • RESTRICTED',
@@ -191,7 +140,7 @@ export default function LoginPage() {
         } else if (mode === 'forgot') {
             // Reset / Update Password
             if (!password || password.length < 4) {
-                setAuthError('New password must be at least 4 characters.');
+                setAuthError('New passphrase must be at least 4 characters.');
                 return;
             }
             if (password !== confirmPassword) {
@@ -199,7 +148,7 @@ export default function LoginPage() {
                 return;
             }
 
-            const res = resetUserPassword({ username, newPassword: password });
+            const res = resetUserPassword({ username: cleanUser, newPassword: password });
             if (res.success) {
                 setAuthSuccess('Passphrase updated successfully in registry! Launching workstation...');
                 playChime();
@@ -238,10 +187,12 @@ export default function LoginPage() {
                         </div>
                     ) : (
                         <div className="split-form-content">
-                            {/* Header Security Status Pill */}
+                            {/* Header Security Status Pill with Live Date */}
                             <div className="auth-system-badge mb-15">
                                 <span className="auth-status-dot"></span>
-                                <span className="auth-status-text">AUTH_DAEMON v3.2.0 • TLS 1.3 • DEFCON 1</span>
+                                <span className="auth-status-text">
+                                    AUTH_DAEMON v3.2.0 • TLS 1.3 • {todayIso}
+                                </span>
                             </div>
 
                             {/* Mode Segmented Tab Switcher */}
@@ -277,50 +228,15 @@ export default function LoginPage() {
                                 <h1 className="split-form-title" style={{ margin: 0, fontSize: '1.85rem' }}>
                                     {mode === 'signin' ? 'Operative Sign In' : mode === 'signup' ? 'Provision Identity' : 'Reset Passphrase'}
                                 </h1>
-                                {ghPreview && (
-                                    <div className="github-user-preview-chip">
-                                        <img src={ghPreview.avatar} alt="github" className="github-preview-avatar" />
-                                        <span className="github-preview-name">{ghPreview.name}</span>
-                                    </div>
-                                )}
                             </div>
 
                             <p style={{ color: 'var(--text-muted)', fontSize: '0.84rem', margin: '0 0 16px 0' }}>
                                 {mode === 'signin' 
                                     ? 'Authenticate credentials to unlock terminal clearance and active cyber labs.' 
                                     : mode === 'signup'
-                                    ? 'Create an operative dossier with your GitHub handle or callsign.'
+                                    ? 'Create an operative dossier with your secure callsign.'
                                     : 'Verify callsign and provision a replacement encryption passphrase.'}
                             </p>
-
-                            {/* Quick Deploy Operative Cards (In Sign-in mode) */}
-                            {mode === 'signin' && (
-                                <div className="quick-deploy-section mb-15">
-                                    <div className="quick-deploy-header">
-                                        <span className="quick-deploy-label">QUICK DEPLOY PRESET OPERATIVES:</span>
-                                    </div>
-                                    <div className="quick-deploy-grid">
-                                        {PRESET_OPERATIVES.map(p => (
-                                            <button
-                                                key={p.id}
-                                                type="button"
-                                                className={`quick-deploy-card ${activePreset === p.id && username === p.username ? 'active' : ''}`}
-                                                onClick={() => handleSelectPreset(p)}
-                                                title={`Click to load ${p.title} credentials`}
-                                            >
-                                                <div className="quick-deploy-card-top">
-                                                    <span className="quick-deploy-icon">{p.icon}</span>
-                                                    <span className="quick-deploy-badge" style={{ color: p.badgeColor, borderColor: p.badgeColor }}>
-                                                        {p.role}
-                                                    </span>
-                                                </div>
-                                                <span className="quick-deploy-name">{p.title}</span>
-                                                <span className="quick-deploy-user">{p.username}</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
 
                             {/* Error & Success Feedback Banners */}
                             {authError && (
@@ -348,14 +264,14 @@ export default function LoginPage() {
                                     <input
                                         type="text"
                                         className="pill-input-field"
-                                        placeholder="Callsign / GitHub Username"
+                                        placeholder="Operative Callsign / Username"
                                         value={username}
                                         onChange={(e) => { 
                                             setUsername(e.target.value); 
-                                            setActivePreset(null);
                                             setAuthError(''); 
                                             setAuthSuccess(''); 
                                         }}
+                                        autoComplete="username"
                                         required
                                     />
                                 </div>
@@ -383,7 +299,7 @@ export default function LoginPage() {
                                     </div>
                                 )}
 
-                                {/* Password Input with Show/Hide Toggle */}
+                                {/* Password Input with Show/Hide Toggle (Default: Masked) */}
                                 <div className="pill-input-group">
                                     <div className="pill-input-icon">
                                         <svg viewBox="0 0 24 24">
@@ -393,13 +309,14 @@ export default function LoginPage() {
                                     <input
                                         type={showPassword ? 'text' : 'password'}
                                         className="pill-input-field"
-                                        placeholder={mode === 'forgot' ? 'New Passphrase (min 4 chars)' : 'Encryption Passphrase'}
+                                        placeholder={mode === 'forgot' ? 'New Passphrase (min 4 chars)' : 'Secret Passphrase'}
                                         value={password}
                                         onChange={(e) => { 
                                             setPassword(e.target.value); 
                                             setAuthError(''); 
                                             setAuthSuccess(''); 
                                         }}
+                                        autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
                                         required
                                     />
                                     <button
@@ -451,6 +368,7 @@ export default function LoginPage() {
                                                 setAuthError(''); 
                                                 setAuthSuccess(''); 
                                             }}
+                                            autoComplete="new-password"
                                             required
                                         />
                                         <button
@@ -541,11 +459,11 @@ export default function LoginPage() {
                 <div className="split-art-panel cyber-tactical-hud">
                     <div className="hud-overlay-grid"></div>
 
-                    {/* Top HUD Telemetry Bar */}
+                    {/* Top HUD Telemetry Bar with Real Live Date & Clock */}
                     <div className="hud-top-telemetry">
                         <div className="hud-brand-tag">
                             <span className="hud-brand-glow">E-HACKER</span>
-                            <span className="hud-brand-sub">TACTICAL C2 HUD</span>
+                            <span className="hud-brand-sub">TACTICAL C2 // {todayIso} {liveTime} UTC</span>
                         </div>
                         <div className="hud-defcon-badge">
                             DEFCON 1 // ARMED
@@ -593,14 +511,14 @@ export default function LoginPage() {
                         </div>
                     </div>
 
-                    {/* Live Scrolling Terminal Telemetry Logs */}
+                    {/* Live Scrolling Terminal Telemetry Logs with Dynamic Time */}
                     <div className="hud-terminal-feed">
                         <div className="hud-terminal-header">
                             <span className="hud-terminal-dot"></span>
                             <span className="hud-terminal-title">LIVE C2 TELEMETRY STREAM</span>
                         </div>
                         <div className="hud-terminal-logs">
-                            {HUD_LOG_ENTRIES.map((log, i) => (
+                            {hudLogEntries.map((log, i) => (
                                 <div key={i} className="hud-log-line">
                                     <span className="hud-log-time">[{log.time}]</span>
                                     <span className="hud-log-tag">{log.tag}:</span>
