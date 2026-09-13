@@ -8,75 +8,75 @@ export const THEMES = [
     { id: 'tokyo', name: 'Tokyo Sunset', primary: '#f43f5e', secondary: '#f59e0b', tag: 'STEALTH', bg: '#0d0614' }
 ];
 
-const DEFAULT_PROFILES = [
+export const DEFAULT_PROFILES = [
     {
-        id: 'prof_root',
+        id: 'usr_root_001',
         callsign: 'root@nextboxis',
         clearance: 'Level 5 • TOP SECRET',
         domain: 'full',
         avatar: '01',
         githubAvatar: null,
         bio: 'Knowledge is free. We are anonymous. Security is an illusion.',
-        created_at: '2026-08-22',
+        created_at: '2026-09-13',
         apiKey: 'ehk_live_sec_root9482x',
-        xp: 350,
-        level: 3,
-        completedProjects: [1, 2, 3],
-        checkedSkills: ['sec-fund', 'linux-cli'],
+        xp: 0,
+        level: 1,
+        completedProjects: [],
+        checkedSkills: [],
         notes: {}
     },
     {
-        id: 'prof_redteam',
+        id: 'usr_red_002',
         callsign: 'Ghost_RedTeam',
         clearance: 'Level 4 • SECRET',
         domain: 'web',
         avatar: '02',
         githubAvatar: null,
         bio: 'Offensive Security Specialist & External Penetration Tester',
-        created_at: '2026-08-22',
+        created_at: '2026-09-13',
         apiKey: 'ehk_live_sec_ghost2819y',
-        xp: 150,
-        level: 2,
-        completedProjects: [1, 2],
-        checkedSkills: ['sec-fund'],
+        xp: 0,
+        level: 1,
+        completedProjects: [],
+        checkedSkills: [],
         notes: {}
     },
     {
-        id: 'prof_soc',
+        id: 'usr_soc_003',
         callsign: 'Sentinel_SOC',
         clearance: 'Level 4 • SECRET',
         domain: 'soc',
         avatar: '03',
         githubAvatar: null,
         bio: 'Blue Team Threat Hunter & SIEM Detection Engineer',
-        created_at: '2026-08-22',
+        created_at: '2026-09-13',
         apiKey: 'ehk_live_sec_soc8392z',
-        xp: 220,
-        level: 2,
-        completedProjects: [3, 4],
-        checkedSkills: ['wireshark-audit'],
+        xp: 0,
+        level: 1,
+        completedProjects: [],
+        checkedSkills: [],
         notes: {}
     }
 ];
 
-const DEFAULT_ACCOUNTS = [
+export const DEFAULT_ACCOUNTS = [
     {
         username: 'root@nextboxis',
         password: 'shadowprotocol2026',
-        profileId: 'prof_root',
-        createdAt: '2026-08-22'
+        profileId: 'usr_root_001',
+        createdAt: '2026-09-13'
     },
     {
         username: 'Ghost_RedTeam',
         password: 'redteam2026',
-        profileId: 'prof_redteam',
-        createdAt: '2026-08-22'
+        profileId: 'usr_red_002',
+        createdAt: '2026-09-13'
     },
     {
         username: 'Sentinel_SOC',
         password: 'soc2026',
-        profileId: 'prof_soc',
-        createdAt: '2026-08-22'
+        profileId: 'usr_soc_003',
+        createdAt: '2026-09-13'
     }
 ];
 
@@ -106,7 +106,7 @@ export function AuthProvider({ children }) {
     });
 
     const [activeProfileId, setActiveProfileId] = useState(() => {
-        return localStorage.getItem('roadmap-active-profile-id') || 'prof_root';
+        return localStorage.getItem('roadmap-active-profile-id') || 'usr_root_001';
     });
 
     const [activeTab, setActiveTab] = useState('overview');
@@ -240,7 +240,7 @@ export function AuthProvider({ children }) {
             // Network fallback
         }
 
-        const newProfileId = 'prof_' + Math.random().toString(36).substring(2, 8);
+        const newProfileId = 'usr_' + Math.random().toString(36).substring(2, 8);
         const newProf = {
             id: newProfileId,
             callsign: cleanUser,
@@ -332,7 +332,7 @@ export function AuthProvider({ children }) {
 
     const createProfile = (profData) => {
         const newProf = {
-            id: 'prof_' + Math.random().toString(36).substring(2, 8),
+            id: 'usr_' + Math.random().toString(36).substring(2, 8),
             callsign: profData.callsign || 'Operative',
             clearance: profData.clearance || 'Level 1 • UNCLASSIFIED',
             domain: profData.domain || 'full',
@@ -407,6 +407,37 @@ export function AuthProvider({ children }) {
         playChime();
     };
 
+    // Global reset of all operative IDs and database storage
+    const resetAllUserIdsAndDatabase = async () => {
+        // Reset in-memory states
+        setUserAccounts(DEFAULT_ACCOUNTS);
+        setAllProfiles(DEFAULT_PROFILES);
+        setActiveProfileId('usr_root_001');
+        setActiveDomain('full');
+
+        // Reset client storage
+        localStorage.setItem('roadmap-multi-profiles', JSON.stringify(DEFAULT_PROFILES));
+        localStorage.setItem('ehacker-user-accounts', JSON.stringify(DEFAULT_ACCOUNTS));
+        localStorage.setItem('roadmap-active-profile-id', 'usr_root_001');
+        localStorage.removeItem('ehacker_db_targets');
+        localStorage.removeItem('ehacker_db_findings');
+        localStorage.removeItem('ehacker_db_fieldnotes');
+
+        // Reset serverless persistent JSON database
+        try {
+            await fetch('/api/db', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'reset_all' })
+            });
+        } catch (err) {
+            console.warn('Backend database reset network note:', err.message);
+        }
+
+        playChime();
+        return { success: true, activeProfileId: 'usr_root_001' };
+    };
+
     // Keyboard Shortcuts (Ctrl+K, Esc)
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -433,6 +464,7 @@ export function AuthProvider({ children }) {
             loginUser,
             registerUser,
             resetUserPassword,
+            resetAllUserIdsAndDatabase,
             userAccounts,
             activeProfile,
             allProfiles,

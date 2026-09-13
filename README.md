@@ -108,18 +108,27 @@ npm install
 npm run dev
 ```
 
-### 3. Automated Cyber Test Suite
+### 3. Database Initialization & ID Reset
 ```bash
-node scratch/test_cyber_suite.mjs
+# Initialize persistent security database
+npm run db:init
+
+# Reset all operative user IDs (usr_root_001, etc.) and rebuild schema
+npm run db:reset
 ```
 
-### 4. Production Build
+### 4. Automated Cyber Test Suite
+```bash
+npm test
+```
+
+### 5. Production Build
 ```bash
 npm run build
 npm run preview
 ```
 
-### 5. Deploy to Vercel
+### 6. Deploy to Vercel
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fnextboxis%2FE-hacker)
 
 ---

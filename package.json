@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node scratch/test_cyber_suite.mjs"
+    "test": "node scratch/test_cyber_suite.mjs",
+    "db:init": "node scripts/init_database.js",
+    "db:reset": "node scripts/init_database.js --reset"
   },
   "dependencies": {
     "lucide-react": "^0.475.0",

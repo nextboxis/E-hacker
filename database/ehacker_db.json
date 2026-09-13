@@ -1,0 +1,181 @@
+{
+  "version": "3.0.0",
+  "database_name": "ehacker_sec_db",
+  "created_at": "2026-09-13T07:35:01.434Z",
+  "last_synced": "2026-09-13T07:35:01.434Z",
+  "users": [
+    {
+      "id": "usr_root_001",
+      "username": "root@nextboxis",
+      "password": "shadowprotocol2026",
+      "role": "Lead Architect",
+      "status": "active",
+      "created_at": "2026-09-13T00:00:00.000Z"
+    },
+    {
+      "id": "usr_red_002",
+      "username": "Ghost_RedTeam",
+      "password": "redteam2026",
+      "role": "Offensive Specialist",
+      "status": "active",
+      "created_at": "2026-09-13T00:00:00.000Z"
+    },
+    {
+      "id": "usr_soc_003",
+      "username": "Sentinel_SOC",
+      "password": "soc2026",
+      "role": "Defense Analyst",
+      "status": "active",
+      "created_at": "2026-09-13T00:00:00.000Z"
+    }
+  ],
+  "profiles": [
+    {
+      "id": "usr_root_001",
+      "user_id": "usr_root_001",
+      "callsign": "root@nextboxis",
+      "clearance": "Level 5 • TOP SECRET",
+      "domain": "full",
+      "avatar": "01",
+      "githubAvatar": null,
+      "bio": "Knowledge is free. We are anonymous. Security is an illusion.",
+      "apiKey": "ehk_live_sec_root9482x",
+      "xp": 0,
+      "level": 1,
+      "completedProjects": [],
+      "checkedSkills": [],
+      "notes": {},
+      "created_at": "2026-09-13"
+    },
+    {
+      "id": "usr_red_002",
+      "user_id": "usr_red_002",
+      "callsign": "Ghost_RedTeam",
+      "clearance": "Level 4 • SECRET",
+      "domain": "web",
+      "avatar": "02",
+      "githubAvatar": null,
+      "bio": "Offensive Security Specialist & External Penetration Tester",
+      "apiKey": "ehk_live_sec_ghost2819y",
+      "xp": 0,
+      "level": 1,
+      "completedProjects": [],
+      "checkedSkills": [],
+      "notes": {},
+      "created_at": "2026-09-13"
+    },
+    {
+      "id": "usr_soc_003",
+      "user_id": "usr_soc_003",
+      "callsign": "Sentinel_SOC",
+      "clearance": "Level 4 • SECRET",
+      "domain": "soc",
+      "avatar": "03",
+      "githubAvatar": null,
+      "bio": "Blue Team Threat Hunter & SIEM Detection Engineer",
+      "apiKey": "ehk_live_sec_soc8392z",
+      "xp": 0,
+      "level": 1,
+      "completedProjects": [],
+      "checkedSkills": [],
+      "notes": {},
+      "created_at": "2026-09-13"
+    }
+  ],
+  "targets": [
+    {
+      "id": "tgt_001",
+      "host": "10.10.11.241",
+      "name": "Internal Domain Controller (DC01.CORP.LOCAL)",
+      "scope": "In-Scope",
+      "ports": "53, 88, 135, 389, 445, 636, 3268",
+      "os": "Windows Server 2022",
+      "notes": "Vulnerable to Kerberoasting on svc_backup account. SMB signing is disabled.",
+      "severity": "CRITICAL",
+      "status": "Active Audit",
+      "created_at": "2026-09-13T00:00:00.000Z"
+    },
+    {
+      "id": "tgt_002",
+      "host": "https://api-staging.target.internal",
+      "name": "Staging API Gateway (Node.js/Express)",
+      "scope": "In-Scope",
+      "ports": "80, 443, 8443",
+      "os": "Ubuntu Linux 22.04 LTS",
+      "notes": "JWT none algorithm bypass confirmed on /auth/v1/refresh. CORS origin reflected.",
+      "severity": "HIGH",
+      "status": "Exploited",
+      "created_at": "2026-09-13T00:00:00.000Z"
+    },
+    {
+      "id": "tgt_003",
+      "host": "192.168.1.1",
+      "name": "Edge Gateway Firewall (pfSense)",
+      "scope": "Out-of-Scope",
+      "ports": "22, 443",
+      "os": "FreeBSD / pfSense",
+      "notes": "Production infrastructure - Do NOT disrupt or flood.",
+      "severity": "INFO",
+      "status": "Passive Recon Only",
+      "created_at": "2026-09-13T00:00:00.000Z"
+    }
+  ],
+  "findings": [
+    {
+      "id": "vuln_001",
+      "title": "Kerberoasting Service Account Ticket Extraction",
+      "target": "DC01.CORP.LOCAL (10.10.11.241)",
+      "severity": "CRITICAL",
+      "cvss": 9.1,
+      "status": "Open",
+      "poc": "GetUserSPNs.py corp.local/jdoe:Password123 -request -dc-ip 10.10.11.241",
+      "remediation": "Enforce AES-256 Kerberos encryption and set complex 25+ character passwords on all SPN accounts.",
+      "created_at": "2026-09-13T00:00:00.000Z"
+    },
+    {
+      "id": "vuln_002",
+      "title": "Authentication Bypass via Insecure JWT Header",
+      "target": "api-staging.target.internal",
+      "severity": "HIGH",
+      "cvss": 8.4,
+      "status": "Triaged",
+      "poc": "{\\n  \"alg\": \"none\",\\n  \"typ\": \"JWT\"\\n}.{\"sub\":\"admin\",\"role\":\"root\"}.",
+      "remediation": "Reject unsigned tokens with algorithm 'none' and enforce strict HMAC-SHA256 signature verification.",
+      "created_at": "2026-09-13T00:00:00.000Z"
+    }
+  ],
+  "field_notes": "# Operative Engagement Field Notes\\n- **Target Network**: 10.10.11.0/24\\n- **Primary Objective**: Active Directory Domain Dominance & Sensitive Data Identification\\n- **Key Pivots**:\\n  1. Compromised initial access via web portal SQLi.\\n  2. Dumped NTLM hashes from memory.\\n  3. Escalated to Domain Admin using DCSync abuse.",
+  "audit_logs": [
+    {
+      "id": "log_g36sp4j",
+      "user_id": "usr_root_001",
+      "action": "STATE_SNAPSHOT_SYNCED",
+      "details": {
+        "targets": 1,
+        "findings": 1
+      },
+      "timestamp": "2026-09-13T07:35:01.431Z"
+    },
+    {
+      "id": "log_init_001",
+      "user_id": "usr_root_001",
+      "action": "DATABASE_INITIALIZED",
+      "details": {
+        "message": "All user IDs reset to clean standardized format. Database created and seeded.",
+        "users_count": 3,
+        "targets_count": 3,
+        "findings_count": 2
+      },
+      "timestamp": "2026-09-13T07:34:39.359Z"
+    },
+    {
+      "id": "log_a2eapme",
+      "user_id": "usr_root_001",
+      "action": "USER_IDS_RESET_AND_DATABASE_REBUILT",
+      "details": {
+        "message": "All user IDs reset to usr_root_001, usr_red_002, usr_soc_003. Schema re-seeded."
+      },
+      "timestamp": "2026-09-13T07:35:01.434Z"
+    }
+  ]
+}

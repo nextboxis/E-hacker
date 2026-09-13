@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const DEFAULT_TARGETS = [
     {
-        id: 'tgt_1',
+        id: 'tgt_001',
         host: '10.10.11.241',
         name: 'Internal Domain Controller (DC01.CORP.LOCAL)',
         scope: 'In-Scope',
@@ -14,7 +14,7 @@ const DEFAULT_TARGETS = [
         status: 'Active Audit'
     },
     {
-        id: 'tgt_2',
+        id: 'tgt_002',
         host: 'https://api-staging.target.internal',
         name: 'Staging API Gateway (Node.js/Express)',
         scope: 'In-Scope',
@@ -25,7 +25,7 @@ const DEFAULT_TARGETS = [
         status: 'Exploited'
     },
     {
-        id: 'tgt_3',
+        id: 'tgt_003',
         host: '192.168.1.1',
         name: 'Edge Gateway Firewall (pfSense)',
         scope: 'Out-of-Scope',
@@ -39,7 +39,7 @@ const DEFAULT_TARGETS = [
 
 const DEFAULT_FINDINGS = [
     {
-        id: 'vuln_1',
+        id: 'vuln_001',
         title: 'Kerberoasting Service Account Ticket Extraction',
         target: 'DC01.CORP.LOCAL (10.10.11.241)',
         severity: 'CRITICAL',
@@ -49,7 +49,7 @@ const DEFAULT_FINDINGS = [
         remediation: 'Enforce AES-256 Kerberos encryption and set complex 25+ character passwords on all SPN accounts.'
     },
     {
-        id: 'vuln_2',
+        id: 'vuln_002',
         title: 'Authentication Bypass via Insecure JWT Header',
         target: 'api-staging.target.internal',
         severity: 'HIGH',
@@ -97,7 +97,7 @@ const BLOODHOUND_EDGES = [
 ];
 
 export default function DatabaseTab() {
-    const { playChime } = useAuth();
+    const { playChime, resetAllUserIdsAndDatabase } = useAuth();
     const [subTab, setSubTab] = useState('targets');
     const [search, setSearch] = useState('');
     const [graphType, setGraphType] = useState('network'); // 'network' or 'bloodhound'
@@ -189,6 +189,30 @@ export default function DatabaseTab() {
     const [sqlResult, setSqlResult] = useState(null);
     const [importJsonText, setImportJsonText] = useState('');
     const [syncMessage, setSyncMessage] = useState(null);
+    const [dbTelemetry, setDbTelemetry] = useState({
+        users: 3,
+        targets: 3,
+        findings: 2,
+        audit_logs: 1,
+        engine: 'ehacker_persistent_json_db'
+    });
+
+    useEffect(() => {
+        let mounted = true;
+        fetch('/api/db')
+            .then(res => res.json())
+            .then(data => {
+                if (mounted && data?.tables) {
+                    setDbTelemetry(prev => ({
+                        ...prev,
+                        ...data.tables,
+                        engine: data.engine || prev.engine
+                    }));
+                }
+            })
+            .catch(() => {});
+        return () => { mounted = false; };
+    }, []);
 
     const testDbConnection = async () => {
         setDbStatus('testing');
@@ -201,9 +225,16 @@ export default function DatabaseTab() {
                 const lat = Math.round(performance.now() - startTime) + 'ms';
                 setDbStatus('connected');
                 setDbLatency(lat);
+                if (data.tables) {
+                    setDbTelemetry(prev => ({
+                        ...prev,
+                        ...data.tables,
+                        engine: data.engine || prev.engine
+                    }));
+                }
                 setSyncMessage({
                     type: 'success',
-                    text: `Live Serverless DB Endpoint Verified: ${data.engine || dbType.toUpperCase()} (${lat}, ${data.tls || 'TLS 1.3 Active'}).`
+                    text: `Live Serverless DB Endpoint Verified: ${data.engine || dbType.toUpperCase()} (${lat}, ${data.tls || 'TLS 1.3 Active'}). Tables: ${data.tables?.users || 3} Users, ${data.tables?.targets || 3} Targets, ${data.tables?.findings || 2} Findings.`
                 });
                 setTimeout(() => setSyncMessage(null), 5000);
                 return;
@@ -341,6 +372,28 @@ export default function DatabaseTab() {
         setSyncMessage({ type: 'success', text: 'Database restored to initial production seed data.' });
         playChime();
         setTimeout(() => setSyncMessage(null), 4000);
+    };
+
+    const handleFullReset = async () => {
+        if (window.confirm('Reset all Operative User IDs (usr_root_001, usr_red_002, usr_soc_003) and rebuild the persistent database?')) {
+            await resetAllUserIdsAndDatabase();
+            setTargets(DEFAULT_TARGETS);
+            setFindings(DEFAULT_FINDINGS);
+            try {
+                const res = await fetch('/api/db');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.tables) {
+                        setDbTelemetry(prev => ({ ...prev, ...data.tables, engine: data.engine || prev.engine }));
+                    }
+                }
+            } catch (e) {}
+            setSyncMessage({
+                type: 'success',
+                text: 'System Rebuilt: All operative user IDs reset (usr_root_001, usr_red_002, usr_soc_003) and database re-seeded.'
+            });
+            setTimeout(() => setSyncMessage(null), 5000);
+        }
     };
 
     const handleSaveTarget = (e) => {
@@ -845,6 +898,14 @@ export default function DatabaseTab() {
                             <button className="site-btn tool-btn secondary-btn" onClick={handleResetDefaults}>
                                 Reset Seed Data
                             </button>
+                            <button
+                                className="site-btn tool-btn"
+                                style={{ background: 'rgba(239, 68, 68, 0.2)', borderColor: '#ef4444', color: '#fca5a5' }}
+                                onClick={handleFullReset}
+                                title="Reset all operative user IDs to usr_root_001, etc. and rebuild persistent database"
+                            >
+                                ⚡ Reset All User IDs & Rebuild DB
+                            </button>
                         </div>
                     </div>
 
@@ -866,7 +927,16 @@ export default function DatabaseTab() {
 
                     {/* Connection Config Box */}
                     <div className="glass-card mb-20" style={{ margin: 0, padding: '16px', background: 'rgba(0, 0, 0, 0.35)' }}>
-                        <span className="projects-badge-tag mb-10">SERVERLESS DATABASE CONNECTION</span>
+                        <div className="flex-space-between-center flex-wrap gap-8 mb-10">
+                            <span className="projects-badge-tag">SERVERLESS PERSISTENT DATABASE</span>
+                            <div className="flex-gap-8 flex-wrap">
+                                <span className="projects-badge-tag" style={{ fontSize: '0.72rem', borderColor: '#38bdf8', color: '#38bdf8' }}>Users: {dbTelemetry.users}</span>
+                                <span className="projects-badge-tag" style={{ fontSize: '0.72rem', borderColor: '#38bdf8', color: '#38bdf8' }}>Targets: {dbTelemetry.targets}</span>
+                                <span className="projects-badge-tag" style={{ fontSize: '0.72rem', borderColor: '#38bdf8', color: '#38bdf8' }}>Findings: {dbTelemetry.findings}</span>
+                                <span className="projects-badge-tag" style={{ fontSize: '0.72rem', borderColor: '#38bdf8', color: '#38bdf8' }}>Audit Logs: {dbTelemetry.audit_logs}</span>
+                                <span className="projects-badge-tag" style={{ fontSize: '0.72rem', borderColor: '#4ade80', color: '#4ade80' }}>Engine: {dbTelemetry.engine}</span>
+                            </div>
+                        </div>
                         <div className="overview-grid mt-10 mb-12" style={{ gridTemplateColumns: '1fr 2.5fr 1fr', gap: '10px' }}>
                             <div>
                                 <label className="tool-input-label">DATABASE PROVIDER:</label>

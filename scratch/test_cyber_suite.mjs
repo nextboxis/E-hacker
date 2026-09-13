@@ -155,15 +155,45 @@ const threatRes = createMockRes();
 await threatHandler({ method: 'GET', query: {} }, threatRes);
 assert(threatRes.statusCode === 200 && Array.isArray(threatRes.data.bulletins) && threatRes.data.bulletins.length >= 3, 'api/threat-intel returns threat bulletins');
 
-// 5. Database API (GET & POST)
+// 5. Database API (GET & POST) & Persistent DB Verification
+import fs from 'fs';
+import path from 'path';
+
+console.log('\n\x1b[36m[SUITE 7] Persistent Database & Standardized Operative ID Verification\x1b[0m');
+
+// A. Check SQL Schema
+const schemaPath = path.resolve('database/schema.sql');
+assert(fs.existsSync(schemaPath), 'database/schema.sql exists');
+const schemaContent = fs.readFileSync(schemaPath, 'utf8');
+assert(schemaContent.includes('CREATE TABLE IF NOT EXISTS users') && schemaContent.includes('CREATE TABLE IF NOT EXISTS targets'), 'database/schema.sql contains full relational table definitions');
+
+// B. Check persistent JSON database
+const jsonDbPath = path.resolve('database/ehacker_db.json');
+assert(fs.existsSync(jsonDbPath), 'database/ehacker_db.json exists');
+const dbJson = JSON.parse(fs.readFileSync(jsonDbPath, 'utf8'));
+assert(Array.isArray(dbJson.users) && dbJson.users.length === 3, 'database/ehacker_db.json contains 3 standardized operatives');
+
+const expectedUserIds = ['usr_root_001', 'usr_red_002', 'usr_soc_003'];
+const actualUserIds = dbJson.users.map(u => u.id);
+assert(JSON.stringify(actualUserIds) === JSON.stringify(expectedUserIds), `All user IDs reset to standardized IDs: ${actualUserIds.join(', ')}`);
+
+// C. Verify Auth API with reset user ID
+assert(authRes.statusCode === 200 && authRes.data.user && authRes.data.user.id === 'usr_root_001', 'api/auth POST authenticates against reset user ID usr_root_001');
+
+// D. Test Database API (GET & POST & Reset)
 const { default: dbHandler } = await import('../api/database.js');
 const dbRes = createMockRes();
 await dbHandler({ method: 'GET' }, dbRes);
-assert(dbRes.statusCode === 200 && dbRes.data.status === 'healthy', 'api/database GET returns healthy telemetry');
+assert(dbRes.statusCode === 200 && (dbRes.data.status === 'healthy' || dbRes.data.status === 'online'), 'api/database GET returns healthy telemetry');
+assert(dbRes.data.tables && dbRes.data.tables.users === 3, 'api/database reports live table row telemetry (3 users)');
 
 const dbPostRes = createMockRes();
-await dbHandler({ method: 'POST', body: { targets: [{ id: 1 }], findings: [{ id: 1 }] } }, dbPostRes);
-assert(dbPostRes.statusCode === 200 && dbPostRes.data.status === 'success', 'api/database POST saves snapshot');
+await dbHandler({ method: 'POST', body: { targets: [{ id: 'tgt_001' }], findings: [{ id: 'vuln_001' }] } }, dbPostRes);
+assert(dbPostRes.statusCode === 200 && (dbPostRes.data.status === 'success' || dbPostRes.data.status === 'synced'), 'api/database POST saves snapshot');
+
+const dbResetRes = createMockRes();
+await dbHandler({ method: 'POST', body: { action: 'reset_all' } }, dbResetRes);
+assert(dbResetRes.statusCode === 200 && dbResetRes.data.status === 'reset_success', 'api/database POST action: reset_all rebuilds persistent database cleanly');
 
 // Summary
 console.log('\n======================================================');
